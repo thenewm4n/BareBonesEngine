@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
 
 	std::string line;
 	std::string firstElement;
-
+	/*
 	while (std::getline(file, line))
 	{
 		std::string shapeText;
@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
 			}
 		}
 	}
-
+	*/
 
 	file.close();
 	
@@ -102,8 +102,8 @@ int main(int argc, char* argv[])
 	ImGui::SFML::Init(window);
 	sf::Clock deltaClock;
 
-	ImGui::GetStyle().ScaleAllSizes(3.5f);		// Scales imgui GUI
-	ImGui::GetIO().FontGlobalScale = 1.3f;		// Scale imgui text size
+	ImGui::GetStyle().ScaleAllSizes(5.0f);	// Scales imgui GUI
+	ImGui::GetIO().FontGlobalScale = 2.0f;		// Scale imgui text size
 
 	float c[3] = { 0.0f, 1.0f, 1.0f };	// imgui requires RGB values as floats from 0-1
 
