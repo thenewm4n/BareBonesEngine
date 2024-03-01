@@ -9,19 +9,27 @@
 #include "imgui.h"
 #include "imgui-SFML.h"
 
-class NewShape()
+class NewShape
 {
 public:
-	sf::Shape shape;
+	std::unique_ptr<sf::Shape> shape;
 	bool draw = true;
 	int velocityX;
 	int velocityY;
 	std::string text;
+
+public:
+	// Constructor needs to take in all parameters
+
+	// NewShape(std::string shapeName)
+	// {
+	//		shape(shapeName);
+	// }
 };
 
 int main(int argc, char* argv[])
 {
-	std::ifstream file(config.txt);
+	std::ifstream file("config.txt");
 	if (!file.is_open())
 	{
 		std::cerr << "Error opening file." << std::endl;
@@ -35,8 +43,8 @@ int main(int argc, char* argv[])
 		exit(-1);
 	}
 
-	// vector of shapes
-	std::vector<std::shared_ptr> shapePointers;
+	// Vector of shapes
+	std::vector<std::unique_ptr<NewShape>> shapes;
 
 	// For window; defaults to these unless changed by file
 	int wWidth = 1920;
@@ -51,27 +59,35 @@ int main(int argc, char* argv[])
 	std::string firstElement;
 	while (std::getline(file, line))
 	{
+		std::string shapeText;
+		float positionX, positionY, velocityX, velocityY, radius, width, height;
+		int red, green, blue;
+
+		// Decomposes line
 		std::istringstream lineStream(line);
 		if (lineStream >> firstElement)
 		{
-			switch (firstElement)
+			if (firstElement == "Window")
 			{
-			case "Window":
 				lineStream >> wWidth >> wHeight;
-				break;
-			case "Font":
-				lineStream >> fontFilename >> textSize >> textColour[0] >> > textColour[1] >> textColour[2];
-				break;
-			case "Rectangle":
-				std::shared_ptr<NewShape> shapePointer = std::make_shared<NewShape>;
-				
-				// Set attributes according to file 
-				//lineStream >> shapeText >> positionX >> positionY >> velocityX >> velocityY >> red >> green >> blue >> width >> height
-			case "Circle":
-				// Instantiate circle shape
+			}
+			else if (firstElement == "Font")
+			{
+				lineStream >> fontFilename >> textSize >> textColour[0] >> textColour[1] >> textColour[2];
+			}
+			else if (firstElement == "Rectangle")
+			{
+				std::unique_ptr<NewShape> shapePointer = std::make_unique<sf::NewShape>(); // parameters go in brackets
 
 				// Set attributes according to file 
-				//lineStream >> shapeText >> positionX >> positionY >> velocityX >> velocityY >> red >> green >> blue >> radius
+				// lineStream >> shapeText >> positionX >> positionY >> velocityX >> velocityY >> red >> green >> blue >> width >> height
+			}
+			else if (firstElement == "Circle")
+			{
+				std::unique_ptr<NewShape> shapePointer = std::make_unique<sf::NewShape>(); // parameters go in brackets
+
+				// Set attributes according to file 
+				// lineStream >> shapeText >> positionX >> positionY >> velocityX >> velocityY >> red >> green >> blue >> radius
 			}
 		}
 	}
@@ -96,10 +112,10 @@ int main(int argc, char* argv[])
 	bool drawCircle = true;
 	bool drawText = true;
 
+	// This will get replaced by dynamic instantiation of objects, I believe
 	sf::CircleShape circle(circleRadius, circleSegments);
 	circle.setPosition(10.0f, 10.0f);
 
-	
 
 	// Text that will be for each shape
 	sf::Text text("Sample Text", myFont, 24);
