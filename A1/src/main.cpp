@@ -12,19 +12,16 @@
 class NewShape
 {
 public:
-	std::unique_ptr<sf::Shape> shape;
-	bool draw = true;
-	int velocityX;
-	int velocityY;
-	std::string text;
+	std::unique_ptr<sf::Shape> m_sprite;
+	bool m_draw = true;
+	std::string m_text;
+	sf::Vector2f m_velocity;
 
 public:
-	// Constructor needs to take in all parameters
-
-	// NewShape(std::string shapeName)
-	// {
-	//		shape(shapeName);
-	// }
+NewShape(std::string text, sf::Vector2f velocity)
+	:	m_text(text), m_velocity(velocity)
+{
+}
 };
 
 int main(int argc, char* argv[])
@@ -60,9 +57,11 @@ int main(int argc, char* argv[])
 
 	while (std::getline(file, line))
 	{
+		// Despite size being exclusive to rectangle and radius to circle, included here for readability
 		std::string shapeText;
-		float positionX, positionY, velocityX, velocityY, radius, width, height;
-		int red, green, blue;
+		sf::Vector2f position, velocity, size;
+		sf::Color colour;
+		float radius;
 
 		// Decomposes line
 		std::istringstream lineStream(line);
@@ -78,21 +77,37 @@ int main(int argc, char* argv[])
 			}
 			else if (firstElement == "Rectangle")
 			{
-				std::unique_ptr<NewShape> shapePointer = std::make_unique<NewShape>(); // parameters go in brackets
-
 				// Set attributes according to file 
-				// lineStream >> shapeText >> positionX >> positionY >> velocityX >> velocityY >> red >> green >> blue >> width >> height
+				lineStream >> shapeText >> position.x >> position.y >> velocity.x >> velocity.y >> colour.r >> colour.g >> colour.b >> size.x >> size.y;
+				
+				// Instantiate pointer to NewShape
+				std::unique_ptr<NewShape> shape = std::make_unique<NewShape>(shapeText, velocity);
+
+				// Instantiate rectangle as the NewShape's sprite
+				shape->m_sprite = std::make_unique<sf::RectangleShape(size)>;
+
+				// Add shape to vector of shape pointers
+				shapes.append(shape);
 			}
 			else if (firstElement == "Circle")
 			{
-				std::unique_ptr<NewShape> shapePointer = std::make_unique<NewShape>(); // parameters go in brackets
+				// Set temporary variables according to file 
+				lineStream >> shapeText >> position.x >> position.y >> velocity.x >> velocity.y >> colour.r >> colour.g >> colour.b >> radius;
+				
+				// Instantiate pointer to NewShape
+				std::unique_ptr<NewShape> shape = std::make_unique<NewShape>(shapeText, velocity);
+				
+				// Instantiate circle as the NewShape's sprite
+				shape->m_sprite = std::make_unique<sf::CircleShape>(radius);
 
-				// Set attributes according to file 
-				// lineStream >> shapeText >> positionX >> positionY >> velocityX >> velocityY >> red >> green >> blue >> radius
+				// Add shape to vector of shape pointers
+				shapes.append(shape);
 			}
+
+			shapes(shapes.size() - 1)->m_sprite->setPosition(position);
+			shapes(shapes.size() - 1)->m_sprite->setColor(colour);
 		}
 	}
-
 
 	file.close();
 	
@@ -109,15 +124,15 @@ int main(int argc, char* argv[])
 
 	float circleRadius = 50.0f;
 	int circleSegments = 32;		// the number of segments to draw the circle with i.e. how detailed?
-	float circleSpeedX = 1.0f;
-	float circleSpeedY = 0.5f;
+	//float circleSpeedX = 1.0f;
+	//float circleSpeedY = 0.5f;
+	sf::Vector2f circleVelocity(1.0f, 0.5f);
 	bool drawCircle = true;
 	bool drawText = true;
 
 	// This will get replaced by dynamic instantiation of objects, I believe
 	sf::CircleShape circle(circleRadius, circleSegments);
 	circle.setPosition(10.0f, 10.0f);
-
 
 	// Text that will be for each shape
 	sf::Text text("Sample Text", myFont, 24);
@@ -147,7 +162,7 @@ int main(int argc, char* argv[])
 				// Examples of changing direction of shape when X is pressed
 				if (event.key.code == sf::Keyboard::X)
 				{
-					circleSpeedX *= -1.0f;
+					circleVelocity.x *= -1.0f;
 				}
 			}
 		}
@@ -181,7 +196,7 @@ int main(int argc, char* argv[])
 		circle.setRadius(circleRadius);
 
 		// Moves the circle, as long as the x and y positions are within from
-		circle.setPosition(circle.getPosition().x + circleSpeedX, circle.getPosition().y + circleSpeedY);
+		circle.setPosition(circle.getPosition().x + circleVelocity.x, circle.getPosition().y + circleVelocity.y);
 
 		window.clear();
 		if (drawCircle)

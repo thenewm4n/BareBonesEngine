@@ -2,7 +2,7 @@
 # To Implement
 
 1. NewShape constructor - using relevant parameters.
-2. Font case.
+2. Is the font shit working?
 
 - Read parameters from config.txt.
 	- Will always be Window and Font line
