@@ -14,30 +14,30 @@ class NewShape
 public:
 	std::unique_ptr<sf::Shape> m_sprite;
 	bool m_draw = true;
-	std::string m_text;
+	std::string m_textString;
+	sf::Text m_text;
 	sf::Vector2f m_velocity;
 
 public:
-NewShape(std::string text, sf::Vector2f velocity)
-	:	m_text(text), m_velocity(velocity)
+	NewShape(std::string text, sf::Vector2f velocity)
+		: m_textString(text), m_velocity(velocity) {}
+
+void move()
 {
+	sf::Vector2f position = m_sprite->getPosition();
+	m_sprite->setPosition(position + m_velocity);
 }
 };
 
+
 int main(int argc, char* argv[])
 {
+	// Reads config file
 	std::ifstream file("config.txt");
 	if (!file.is_open())
 	{
 		std::cerr << "Error opening file." << std::endl;
 		exit(-2);
-	}
-
-	sf::Font myFont;
-	if (!myFont.loadFromFile("fonts/tech.ttf"))
-	{
-		std::cerr << "Could not load font!\n";
-		exit(-1);
 	}
 
 	// Vector of shapes
@@ -47,20 +47,22 @@ int main(int argc, char* argv[])
 	int wWidth = 1920;
 	int wHeight = 1080;
 
-	// For font
-	std::string fontFilename;
+	// For each shape's text
+	sf::Font myFont;
+	std::string fontPath;
 	int textSize;
 	int textColour[3];
 
+	// For reading config file
 	std::string line;
 	std::string firstElement;
-
+	
 	while (std::getline(file, line))
 	{
 		// Despite size being exclusive to rectangle and radius to circle, included here for readability
 		std::string shapeText;
 		sf::Vector2f position, velocity, size;
-		sf::Color colour;
+		int r, g, b;									// Necessary since sf::Color RGB components are Uint8s, so are read by istringstream as chars, not ints
 		float radius;
 
 		// Decomposes line
@@ -73,39 +75,40 @@ int main(int argc, char* argv[])
 			}
 			else if (firstElement == "Font")
 			{
-				lineStream >> fontFilename >> textSize >> textColour[0] >> textColour[1] >> textColour[2];
-			}
-			else if (firstElement == "Rectangle")
-			{
-				// Set attributes according to file 
-				lineStream >> shapeText >> position.x >> position.y >> velocity.x >> velocity.y >> colour.r >> colour.g >> colour.b >> size.x >> size.y;
+				lineStream >> fontPath >> textSize >> textColour[0] >> textColour[1] >> textColour[2];
 				
+				if (!myFont.loadFromFile(fontPath))
+				{
+					std::cerr << "Could not load font!\n";
+					exit(-1);
+				}
+			}
+			else
+			{
+				// Extract common attributes to rectangle and circle
+				lineStream >> shapeText >> position.x >> position.y >> velocity.x >> velocity.y >> r >> g >> b;
+
 				// Instantiate pointer to NewShape
 				std::unique_ptr<NewShape> shape = std::make_unique<NewShape>(shapeText, velocity);
 
-				// Instantiate rectangle as the NewShape's sprite
-				shape->m_sprite = std::make_unique<sf::RectangleShape(size)>;
+				if (firstElement == "Rectangle")
+				{
+					lineStream >> size.x >> size.y;
+					shape->m_sprite = std::make_unique<sf::RectangleShape>(size);
+				}
+				else
+				{
+					lineStream >> radius;
+					shape->m_sprite = std::make_unique<sf::CircleShape>(radius);
+				}
+
+				// Set position and colour of sprite (not possible with constructor)
+				shape->m_sprite->setPosition(position);
+				shape->m_sprite->setFillColor(sf::Color(static_cast<sf::Uint8>(r), static_cast<sf::Uint8>(g), static_cast<sf::Uint8>(b)));
 
 				// Add shape to vector of shape pointers
-				shapes.append(shape);
+				shapes.push_back(std::move(shape));
 			}
-			else if (firstElement == "Circle")
-			{
-				// Set temporary variables according to file 
-				lineStream >> shapeText >> position.x >> position.y >> velocity.x >> velocity.y >> colour.r >> colour.g >> colour.b >> radius;
-				
-				// Instantiate pointer to NewShape
-				std::unique_ptr<NewShape> shape = std::make_unique<NewShape>(shapeText, velocity);
-				
-				// Instantiate circle as the NewShape's sprite
-				shape->m_sprite = std::make_unique<sf::CircleShape>(radius);
-
-				// Add shape to vector of shape pointers
-				shapes.append(shape);
-			}
-
-			shapes(shapes.size() - 1)->m_sprite->setPosition(position);
-			shapes(shapes.size() - 1)->m_sprite->setColor(colour);
 		}
 	}
 
@@ -124,8 +127,6 @@ int main(int argc, char* argv[])
 
 	float circleRadius = 50.0f;
 	int circleSegments = 32;		// the number of segments to draw the circle with i.e. how detailed?
-	//float circleSpeedX = 1.0f;
-	//float circleSpeedY = 0.5f;
 	sf::Vector2f circleVelocity(1.0f, 0.5f);
 	bool drawCircle = true;
 	bool drawText = true;
@@ -136,7 +137,6 @@ int main(int argc, char* argv[])
 
 	// Text that will be for each shape
 	sf::Text text("Sample Text", myFont, 24);
-
 	text.setPosition(0, wHeight - (float)text.getCharacterSize());
 
 	// Array for imgui text
@@ -153,17 +153,6 @@ int main(int argc, char* argv[])
 			if (event.type == sf::Event::Closed)
 			{
 				window.close();
-			}
-
-			if (event.type == sf::Event::KeyPressed)
-			{
-				std::cout << "Key pressed with code = " << event.key.code << "\n";
-
-				// Examples of changing direction of shape when X is pressed
-				if (event.key.code == sf::Keyboard::X)
-				{
-					circleVelocity.x *= -1.0f;
-				}
 			}
 		}
 
@@ -191,6 +180,25 @@ int main(int argc, char* argv[])
 		}
 		ImGui::End();
 
+		// Update logic
+		/*
+		for (auto& shape : shapes)
+		{
+			const sf::FloatRect& rect = shape->m_sprite->getGlobalBounds();
+			if (rect.left < 0 || rect.left + rect.width > wWidth)
+				shape->velocity.x *= -1.0f;
+
+			if (rect.top < 0 || rect.top + rect.height > wHeight)
+				shape->velocity.y *= -1.0f;
+
+			shape->move();
+
+			shape->m_sprite->setFillColour(sf::Color(c[0] * 255, c[1] * 255, c[2] * 255);		// converts from a value 0-1 to 0-255
+			shape->m_sprite->setPointCount(WHAT GOES HERE);
+			shape->m_sprite->setRadius(WHAT GOES HERE);
+		}
+		*/
+
 		circle.setFillColor(sf::Color(c[0] * 255, c[1] * 255, c[2] * 255));		// convert from a value 0-1 to 0-255
 		circle.setPointCount(circleSegments);
 		circle.setRadius(circleRadius);
@@ -198,7 +206,21 @@ int main(int argc, char* argv[])
 		// Moves the circle, as long as the x and y positions are within from
 		circle.setPosition(circle.getPosition().x + circleVelocity.x, circle.getPosition().y + circleVelocity.y);
 
+
+		// Drawing to window
 		window.clear();
+
+		/*
+		for (auto& shape : shapes)
+		{
+			if (shape->m_draw)
+			{
+				window.draw(shape->m_sprite);
+				window.draw(shape->m_text);
+			}
+		}
+		*/
+
 		if (drawCircle)
 		{
 			window.draw(circle);
