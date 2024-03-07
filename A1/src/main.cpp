@@ -14,41 +14,25 @@ class NewShape
 public:
 	std::unique_ptr<sf::Shape> m_sprite;
 	bool m_draw = true;
-	std::string m_textString;
+	//std::string m_textString;		Might not be necessary as we aren't changing it
 	sf::Text m_text;
 	sf::Vector2f m_velocity;
 
 public:
-	NewShape(std::string text, sf::Vector2f velocity)
-		: m_textString(text), m_velocity(velocity) {}
+	NewShape(sf::Vector2f velocity)					// std::string text
+		: m_velocity(velocity) {}					// m_textString(text) 
 
-void move()
-{
-	sf::Vector2f position = m_sprite->getPosition();
-	m_sprite->setPosition(position + m_velocity);
-}
+	void move()
+	{
+		sf::Vector2f position = m_sprite->getPosition();
+		m_sprite->setPosition(position + m_velocity);
+	}
 };
 
-
-int main(int argc, char* argv[])
+void readConfigFile(std::ifstream& file, std::vector<std::unique_ptr<NewShape>>& shapes, sf::Vector2i& windowDimensions)
 {
-	// Reads config file
-	std::ifstream file("config.txt");
-	if (!file.is_open())
-	{
-		std::cerr << "Error opening file." << std::endl;
-		exit(-2);
-	}
-
-	// Vector of shapes
-	std::vector<std::unique_ptr<NewShape>> shapes;
-
-	// For window; defaults to these unless changed by file
-	int wWidth = 1920;
-	int wHeight = 1080;
-
-	// For each shape's text
-	sf::Font myFont;
+	// For all shapes' text
+	sf::Font font;
 	std::string fontPath;
 	int textSize;
 	int textColour[3];
@@ -56,28 +40,22 @@ int main(int argc, char* argv[])
 	// For reading config file
 	std::string line;
 	std::string firstElement;
-	
+
 	while (std::getline(file, line))
 	{
-		// Despite size being exclusive to rectangle and radius to circle, included here for readability
-		std::string shapeText;
-		sf::Vector2f position, velocity, size;
-		int r, g, b;									// Necessary since sf::Color RGB components are Uint8s, so are read by istringstream as chars, not ints
-		float radius;
-
 		// Decomposes line
 		std::istringstream lineStream(line);
 		if (lineStream >> firstElement)
 		{
 			if (firstElement == "Window")
 			{
-				lineStream >> wWidth >> wHeight;
+				lineStream >> windowDimensions.x >> windowDimensions.y;
 			}
 			else if (firstElement == "Font")
 			{
 				lineStream >> fontPath >> textSize >> textColour[0] >> textColour[1] >> textColour[2];
-				
-				if (!myFont.loadFromFile(fontPath))
+
+				if (!font.loadFromFile(fontPath))
 				{
 					std::cerr << "Could not load font!\n";
 					exit(-1);
@@ -85,11 +63,16 @@ int main(int argc, char* argv[])
 			}
 			else
 			{
+				std::string shapeText;
+				sf::Vector2f position, velocity, size;
+				int r, g, b;																					// Necessary since sf::Color RGB components are Uint8s, so are read by istringstream as chars, not ints
+				float radius;
+
 				// Extract common attributes to rectangle and circle
 				lineStream >> shapeText >> position.x >> position.y >> velocity.x >> velocity.y >> r >> g >> b;
 
-				// Instantiate pointer to NewShape
-				std::unique_ptr<NewShape> shape = std::make_unique<NewShape>(shapeText, velocity);
+				// Instantiate NewShape
+				std::unique_ptr<NewShape> shape = std::make_unique<NewShape>(velocity);
 
 				if (firstElement == "Rectangle")
 				{
@@ -106,15 +89,38 @@ int main(int argc, char* argv[])
 				shape->m_sprite->setPosition(position);
 				shape->m_sprite->setFillColor(sf::Color(static_cast<sf::Uint8>(r), static_cast<sf::Uint8>(g), static_cast<sf::Uint8>(b)));
 
+				// Set text string, font, size, colour
+				shape->m_text = sf::Text(shapeText, font, textSize);
+				shape->m_text.setFillColor(sf::Color(textColour[0], textColour[1], textColour[2]));
+
 				// Add shape to vector of shape pointers
 				shapes.push_back(std::move(shape));
 			}
 		}
 	}
+}
+
+int main(int argc, char* argv[])
+{
+	// Reads config file
+	std::ifstream file("config.txt");
+	if (!file.is_open())
+	{
+		std::cerr << "Error opening file." << std::endl;
+		exit(-2);
+	}
+
+	// Vector of shapes
+	std::vector<std::unique_ptr<NewShape>> shapes;
+
+	// For window; defaults to these unless changed by file
+	sf::Vector2i windowDimensions(1920, 1080);
+
+	readConfigFile(file, shapes, windowDimensions);
 
 	file.close();
 	
-	sf::RenderWindow window(sf::VideoMode(wWidth, wHeight), "SFML works!");
+	sf::RenderWindow window(sf::VideoMode(windowDimensions.x, windowDimensions.y), "SFML works!");
 	window.setFramerateLimit(60);
 
 	ImGui::SFML::Init(window);
@@ -135,9 +141,6 @@ int main(int argc, char* argv[])
 	sf::CircleShape circle(circleRadius, circleSegments);
 	circle.setPosition(10.0f, 10.0f);
 
-	// Text that will be for each shape
-	sf::Text text("Sample Text", myFont, 24);
-	text.setPosition(0, wHeight - (float)text.getCharacterSize());
 
 	// Array for imgui text
 	char displayString[255] = "Sample Text";
@@ -169,9 +172,9 @@ int main(int argc, char* argv[])
 		ImGui::SliderInt("Sides", &circleSegments, 3, 64);
 		ImGui::ColorEdit3("Color Circle", c);
 		ImGui::InputText("Text", displayString, 255);
-		if (ImGui::Button("Set Text"))			// if the button "Set Text" is clicked, set the text to the input text
+		if (ImGui::Button("Set Text"))
 		{
-			text.setString(displayString);
+			//text.setString(displayString);
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Reset Circle"))
@@ -184,19 +187,22 @@ int main(int argc, char* argv[])
 		/*
 		for (auto& shape : shapes)
 		{
-			const sf::FloatRect& rect = shape->m_sprite->getGlobalBounds();
-			if (rect.left < 0 || rect.left + rect.width > wWidth)
+			const sf::FloatRect& shapeBounds = shape->m_sprite->getGlobalBounds();\
+			cost sf::FloatRect& textBounds = shape->m_text->getLocalBounds();
+			if (shapeBounds.left < 0 || shapeBounds.left + shapeBounds.width > wWidth)
 				shape->velocity.x *= -1.0f;
 
-			if (rect.top < 0 || rect.top + rect.height > wHeight)
+			if (shapeBounds.top < 0 || shapeBounds.top + shapeBounds.height > wHeight)
 				shape->velocity.y *= -1.0f;
 
 			shape->move();
 
+			// Sets text to center of shape
+			shape->m_text.setPosition(shapeBounds.left + shapeBounds.width / 2.f - textBounds.width / 2.f, shapeBounds.top + shapeBounds.height / 2.f - textBounds.height / 2.f);
+
 			shape->m_sprite->setFillColour(sf::Color(c[0] * 255, c[1] * 255, c[2] * 255);		// converts from a value 0-1 to 0-255
 			shape->m_sprite->setPointCount(WHAT GOES HERE);
-			shape->m_sprite->setRadius(WHAT GOES HERE);
-		}
+			shape->m_sprite->setRadius(WHAT GOES HERE);			INSTEAD OF .setRadius() -> .scale()
 		*/
 
 		circle.setFillColor(sf::Color(c[0] * 255, c[1] * 255, c[2] * 255));		// convert from a value 0-1 to 0-255
@@ -205,6 +211,9 @@ int main(int argc, char* argv[])
 
 		// Moves the circle, as long as the x and y positions are within from
 		circle.setPosition(circle.getPosition().x + circleVelocity.x, circle.getPosition().y + circleVelocity.y);
+		sf::FloatRect circleBounds = circle.getGlobalBounds();
+		//sf::FloatRect textBounds = text.getLocalBounds();
+		//text.setPosition(circleBounds.left + circleBounds.width / 2.f - textBounds.width / 2.f, circleBounds.top + circleBounds.height / 2.f - textBounds.height / 2.f);
 
 
 		// Drawing to window
@@ -227,10 +236,10 @@ int main(int argc, char* argv[])
 		}
 		if (drawText)
 		{
-			window.draw(text);
+			//window.draw(text);
 		}
-		ImGui::SFML::Render(window);		// Render the imgui GUI to the SFML window
-		window.display();			// Switches the front and back buffers
+		ImGui::SFML::Render(window);			// Render the imgui GUI to the back buffer window
+		window.display();						// Switches the front and back buffers
 	}
 
 	return 0;
