@@ -131,16 +131,9 @@ int main(int argc, char* argv[])
 
 	float c[3] = { 0.0f, 1.0f, 1.0f };	// imgui requires RGB values as floats from 0-1
 
-	float circleRadius = 50.0f;
-	int circleSegments = 32;		// the number of segments to draw the circle with i.e. how detailed?
-	sf::Vector2f circleVelocity(1.0f, 0.5f);
-	bool drawCircle = true;
+	float scale = 50.0f;
+	bool drawShape = true;
 	bool drawText = true;
-
-	// This will get replaced by dynamic instantiation of objects, I believe
-	sf::CircleShape circle(circleRadius, circleSegments);
-	circle.setPosition(10.0f, 10.0f);
-
 
 	// Array for imgui text
 	char displayString[255] = "Sample Text";
@@ -162,33 +155,30 @@ int main(int argc, char* argv[])
 		// Updates imgui for this frame with the time the last frame took; .restart() returns the sf::Time object and restarts the clock
 		ImGui::SFML::Update(window, deltaClock.restart());
 
+		/* for std::unique_ptr<sf::NewShape> : shapes
+		{
+			// ImGui shit from below
+		}
+		*/
+
 		// Draw the UI
-		ImGui::Begin("Window title");
-		ImGui::Text("Window text!");
-		ImGui::Checkbox("Draw Circle", &drawCircle);
+		ImGui::Begin("Shape Properties");
+		ImGui::Checkbox("Draw Shape", &drawShape);
+		ImGui::SliderFloat(&shape->m_velocity.x, 0.0f, 100.f);					// Does it need text?
 		ImGui::SameLine();
-		ImGui::Checkbox("Draw Text", &drawText);
-		ImGui::SliderFloat("Radius", &circleRadius, 0.0f, 300.0f);
-		ImGui::SliderInt("Sides", &circleSegments, 3, 64);
-		ImGui::ColorEdit3("Color Circle", c);
-		ImGui::InputText("Text", displayString, 255);
-		if (ImGui::Button("Set Text"))
-		{
-			//text.setString(displayString);
-		}
+		ImGui::SliderFloat("Velocity", &shape->m_velocity.y, 0.0f, 100.f);
+		ImGui::SliderFloat("Scale", &scale, 0.0f, 300.0f);
+		ImGui::ColorEdit3("Color", c);
+		ImGui::InputText("Name", displayString, 255);							// Should directly change text, as below
+		shape->m_text.setString(displayString);									// THIS IS CORRECT
 		ImGui::SameLine();
-		if (ImGui::Button("Reset Circle"))
-		{
-			circle.setPosition(0, 0);
-		}
 		ImGui::End();
 
 		// Update logic
-		/*
 		for (auto& shape : shapes)
 		{
 			const sf::FloatRect& shapeBounds = shape->m_sprite->getGlobalBounds();\
-			cost sf::FloatRect& textBounds = shape->m_text->getLocalBounds();
+			const sf::FloatRect& textBounds = shape->m_text->getLocalBounds();
 			if (shapeBounds.left < 0 || shapeBounds.left + shapeBounds.width > wWidth)
 				shape->velocity.x *= -1.0f;
 
@@ -200,14 +190,9 @@ int main(int argc, char* argv[])
 			// Sets text to center of shape
 			shape->m_text.setPosition(shapeBounds.left + shapeBounds.width / 2.f - textBounds.width / 2.f, shapeBounds.top + shapeBounds.height / 2.f - textBounds.height / 2.f);
 
-			shape->m_sprite->setFillColour(sf::Color(c[0] * 255, c[1] * 255, c[2] * 255);		// converts from a value 0-1 to 0-255
-			shape->m_sprite->setPointCount(WHAT GOES HERE);
-			shape->m_sprite->setRadius(WHAT GOES HERE);			INSTEAD OF .setRadius() -> .scale()
-		*/
-
-		circle.setFillColor(sf::Color(c[0] * 255, c[1] * 255, c[2] * 255));		// convert from a value 0-1 to 0-255
-		circle.setPointCount(circleSegments);
-		circle.setRadius(circleRadius);
+			shape->m_sprite->setFillColour(sf::Color(c[0] * 255, c[1] * 255, c[2] * 255));		// converts from a value 0-1 to 0-255
+			shape->m_sprite->setScale(scale);			// INSTEAD OF .setRadius() -> .scale()
+		}
 
 		// Moves the circle, as long as the x and y positions are within from
 		circle.setPosition(circle.getPosition().x + circleVelocity.x, circle.getPosition().y + circleVelocity.y);

@@ -1,5 +1,7 @@
 
 # Next
+- From line 132 onwards
+- Does each shape need scale, drawShape, displayString attributes?
 - Uncomment code using shapes from vector
 - ImGui demo (see Lecture 4a)
 
