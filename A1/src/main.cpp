@@ -65,7 +65,7 @@ void readConfigFile(std::ifstream& file, std::vector<std::unique_ptr<NewShape>>&
 			{
 				std::string shapeText;
 				sf::Vector2f position, velocity, size;
-				int r, g, b;																					// Necessary since sf::Color RGB components are Uint8s, so are read by istringstream as chars, not ints
+				int r, g, b;	                            // Necessary since sf::Color RGB components are Uint8s, so are read by istringstream as chars, not ints
 				float radius;
 
 				// Extract common attributes to rectangle and circle
@@ -120,15 +120,17 @@ int main(int argc, char* argv[])
 
 	file.close();
 	
-	sf::RenderWindow window(sf::VideoMode(windowDimensions.x, windowDimensions.y), "SFML works!");
+	sf::RenderWindow window(sf::VideoMode(windowDimensions.x, windowDimensions.y), "Assignment 1");
 	window.setFramerateLimit(60);
 
-	ImGui::SFML::Init(window);
 	sf::Clock deltaClock;
 
+	ImGui::SFML::Init(window);
 	ImGui::GetStyle().ScaleAllSizes(3.5f);		// Scales imgui GUI
 	ImGui::GetIO().FontGlobalScale = 1.3f;		// Scale imgui text size
 
+	/*				I think these should be attributes of each shape?
+	
 	float c[3] = { 0.0f, 1.0f, 1.0f };	// imgui requires RGB values as floats from 0-1
 
 	float scale = 50.0f;
@@ -137,6 +139,8 @@ int main(int argc, char* argv[])
 
 	// Array for imgui text
 	char displayString[255] = "Sample Text";
+
+	*/
 
 	while (window.isOpen())
 	{
@@ -155,6 +159,7 @@ int main(int argc, char* argv[])
 		// Updates imgui for this frame with the time the last frame took; .restart() returns the sf::Time object and restarts the clock
 		ImGui::SFML::Update(window, deltaClock.restart());
 
+		// Draw UI for each shape
 		/* for std::unique_ptr<sf::NewShape> : shapes
 		{
 			// ImGui shit from below
@@ -194,16 +199,10 @@ int main(int argc, char* argv[])
 			shape->m_sprite->setScale(scale);			// INSTEAD OF .setRadius() -> .scale()
 		}
 
-		// Moves the circle, as long as the x and y positions are within from
-		circle.setPosition(circle.getPosition().x + circleVelocity.x, circle.getPosition().y + circleVelocity.y);
-		sf::FloatRect circleBounds = circle.getGlobalBounds();
-		//sf::FloatRect textBounds = text.getLocalBounds();
-		//text.setPosition(circleBounds.left + circleBounds.width / 2.f - textBounds.width / 2.f, circleBounds.top + circleBounds.height / 2.f - textBounds.height / 2.f);
-
-
-		// Drawing to window
+		// Clear window
 		window.clear();
 
+		// Draw each shape to window
 		/*
 		for (auto& shape : shapes)
 		{
@@ -215,19 +214,9 @@ int main(int argc, char* argv[])
 		}
 		*/
 
-		if (drawCircle)
-		{
-			window.draw(circle);
-		}
-		if (drawText)
-		{
-			//window.draw(text);
-		}
 		ImGui::SFML::Render(window);			// Render the imgui GUI to the back buffer window
 		window.display();						// Switches the front and back buffers
 	}
 
 	return 0;
 }
-
-// void setWindowAndFont (
