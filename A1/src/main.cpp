@@ -14,19 +14,13 @@ class NewShape
 public:
 	std::unique_ptr<sf::Shape> m_sprite;
 	bool m_draw = true;
-	//std::string m_textString;					Might not be necessary as we aren't changing it
 	sf::Text m_text;
 	sf::Vector2f m_velocity;
 	float m_scale = 1.f;
-	float m_colour[3] = { 0.f, 1.f, 1.f };			// imgui requires RGB values as floats from 0-1
-	char m_guiString[255];
 
 public:
-	NewShape(const std::string& shapeName, sf::Vector2f velocity)					// std::string text
-		: m_velocity(velocity)
-	{
-		strncpy_s(m_guiString, shapeName.c_str(), sizeof(m_guiString) - 1);
-	}
+	NewShape(sf::Vector2f velocity)					// std::string text
+		: m_velocity(velocity) {}
 
 	void move()
 	{
@@ -51,6 +45,8 @@ void readConfigFile(std::ifstream& file, std::vector<std::shared_ptr<NewShape>>&
 	{
 		// Decomposes line
 		std::istringstream lineStream(line);
+
+		// If line isn't whitespace, extract until whitespace
 		if (lineStream >> firstElement)
 		{
 			if (firstElement == "Window")
@@ -71,21 +67,21 @@ void readConfigFile(std::ifstream& file, std::vector<std::shared_ptr<NewShape>>&
 			{
 				std::string shapeText;
 				sf::Vector2f position, velocity, size;
-				int r, g, b;	                            // Necessary since sf::Color RGB components are Uint8s, so are read by istringstream as chars, not ints
+				int r, g, b;									// Necessary since sf::Color RGB components are Uint8s, so are read by istringstream as chars, not ints
 				float radius;
 
 				// Extract common attributes to rectangle and circle
 				lineStream >> shapeText >> position.x >> position.y >> velocity.x >> velocity.y >> r >> g >> b;
 
 				// Instantiate NewShape
-				std::shared_ptr<NewShape> shape = std::make_shared<NewShape>(shapeText, velocity);
+				std::shared_ptr<NewShape> shape = std::make_shared<NewShape>(velocity);
 
 				if (firstElement == "Rectangle")
 				{
 					lineStream >> size.x >> size.y;
 					shape->m_sprite = std::make_unique<sf::RectangleShape>(size);
 				}
-				else
+				else		// i.e. if Circle
 				{
 					lineStream >> radius;
 					shape->m_sprite = std::make_unique<sf::CircleShape>(radius);
@@ -94,10 +90,15 @@ void readConfigFile(std::ifstream& file, std::vector<std::shared_ptr<NewShape>>&
 				// Set position and colour of sprite (not possible with constructor)
 				shape->m_sprite->setPosition(position);
 				shape->m_sprite->setFillColor(sf::Color(static_cast<sf::Uint8>(r), static_cast<sf::Uint8>(g), static_cast<sf::Uint8>(b)));
+				/*
+				sf::Text text(sf::String("Hello"), font);
 
 				// Set text string, font, size, colour
-				shape->m_text = sf::Text(shapeText, font, textSize);
+				shape->m_text.setString(shapeText);
+				shape->m_text.setFont(font);
+				shape->m_text.setCharacterSize(textSize);
 				shape->m_text.setFillColor(sf::Color(textColour[0], textColour[1], textColour[2]));
+				*/
 
 				// Add shape to vector of shape pointers; std::move() required because shape is a std::unique_ptr
 				shapes.push_back(shape);
@@ -152,9 +153,8 @@ int main(int argc, char* argv[])
 
 		//ImGui::ShowDemoWindow();
 
-		static int dropdownIndex = 0;
-
 		// GUI dropdown box
+		static int dropdownIndex = 0;
 		if (ImGui::BeginCombo("##dropdown", shapes[dropdownIndex]->m_text.getString().toAnsiString().c_str()))
 		{
 			for (int i = 0; i < shapes.size(); i++)
@@ -170,6 +170,14 @@ int main(int argc, char* argv[])
 		}
 
 		std::shared_ptr<NewShape> currentShape = shapes[dropdownIndex];
+		
+		// Prepare buffer for GUI textbox
+		static char guiString[255];
+		strncpy_s(guiString, sizeof(char) * 255, currentShape->m_text.getString().toAnsiString().c_str(), sizeof(guiString) - 1);
+
+		// Get sf::Color of shape and convert to float array; imgui requires RGB values as floats from 0-1
+		sf::Color shapeColour = currentShape->m_sprite->getFillColor();
+		float shapeColourFloat[3] = { static_cast<float>(shapeColour.r) / 256.f, static_cast<float>(shapeColour.g) / 256.f, static_cast<float>(shapeColour.b) / 256.f };
 
 		// Draw the UI
 		ImGui::Begin("Shape Properties");
@@ -178,12 +186,18 @@ int main(int argc, char* argv[])
 		ImGui::SameLine();
 		ImGui::SliderFloat("Velocity", &currentShape->m_velocity.y, 0.0f, 100.f);
 		ImGui::SliderFloat("Scale", &currentShape->m_scale, 0.0f, 300.0f);
-		ImGui::ColorEdit3("Color", currentShape->m_colour);
-		ImGui::InputText("Name", currentShape->m_guiString, 255);									// Should directly change text, as below
+		ImGui::ColorEdit3("Color", shapeColourFloat);
+		ImGui::InputText("Name", guiString, 255);
 		ImGui::End();
 
-		currentShape->m_text.setString(currentShape->m_guiString);
-		currentShape->m_sprite->setFillColor(sf::Color(currentShape->m_colour[0] * 255, currentShape->m_colour[1] * 255, currentShape->m_colour[2] * 255));		// converts from a value 0-1 to 0-255
+		// Update shape attributes
+		shapeColour = sf::Color(
+			static_cast<sf::Uint8>(shapeColourFloat[0] * 255),
+			static_cast<sf::Uint8>(shapeColourFloat[1] * 255),
+			static_cast<sf::Uint8>(shapeColourFloat[2] * 255)
+		);
+		currentShape->m_sprite->setFillColor(shapeColour);
+		currentShape->m_text.setString(guiString);
 		currentShape->m_sprite->setScale(sf::Vector2f(currentShape->m_scale, currentShape->m_scale));			// was .setRadius()
 
 		// Update logic

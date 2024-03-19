@@ -1,7 +1,7 @@
 
 # Next
-- From line 132 onwards
-- Does each shape need scale, drawShape, displayString attributes?
+- MAJOR PROBLEM - does m_text get initialised correctly? Why are we accessing invalid memory?
+- Does each shape need scale, drawShape attributes?
 - Uncomment code using shapes from vector
 - ImGui demo (see Lecture 4a)
 
