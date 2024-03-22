@@ -29,13 +29,12 @@ public:
 	}
 };
 
-void readConfigFile(std::ifstream& file, std::vector<std::shared_ptr<NewShape>>& shapes, sf::Vector2i& windowDimensions)
+void readConfigFile(std::ifstream& file, std::vector<std::shared_ptr<NewShape>>& shapes, sf::Vector2i& windowDimensions, sf::Font& font)
 {
 	// For all shapes' text
-	sf::Font font;
 	std::string fontPath;
 	int textSize = 0;
-	int textColour[3] = { 0.f, 0.f, 0.f };
+	int textColour[3] = { 0, 0, 0 };
 
 	// For reading config file
 	std::string line;
@@ -66,12 +65,12 @@ void readConfigFile(std::ifstream& file, std::vector<std::shared_ptr<NewShape>>&
 			else
 			{
 				std::string shapeText;
-				sf::Vector2f position, velocity, size;
-				int r, g, b;									// Necessary since sf::Color RGB components are Uint8s, so are read by istringstream as chars, not ints
+				sf::Vector2f position, size, velocity;
+				int shapeColour[3] = { 0, 0, 0 };    // Necessary since sf::Color RGB components are Uint8s, so are read by istringstream as chars, not ints
 				float radius;
 
 				// Extract common attributes
-				lineStream >> shapeText >> position.x >> position.y >> velocity.x >> velocity.y >> r >> g >> b;
+				lineStream >> shapeText >> position.x >> position.y >> velocity.x >> velocity.y >> shapeColour[0] >> shapeColour[1] >> shapeColour[2];
 
 				// Instantiate NewShape
 				std::shared_ptr<NewShape> shape = std::make_shared<NewShape>(velocity);
@@ -89,9 +88,7 @@ void readConfigFile(std::ifstream& file, std::vector<std::shared_ptr<NewShape>>&
 
 				// Set position and colour of sprite (not possible with constructor)
 				shape->m_sprite->setPosition(position);
-				shape->m_sprite->setFillColor(sf::Color(static_cast<sf::Uint8>(r), static_cast<sf::Uint8>(g), static_cast<sf::Uint8>(b)));
-				
-				// sf::Text text(sf::String("Hello"), font);
+				shape->m_sprite->setFillColor(sf::Color(shapeColour[0], shapeColour[1], shapeColour[2]));		// Should I static_cast<sf::Uint8> for correctness?
 
 				// Set text string, font, size, colour
 				shape->m_text = sf::Text(sf::String(shapeText), font, textSize);
@@ -116,11 +113,10 @@ int main(int argc, char* argv[])
 
 	// Vector of shapes
 	std::vector<std::shared_ptr<NewShape>> shapes;
-
-	// For window; defaults to these unless changed by file
-	sf::Vector2i windowDimensions(1920, 1080);
-
-	readConfigFile(file, shapes, windowDimensions);
+	sf::Vector2i windowDimensions(1920, 1080);			// Dynamically changed when reading config file
+	sf::Font font;
+	
+	readConfigFile(file, shapes, windowDimensions, font);
 	file.close();
 	
 	sf::RenderWindow window(sf::VideoMode(windowDimensions.x, windowDimensions.y), "Assignment 1");
@@ -165,10 +161,11 @@ int main(int argc, char* argv[])
 		}
 
 		std::shared_ptr<NewShape> currentShape = shapes[dropdownIndex];
-		
+
 		// Prepare buffer for GUI textbox
 		static char guiString[255];
-		strncpy_s(guiString, 255, currentShape->m_text.getString().toAnsiString().c_str(), 254);
+		strncpy(guiString, currentShape->m_text.getString().toAnsiString().c_str(), 254);	// strncpy_s on Windows
+		guiString[254] = '\0';		// only necessary with srncpy on Mac
 
 		// Get sf::Color of shape and convert to float array; imgui requires RGB values as floats from 0-1
 		sf::Color shapeColour = currentShape->m_sprite->getFillColor();
@@ -199,10 +196,10 @@ int main(int argc, char* argv[])
 		for (auto& shape : shapes)
 		{
 			const sf::FloatRect shapeBounds = shape->m_sprite->getGlobalBounds();
-			const sf::FloatRect textBounds = shape->m_text.getLocalBounds();
+			const sf::FloatRect textBounds = shape->m_text.getLocalBounds();		// This is the problem line. A problem with font?
 
 			// If bounds exceed window edge, reverse corresponding velocity
-			if (shapeBounds.left < 0 || shapeBounds.left + shapeBounds.width > windowDimensions.x)					// THIS IS THE PROBLEM LINE. SHAPES BEING DELETED PREMATURELY?
+			if (shapeBounds.left < 0 || shapeBounds.left + shapeBounds.width > windowDimensions.x)					// Appaz this was problem line... but it's not
 				shape->m_velocity.x *= -1.0f;
 
 			if (shapeBounds.top < 0 || shapeBounds.top + shapeBounds.height > windowDimensions.y)
