@@ -1,6 +1,8 @@
 
 # Next
-- MAJOR PROBLEM - do shapes get initialised properly? Are they deleted early?
+- First shape (CGreen) starts green, gets darker until black
+	- Maybe to do with being the selected one?
+- Text for RRed (I think) shifts on hitting bounds
 - ImGui demo (see Lecture 4a)
 
 

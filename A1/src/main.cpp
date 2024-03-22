@@ -8,6 +8,7 @@
 #include <SFML/Graphics.hpp>
 #include "imgui.h"
 #include "imgui-SFML.h"
+#include "imgui_demo.cpp"
 
 class NewShape
 {
@@ -142,7 +143,7 @@ int main(int argc, char* argv[])
 		// Updates imgui for this frame with the time the last frame took; .restart() returns the sf::Time object and restarts the clock
 		ImGui::SFML::Update(window, deltaClock.restart());
 
-		//ImGui::ShowDemoWindow();
+		ImGui::ShowDemoWindow();
 
 		// GUI dropdown box
 		static int dropdownIndex = 0;
@@ -164,8 +165,8 @@ int main(int argc, char* argv[])
 
 		// Prepare buffer for GUI textbox
 		static char guiString[255];
-		strncpy(guiString, currentShape->m_text.getString().toAnsiString().c_str(), 254);	// strncpy_s on Windows
-		guiString[254] = '\0';		// only necessary with srncpy on Mac
+		strncpy_s(guiString, currentShape->m_text.getString().toAnsiString().c_str(), 254);	// strncpy_s on Windows; strncpy on Cac
+		//guiString[254] = '\0';		// only necessary with srncpy on Mac
 
 		// Get sf::Color of shape and convert to float array; imgui requires RGB values as floats from 0-1
 		sf::Color shapeColour = currentShape->m_sprite->getFillColor();
@@ -196,16 +197,18 @@ int main(int argc, char* argv[])
 		for (auto& shape : shapes)
 		{
 			const sf::FloatRect shapeBounds = shape->m_sprite->getGlobalBounds();
-			const sf::FloatRect textBounds = shape->m_text.getLocalBounds();		// This is the problem line. A problem with font?
 
 			// If bounds exceed window edge, reverse corresponding velocity
-			if (shapeBounds.left < 0 || shapeBounds.left + shapeBounds.width > windowDimensions.x)					// Appaz this was problem line... but it's not
+			if (shapeBounds.left < 0 || shapeBounds.left + shapeBounds.width > windowDimensions.x)
 				shape->m_velocity.x *= -1.0f;
 
 			if (shapeBounds.top < 0 || shapeBounds.top + shapeBounds.height > windowDimensions.y)
 				shape->m_velocity.y *= -1.0f;
 
 			shape->move();
+			
+			const sf::FloatRect newShapeBounds = shape->m_sprite->getGlobalBounds();
+			const sf::FloatRect textBounds = shape->m_text.getLocalBounds();
 
 			// Sets text to center of shape
 			shape->m_text.setPosition(shapeBounds.left + shapeBounds.width / 2.f - textBounds.width / 2.f, shapeBounds.top + shapeBounds.height / 2.f - textBounds.height / 2.f);
