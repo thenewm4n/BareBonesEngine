@@ -1,8 +1,6 @@
 
 # Next
-- MAJOR PROBLEM - does m_text get initialised correctly? Why are we accessing invalid memory?
-- Does each shape need scale, drawShape attributes?
-- Uncomment code using shapes from vector
+- MAJOR PROBLEM - do shapes get initialised properly? Are they deleted early?
 - ImGui demo (see Lecture 4a)
 
 
