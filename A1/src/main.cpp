@@ -59,7 +59,7 @@ void readConfigFile(std::ifstream& file, std::vector<std::shared_ptr<NewShape>>&
 
 				if (!font.loadFromFile(fontPath))
 				{
-					std::cerr << "Could not load font!\n";
+					std::cerr << "Could not load font!" << std::endl;
 					exit(-1);
 				}
 			}
@@ -70,7 +70,7 @@ void readConfigFile(std::ifstream& file, std::vector<std::shared_ptr<NewShape>>&
 				int r, g, b;									// Necessary since sf::Color RGB components are Uint8s, so are read by istringstream as chars, not ints
 				float radius;
 
-				// Extract common attributes to rectangle and circle
+				// Extract common attributes
 				lineStream >> shapeText >> position.x >> position.y >> velocity.x >> velocity.y >> r >> g >> b;
 
 				// Instantiate NewShape
@@ -90,15 +90,12 @@ void readConfigFile(std::ifstream& file, std::vector<std::shared_ptr<NewShape>>&
 				// Set position and colour of sprite (not possible with constructor)
 				shape->m_sprite->setPosition(position);
 				shape->m_sprite->setFillColor(sf::Color(static_cast<sf::Uint8>(r), static_cast<sf::Uint8>(g), static_cast<sf::Uint8>(b)));
-				/*
-				sf::Text text(sf::String("Hello"), font);
+				
+				// sf::Text text(sf::String("Hello"), font);
 
 				// Set text string, font, size, colour
-				shape->m_text.setString(shapeText);
-				shape->m_text.setFont(font);
-				shape->m_text.setCharacterSize(textSize);
+				shape->m_text = sf::Text(sf::String(shapeText), font, textSize);
 				shape->m_text.setFillColor(sf::Color(textColour[0], textColour[1], textColour[2]));
-				*/
 
 				// Add shape to vector of shape pointers; std::move() required because shape is a std::unique_ptr
 				shapes.push_back(shape);
@@ -124,12 +121,10 @@ int main(int argc, char* argv[])
 	sf::Vector2i windowDimensions(1920, 1080);
 
 	readConfigFile(file, shapes, windowDimensions);
-
 	file.close();
 	
 	sf::RenderWindow window(sf::VideoMode(windowDimensions.x, windowDimensions.y), "Assignment 1");
 	window.setFramerateLimit(60);
-
 	sf::Clock deltaClock;
 
 	ImGui::SFML::Init(window);
@@ -173,7 +168,7 @@ int main(int argc, char* argv[])
 		
 		// Prepare buffer for GUI textbox
 		static char guiString[255];
-		strncpy_s(guiString, sizeof(char) * 255, currentShape->m_text.getString().toAnsiString().c_str(), sizeof(guiString) - 1);
+		strncpy_s(guiString, 255, currentShape->m_text.getString().toAnsiString().c_str(), 254);
 
 		// Get sf::Color of shape and convert to float array; imgui requires RGB values as floats from 0-1
 		sf::Color shapeColour = currentShape->m_sprite->getFillColor();
@@ -197,17 +192,17 @@ int main(int argc, char* argv[])
 			static_cast<sf::Uint8>(shapeColourFloat[2] * 255)
 		);
 		currentShape->m_sprite->setFillColor(shapeColour);
-		currentShape->m_text.setString(guiString);
 		currentShape->m_sprite->setScale(sf::Vector2f(currentShape->m_scale, currentShape->m_scale));			// was .setRadius()
+		currentShape->m_text.setString(sf::String(guiString));
 
 		// Update logic
 		for (auto& shape : shapes)
 		{
-			const sf::FloatRect& shapeBounds = shape->m_sprite->getGlobalBounds();
-			const sf::FloatRect& textBounds = shape->m_text.getLocalBounds();
+			const sf::FloatRect shapeBounds = shape->m_sprite->getGlobalBounds();
+			const sf::FloatRect textBounds = shape->m_text.getLocalBounds();
 
 			// If bounds exceed window edge, reverse corresponding velocity
-			if (shapeBounds.left < 0 || shapeBounds.left + shapeBounds.width > windowDimensions.x)
+			if (shapeBounds.left < 0 || shapeBounds.left + shapeBounds.width > windowDimensions.x)					// THIS IS THE PROBLEM LINE. SHAPES BEING DELETED PREMATURELY?
 				shape->m_velocity.x *= -1.0f;
 
 			if (shapeBounds.top < 0 || shapeBounds.top + shapeBounds.height > windowDimensions.y)
