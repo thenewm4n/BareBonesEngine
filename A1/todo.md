@@ -1,9 +1,7 @@
 
 # Next
-- First shape (CGreen) starts green, gets darker until black
-	- Maybe to do with being the selected one?
-- Text for RRed (I think) shifts on hitting bounds
-- ImGui demo (see Lecture 4a)
+- The colours of the selected shape decrease until 128
+- Shape ext shifts on hitting bounds
 
 
 ### Left to do

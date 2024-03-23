@@ -8,7 +8,7 @@
 #include <SFML/Graphics.hpp>
 #include "imgui.h"
 #include "imgui-SFML.h"
-//#include "imgui_demo.cpp"
+#include "imgui_demo.cpp"
 
 class NewShape
 {
@@ -148,16 +148,8 @@ int main(int argc, char* argv[])
 		// GUI dropdown box
 		static int dropdownIndex = 0;
 
-		std::shared_ptr<NewShape> currentShape = shapes[dropdownIndex];
-
 		// Prepare buffer for GUI textbox
 		static char guiString[255];
-		strncpy(guiString, currentShape->m_text.getString().toAnsiString().c_str(), 254);	// strncpy_s on Windows; strncpy on Cac
-		guiString[254] = '\0';		// only necessary with srncpy on Mac
-
-		// Get sf::Color of shape and convert to float array; imgui requires RGB values as floats from 0-1
-		sf::Color shapeColour = currentShape->m_sprite->getFillColor();
-		float shapeColourFloat[3] = { static_cast<float>(shapeColour.r) / 256.f, static_cast<float>(shapeColour.g) / 256.f, static_cast<float>(shapeColour.b) / 256.f };
 
 		// Draw the UI
 		ImGui::Begin("Shape Properties");
@@ -174,23 +166,32 @@ int main(int argc, char* argv[])
 			}
 			ImGui::EndCombo();
 		}
+
+		std::shared_ptr<NewShape> currentShape = shapes[dropdownIndex];
+		strncpy_s(guiString, currentShape->m_text.getString().toAnsiString().c_str(), 254);	// strncpy_s on Windows; strncpy on Cac
+		//guiString[254] = '\0';		// only necessary with srncpy on Mac
+		
+		// Get sf::Color of shape and convert to float array; imgui requires RGB values as floats from 0-1
+		sf::Color shapeColour = currentShape->m_sprite->getFillColor();
+		static float shapeColourFloat[3] = { static_cast<float>(shapeColour.r) / 256.f, static_cast<float>(shapeColour.g) / 256.f, static_cast<float>(shapeColour.b) / 256.f };
+		float velocityVec2f[2] = { currentShape->m_velocity.x, currentShape->m_velocity.y };
+
 		ImGui::Checkbox("Draw Shape", &currentShape->m_draw);
-		ImGui::SliderFloat("##XVelocity", &currentShape->m_velocity.x, 0.0f, 100.f);					// Does it need text?
-		ImGui::SameLine();
-		ImGui::SliderFloat("Velocity", &currentShape->m_velocity.y, 0.0f, 100.f);
-		ImGui::SliderFloat("Scale", &currentShape->m_scale, 0.0f, 300.0f);
+		ImGui::SliderFloat2("Velocity", velocityVec2f, -8.f, 8.f);
+		ImGui::SliderFloat("Scale", &currentShape->m_scale, 0.f, 4.f);
 		ImGui::ColorEdit3("Color", shapeColourFloat);
 		ImGui::InputText("Name", guiString, 255);
 		ImGui::End();
 
 		// Update shape attributes
 		shapeColour = sf::Color(
-			static_cast<sf::Uint8>(shapeColourFloat[0] * 255),
-			static_cast<sf::Uint8>(shapeColourFloat[1] * 255),
-			static_cast<sf::Uint8>(shapeColourFloat[2] * 255)
+			static_cast<sf::Uint8>(shapeColourFloat[0] * 255.f),
+			static_cast<sf::Uint8>(shapeColourFloat[1] * 255.f),
+			static_cast<sf::Uint8>(shapeColourFloat[2] * 255.f)
 		);
+		currentShape->m_velocity = sf::Vector2f(velocityVec2f[0], velocityVec2f[1]);
+		currentShape->m_sprite->setScale(sf::Vector2f(currentShape->m_scale, currentShape->m_scale));
 		currentShape->m_sprite->setFillColor(shapeColour);
-		currentShape->m_sprite->setScale(sf::Vector2f(currentShape->m_scale, currentShape->m_scale));			// was .setRadius()
 		currentShape->m_text.setString(sf::String(guiString));
 
 		// Update logic
