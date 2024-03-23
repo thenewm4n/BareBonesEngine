@@ -8,7 +8,7 @@
 #include <SFML/Graphics.hpp>
 #include "imgui.h"
 #include "imgui-SFML.h"
-#include "imgui_demo.cpp"
+//#include "imgui_demo.cpp"
 
 class NewShape
 {
@@ -147,6 +147,20 @@ int main(int argc, char* argv[])
 
 		// GUI dropdown box
 		static int dropdownIndex = 0;
+
+		std::shared_ptr<NewShape> currentShape = shapes[dropdownIndex];
+
+		// Prepare buffer for GUI textbox
+		static char guiString[255];
+		strncpy(guiString, currentShape->m_text.getString().toAnsiString().c_str(), 254);	// strncpy_s on Windows; strncpy on Cac
+		guiString[254] = '\0';		// only necessary with srncpy on Mac
+
+		// Get sf::Color of shape and convert to float array; imgui requires RGB values as floats from 0-1
+		sf::Color shapeColour = currentShape->m_sprite->getFillColor();
+		float shapeColourFloat[3] = { static_cast<float>(shapeColour.r) / 256.f, static_cast<float>(shapeColour.g) / 256.f, static_cast<float>(shapeColour.b) / 256.f };
+
+		// Draw the UI
+		ImGui::Begin("Shape Properties");
 		if (ImGui::BeginCombo("##dropdown", shapes[dropdownIndex]->m_text.getString().toAnsiString().c_str()))
 		{
 			for (int i = 0; i < shapes.size(); i++)
@@ -160,20 +174,6 @@ int main(int argc, char* argv[])
 			}
 			ImGui::EndCombo();
 		}
-
-		std::shared_ptr<NewShape> currentShape = shapes[dropdownIndex];
-
-		// Prepare buffer for GUI textbox
-		static char guiString[255];
-		strncpy_s(guiString, currentShape->m_text.getString().toAnsiString().c_str(), 254);	// strncpy_s on Windows; strncpy on Cac
-		//guiString[254] = '\0';		// only necessary with srncpy on Mac
-
-		// Get sf::Color of shape and convert to float array; imgui requires RGB values as floats from 0-1
-		sf::Color shapeColour = currentShape->m_sprite->getFillColor();
-		float shapeColourFloat[3] = { static_cast<float>(shapeColour.r) / 256.f, static_cast<float>(shapeColour.g) / 256.f, static_cast<float>(shapeColour.b) / 256.f };
-
-		// Draw the UI
-		ImGui::Begin("Shape Properties");
 		ImGui::Checkbox("Draw Shape", &currentShape->m_draw);
 		ImGui::SliderFloat("##XVelocity", &currentShape->m_velocity.x, 0.0f, 100.f);					// Does it need text?
 		ImGui::SameLine();
