@@ -95,7 +95,7 @@ void readConfigFile(std::ifstream& file, std::vector<std::shared_ptr<NewShape>>&
 				shape->m_text = sf::Text(sf::String(shapeText), font, textSize);
 				shape->m_text.setFillColor(sf::Color(textColour[0], textColour[1], textColour[2]));
 
-				// Add shape to vector of shape pointers; std::move() required because shape is a std::unique_ptr
+				// Add shape to vector of shape pointers
 				shapes.push_back(shape);
 			}
 		}
@@ -114,9 +114,10 @@ int main(int argc, char* argv[])
 
 	// Vector of shapes
 	std::vector<std::shared_ptr<NewShape>> shapes;
-	sf::Vector2i windowDimensions(1920, 1080);			// Dynamically changed when reading config file
+	sf::Vector2i windowDimensions(1920, 1080);
 	sf::Font font;
 	
+	// Instantiates sf::Window, sf::Font and NewShapes according to config.txt
 	readConfigFile(file, shapes, windowDimensions, font);
 	file.close();
 	
@@ -143,12 +144,10 @@ int main(int argc, char* argv[])
 		// Updates imgui for this frame with the time the last frame took; .restart() returns the sf::Time object and restarts the clock
 		ImGui::SFML::Update(window, deltaClock.restart());
 
-		ImGui::ShowDemoWindow();
-
-		// GUI dropdown box
+		// GUI dropdown box index
 		static int dropdownIndex = 0;
 
-		// Prepare buffer for GUI textbox
+		// Prepare GUI textbox buffer
 		static char guiString[255];
 
 		// Draw the UI
@@ -158,7 +157,7 @@ int main(int argc, char* argv[])
 			for (int i = 0; i < shapes.size(); i++)
 			{
 				const bool isSelected = (dropdownIndex == i);
-				if (ImGui::Selectable(shapes[i]->m_text.getString().toAnsiString().c_str()), isSelected)
+				if (ImGui::Selectable(shapes[i]->m_text.getString().toAnsiString().c_str(), isSelected))
 					dropdownIndex = i;
 
 				if (isSelected)
@@ -168,12 +167,16 @@ int main(int argc, char* argv[])
 		}
 
 		std::shared_ptr<NewShape> currentShape = shapes[dropdownIndex];
+		
+		// Copies shape name to textbox buffer
 		strncpy_s(guiString, currentShape->m_text.getString().toAnsiString().c_str(), 254);	// strncpy_s on Windows; strncpy on Cac
 		//guiString[254] = '\0';		// only necessary with srncpy on Mac
 		
-		// Get sf::Color of shape and convert to float array; imgui requires RGB values as floats from 0-1
+		// Gets sf::Color of shape and convert to float array (imgui requires RGB values as floats from 0-1)
 		sf::Color shapeColour = currentShape->m_sprite->getFillColor();
-		static float shapeColourFloat[3] = { static_cast<float>(shapeColour.r) / 256.f, static_cast<float>(shapeColour.g) / 256.f, static_cast<float>(shapeColour.b) / 256.f };
+		float shapeColourFloat[3] = { static_cast<float>(shapeColour.r) / 256.f, static_cast<float>(shapeColour.g) / 256.f, static_cast<float>(shapeColour.b) / 256.f };
+		
+		// Gets the velocity as a float array (necessary for ImGui SliderFloat2)
 		float velocityVec2f[2] = { currentShape->m_velocity.x, currentShape->m_velocity.y };
 
 		ImGui::Checkbox("Draw Shape", &currentShape->m_draw);
@@ -185,9 +188,9 @@ int main(int argc, char* argv[])
 
 		// Update shape attributes
 		shapeColour = sf::Color(
-			static_cast<sf::Uint8>(shapeColourFloat[0] * 255.f),
-			static_cast<sf::Uint8>(shapeColourFloat[1] * 255.f),
-			static_cast<sf::Uint8>(shapeColourFloat[2] * 255.f)
+			static_cast<sf::Uint8>(shapeColourFloat[0] * 256.f),
+			static_cast<sf::Uint8>(shapeColourFloat[1] * 256.f),
+			static_cast<sf::Uint8>(shapeColourFloat[2] * 256.f)
 		);
 		currentShape->m_velocity = sf::Vector2f(velocityVec2f[0], velocityVec2f[1]);
 		currentShape->m_sprite->setScale(sf::Vector2f(currentShape->m_scale, currentShape->m_scale));
@@ -197,18 +200,19 @@ int main(int argc, char* argv[])
 		// Update logic
 		for (auto& shape : shapes)
 		{
-			const sf::FloatRect shapeBounds = shape->m_sprite->getGlobalBounds();
+			sf::FloatRect shapeBounds = shape->m_sprite->getGlobalBounds();
 
 			// If bounds exceed window edge, reverse corresponding velocity
 			if (shapeBounds.left < 0 || shapeBounds.left + shapeBounds.width > windowDimensions.x)
-				shape->m_velocity.x *= -1.0f;
+				shape->m_velocity.x *= -1.f;
 
 			if (shapeBounds.top < 0 || shapeBounds.top + shapeBounds.height > windowDimensions.y)
-				shape->m_velocity.y *= -1.0f;
+				shape->m_velocity.y *= -1.f;
 
 			shape->move();
-			
-			const sf::FloatRect newShapeBounds = shape->m_sprite->getGlobalBounds();
+
+			// Gets new bounds after shape has moved
+			shapeBounds = shape->m_sprite->getGlobalBounds();
 			const sf::FloatRect textBounds = shape->m_text.getLocalBounds();
 
 			// Sets text to center of shape

@@ -1,7 +1,6 @@
 
 # Next
-- The colours of the selected shape decrease until 128
-- Shape ext shifts on hitting bounds
+- Shape text shifts on hitting bounds.
 
 
 ### Left to do
