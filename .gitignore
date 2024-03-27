@@ -1,1 +1,3 @@
 /A1/visualstudio
+*.o
+*.DS_Store
