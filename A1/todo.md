@@ -1,19 +1,4 @@
 
-# Next
-- Shape text shifts on hitting bounds.
-
-
-### Left to do
-- ImGui:
-	- Drop box to select a shape
-	- Toggle if shape drawn
-		- for shape in shapes, if bool draw == true, window.draw(shape)
-	- Change scale (from 0-4)
-	- X & Y velocity (from -8 to 8)	
-	- Change color
-	- Change text
-
-
 ### What I think is done
 - [X] Read parameters from config.txt.
 	- Will always be Window and Font line
@@ -30,3 +15,12 @@
 	- shape.getLocalBounds().top/.left/.width/.height
 	- shape.getGlobalBounds() (?)
 	- for edge of shape, if edge exceeds corresponding edge of window, shape.correspondingVelocity *= -1
+
+- [X] ImGui:
+	- Drop box to select a shape
+	- Toggle if shape drawn
+		- for shape in shapes, if bool draw == true, window.draw(shape)
+	- Change scale (from 0-4)
+	- X & Y velocity (from -8 to 8)	
+	- Change color
+	- Change text
