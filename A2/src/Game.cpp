@@ -184,3 +184,64 @@ void Game::sRender()
 
     m_window.display()
 }
+
+void Game::sUserInput()
+{
+    //TODO: note that you should only be setting the player's input component variables here
+    // you should not implement the player's movement logic here
+    // the movement system will read the variables you set in this function
+
+    sf::Event;
+    while (m_window.pollEvent(event))
+    {
+        ImGui::SFML::ProcessEvent(m_window, event);
+
+        if (event.type == sf::Event::Closed)
+            m_running = false;
+        
+        if (event.type == escape key)
+            Game.m_isPaused = true; .....
+
+        if (event.type == sf::Event::KeyPressed)
+        {
+            switch (event.key.code)
+            {
+                case sf::Keyboard::W:
+                    std::cout << "W key pressed." << std::endl;
+                    // TODO: set player's input component "up" to true
+                    break;
+                default: break;
+            }
+        }
+
+        if (event.type == sf::Event::KeyReleased)
+        {
+            switch (event.key.code)
+            {
+            case sf::Keyboard::W:
+                std::cout << "W key released." << std::endl;
+                // TODO: set player's input component "up" to false
+                break;
+            default: break;
+            }
+        }
+
+        if (event.type == sf::Event::MouseButtonPressed)
+        {
+            // If ImGui is being clicked, ignores the mouse event
+            if (ImGui::GetIO().WantCaptureMouse) { continue; }
+
+            if (event.mouseButton.button == sf::Mouse::Left)
+            {
+                std::cout << "Left mouse button clicked at (" << event.MouseButton.x << ", " << event.mouseButton.y << ")" << std::endl;
+                // Call spawnBullet() here
+            }
+
+            if (event.mouseButton.button == sf::Mouse::Right)
+            {
+                std::cout << "Right mouse button clicked at (" << event.MouseButton.x << ", " << event.mouseButton.y << ")" << std::endl;
+                // call spawnSpecialWeapon() here
+            }
+        }
+    }
+}
