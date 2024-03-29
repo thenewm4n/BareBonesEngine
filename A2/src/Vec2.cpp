@@ -1,75 +1,84 @@
 #include "Vec2.h"
-#include <math.h>
+#include <cmath>
 
 Vec2::Vec2()
 {
-
 }
 
 Vec2::Vec2(float xIn, float yIn)
     : x(xIn), y(yIn)
 {
-
 }
 
-Vec2 Vect2::operator + (const Vec2& other) const
+Vec2 Vec2::operator + (const Vec2& other) const
 {
-    // TODO
-    return Vec2(0, 0);
+    return Vec2(this->x + other.x, this->y + other.y);
 }
 
-Vec2 Vect2::operator - (const Vec2& other) const
+Vec2 Vec2::operator - (const Vec2& other) const
 {
-    // TODO
-    return Vec2(0, 0);
+    return Vec2(this->x - other.x, this->y - other.y);
 }
 
-Vec2 Vect2::operator * (const float scalar) const
+Vec2 Vec2::operator * (const float scalar) const
 {
-    // TODO
-    return Vec2(0, 0);
+    return Vec2(this->x * scalar, this->y * scalar);
 }
 
-Vec2 Vect2::operator / (const float scalar) const
+Vec2 Vec2::operator / (const float scalar) const
 {
-    // TODO
-    return Vec2(0, 0);
+    return Vec2(this->x / scalar, this->y / scalar);
 }
 
-bool Vect2::operator == (const Vec2& other) const
+bool Vec2::operator == (const Vec2& other) const
 {
-    // TODO
+    if (this->x == other.x && this->y == other.y)
+        return true;
+    
     return false;
 }
 
-bool Vect2::operator != (const Vec2& other) const
+bool Vec2::operator != (const Vec2& other) const
 {
-    // TODO
-    return false;
+    if (this->x == other.x && this->y == other.y)
+        return false;
+    
+    return true;
 }
 
-void Vect2::operator += (const Vec2& other) const
+void Vec2::operator += (const Vec2& other)
 {
-    // TODO
+    this->x += other.x;
+    this->y += other.y;
 }
 
-void Vect2::operator -= (const Vec2& other) const
+void Vec2::operator -= (const Vec2& other)
 {
-    // TODO
+    this->x -= other.x;
+    this->y -= other.y;
 }
 
-void Vect2::operator *= (const float scalar) const
+void Vec2::operator *= (const float scalar)
 {
-    // TODO
+    this->x *= scalar;
+    this->y *= scalar;
 }
 
-void Vect2::operator /= (const float scalar) const
+void Vec2::operator /= (const float scalar)
 {
-    // TODO
+    this->x /= scalar;
+    this->y /= scalar;
 }
 
-float Vec2::distanct(const Vec2& other) const
+float Vec2::distance(const Vec2& other) const
 {
-    // TODO
-    return 0.f;
+    Vec2 diff = other - *this;
+    
+    return sqrtf(diff.x * diff.x + diff.y * diff.y);
 }
+
+/*
+void normalise()
+{
+}
+*/

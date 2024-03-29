@@ -5,7 +5,7 @@ Game::Game(const std::string& config)
     init(config);
 }
 
-Game::init(const std::string& path)
+void Game::init(const std::string& path)
 {
     // TODO: read in config file
 
@@ -49,6 +49,167 @@ void Game::setPaused(bool isPaused)
 {
     m_isPaused = isPaused;
 }
+
+
+// Systems
+
+void Game::sMovement()
+{
+    // TODO: implement all entity movement within this function
+    // - should read the m_player->cInput component to determine if player is moving
+
+// for (auto entity : m_entities.getEntities())
+
+    m_player->cTransform->position += m_player->cTransform->velocity;
+}
+
+void Game::sUserInput()
+{
+    //TODO: note that you should only be setting the player's input component variables here
+    // you should not implement the player's movement logic here
+    // the movement system will read the variables you set in this function
+
+    sf::Event;
+    while (m_window.pollEvent(event))
+    {
+        ImGui::SFML::ProcessEvent(m_window, event);
+
+        if (event.type == sf::Event::Closed)
+            m_isRunning = false;
+        
+        /* if (event.type == escape key)
+            quit game
+        */
+
+        if (event.type == sf::Event::KeyPressed)
+        {
+            switch (event.key.code)
+            {
+                case sf::Keyboard::Escape:
+                    m_isRunning = false;
+                    break;
+                case sf::Keyboard::P:
+                    m_isPaused = true;
+                    break;
+                case sf::Keyboard::W:
+                    std::cout << "W key pressed." << std::endl;
+                    // TODO: set player's input component "up" to true
+                    break;
+                default: break;
+            }
+        }
+
+        if (event.type == sf::Event::KeyReleased)
+        {
+            switch (event.key.code)
+            {
+            case sf::Keyboard::W:
+                std::cout << "W key released." << std::endl;
+                // TODO: set player's input component "up" to false
+                break;
+            default: break;
+            }
+        }
+
+        if (event.type == sf::Event::MouseButtonPressed)
+        {
+            // If ImGui is being clicked, ignores the mouse event
+            if (ImGui::GetIO().WantCaptureMouse) { continue; }
+
+            if (event.mouseButton.button == sf::Mouse::Left)
+            {
+                std::cout << "Left mouse button clicked at (" << event.MouseButton.x << ", " << event.mouseButton.y << ")" << std::endl;
+                // Call spawnBullet() here
+            }
+
+            if (event.mouseButton.button == sf::Mouse::Right)
+            {
+                std::cout << "Right mouse button clicked at (" << event.MouseButton.x << ", " << event.mouseButton.y << ")" << std::endl;
+                // call spawnSpecialWeapon() here
+            }
+        }
+    }
+}
+
+void Game::sRender()
+{
+    // TODO: change code to draw ALL entities
+    m_window.clear();
+    
+    // Set position of player sprite
+    m_player->cShape->circle.setPosition(m_player->cTransform->position.x, m_player->cTransform->position.y);
+
+    // Set rotation of player sprite
+    m_player->cTransform->angle += 1.f;
+    m_player->cShape->circle.setRotation(m_player->cTransform->angle);
+
+    // Draw the player's sf::CircleShape
+    m_window.draw(m_player->cShape->circle);
+
+    // Draw the UI
+    ImGui::SFML::Render(m_window);
+
+    m_window.display()
+}
+
+void Game::sCollision()
+{
+    // Don't use square root: use if (distance^2 < (r1+r2)^2)
+
+    // TODO: implement all proper collisions between entities
+    // - use COLLISION RADIUS, not shape radius
+
+    // Collisions between bullet and enemies
+    for (auto bullet : m_entities.getEntities("Bullet"))
+    {
+        for (auto enemy : m_entities.getEntities("Enemy"))
+        {
+            // if distance < bullet->cShape->radius + enement->cShape->radius
+                // destoy bullet, destroy enemy, spawn small enemies, update score
+        }
+
+        for (auto smallEnemy : m_entities.getEntities("SmallEnemy"))
+        {
+
+        }
+    }
+
+    // Collisions with edge of screen
+        // 
+
+    // Collisions between player and enemy
+        // set player to dead
+}
+
+void Game::sLifespan()
+{
+    // TODO
+
+    // for all entities
+    // - if entity has no lifespan component, skip
+    // - if entity has > 0 remaining lifespan, decrement
+    // - if it has lifespan and is alive: scale alpha channel properly
+    // - if it has lifespand and time is up: destroy the entity
+}
+
+void Game::sEnemySpawner()
+{
+    // TODO: code implementing enemy spawning
+    // if no. frames since last enemy spawned > spawnInterval: spawnEnemy()
+    // - i.e. m_currentFrame - m_lastEnemySpawnTime
+}
+
+void Game::sGUI()
+{
+    ImGui::Begin("Assignment 2");
+
+    ImGui::Text("Stuff goes here.");
+
+    ImGui::End();
+}
+
+
+// Other functions
 
 // Spawns the player entity in middle of screen
 void Game::spawnPlayer()
@@ -98,150 +259,4 @@ void Game::spawnBullet(std::shared_ptr<Entity> entity, const Vec2& target)  // t
 void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity)
 {
     //TODO
-}
-
-void Game::sMovement()
-{
-    // TODO: implement all entity movement within this function
-    // - should read the m_player->cInput component to determine if player is moving
-
-// for (auto entity : m_entities.getEntities())
-
-    m_player->cTransform->position += m_player->cTransform->velocity;
-}
-
-void Game::sLifespan()
-{
-    // TODO
-
-    // for all entities
-    // - if entity has no lifespan component, skip
-    // - if entity has > 0 remaining lifespan, decrement
-    // - if it has lifespan and is alive: scale alpha channel properly
-    // - if it has lifespand and time is up: destroy the entity
-}
-
-void Game::sCollision()
-{
-    // TODO: implement all proper collisions between entities
-    // - use COLLISION RADIUS, not shape radius
-
-    // Collisions between bullet and enemies
-    for (auto bullet : m_entities.getEntities("Bullet"))
-    {
-        for (auto enemy : m_entities.getEntities("Enemy"))
-        {
-            // if distance < bullet->cShape->radius + enement->cShape->radius
-                // destoy bullet, destroy enemy, spawn small enemies, update score
-        }
-
-        for (auto smallEnemy : m_entities.getEntities("SmallEnemy"))
-        {
-
-        }
-    }
-
-    // Collisions with edge of screen
-        // 
-
-    // Collisions between player and enemy
-        // set player to dead
-}
-
-void Game::sEnemySpawner()
-{
-    // TODO: code implementing enemy spawning
-    // if no. frames since last enemy spawned > spawnInterval: spawnEnemy()
-    // - i.e. m_currentFrame - m_lastEnemySpawnTime
-}
-
-void Game::sGUI()
-{
-    ImGui::Begin("Assignment 2");
-
-    ImGui::Text("Stuff goes here.");
-
-    ImGui::End();
-}
-
-void Game::sRender()
-{
-    // TODO: change code to draw ALL entities
-    m_window.clear();
-    
-    // Set position of player sprite
-    m_player->cShape->circle.setPosition(m_player->cTransform->position.x, m_player->cTransform->position.y);
-
-    // Set rotation of player sprite
-    m_player->cTransform->angle += 1.f;
-    m_player->cShape->circle.setRotation(m_player->cTransform->angle);
-
-    // Draw the player's sf::CircleShape
-    m_window.draw(m_player->cShape->circle);
-
-    // Draw the UI
-    ImGui::SFML::Render(m_window);
-
-    m_window.display()
-}
-
-void Game::sUserInput()
-{
-    //TODO: note that you should only be setting the player's input component variables here
-    // you should not implement the player's movement logic here
-    // the movement system will read the variables you set in this function
-
-    sf::Event;
-    while (m_window.pollEvent(event))
-    {
-        ImGui::SFML::ProcessEvent(m_window, event);
-
-        if (event.type == sf::Event::Closed)
-            m_running = false;
-        
-        if (event.type == escape key)
-            Game.m_isPaused = true; .....
-
-        if (event.type == sf::Event::KeyPressed)
-        {
-            switch (event.key.code)
-            {
-                case sf::Keyboard::W:
-                    std::cout << "W key pressed." << std::endl;
-                    // TODO: set player's input component "up" to true
-                    break;
-                default: break;
-            }
-        }
-
-        if (event.type == sf::Event::KeyReleased)
-        {
-            switch (event.key.code)
-            {
-            case sf::Keyboard::W:
-                std::cout << "W key released." << std::endl;
-                // TODO: set player's input component "up" to false
-                break;
-            default: break;
-            }
-        }
-
-        if (event.type == sf::Event::MouseButtonPressed)
-        {
-            // If ImGui is being clicked, ignores the mouse event
-            if (ImGui::GetIO().WantCaptureMouse) { continue; }
-
-            if (event.mouseButton.button == sf::Mouse::Left)
-            {
-                std::cout << "Left mouse button clicked at (" << event.MouseButton.x << ", " << event.mouseButton.y << ")" << std::endl;
-                // Call spawnBullet() here
-            }
-
-            if (event.mouseButton.button == sf::Mouse::Right)
-            {
-                std::cout << "Right mouse button clicked at (" << event.MouseButton.x << ", " << event.mouseButton.y << ")" << std::endl;
-                // call spawnSpecialWeapon() here
-            }
-        }
-    }
 }

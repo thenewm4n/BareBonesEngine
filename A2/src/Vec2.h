@@ -8,7 +8,7 @@ public:
 
 public:
     Vec2();
-    Vec2(float x, float y);
+    Vec2(float xIn, float yIn);
 
     bool operator == (const Vec2& other) const;
     bool operator != (const Vec2& other) const;
@@ -24,4 +24,5 @@ public:
     void operator /= (const float scalar);
 
     float distance(const Vec2& other) const;
+    //void normalise();
 };
