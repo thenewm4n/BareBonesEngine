@@ -9,7 +9,7 @@ class Entity
     friend class EntityManager;
 
 private:
-    bool m_active = true;
+    bool m_alive = true;
     size_t m_id = 0;
     std::string m_tag = "Default";
 
@@ -24,8 +24,8 @@ public:
     std::shared_ptr<CLifespan> cLifespan;
 
 public:
-    bool isActice() const;
-    const std::string& tag() const;
-    const size_t id() const;
+    bool isAlive() const;
+    const std::string& getTag() const;
+    const size_t getId() const;
     void destroy();
 };

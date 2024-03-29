@@ -6,14 +6,22 @@ EntityManager::EntityManager()
 
 void EntityManager::update()
 {
-    // TODO: add entities from m_entityToAdd to the proper location(s)
-    // - add them to vector of all entities
-    // - add them to vector inside the map, with the tag as the (?)key
+    // Adding entities
+    for (auto& entity : m_entitiesToAdd)        // use & to avoid copy of the shared_ptr, and therefore increase of its reference count
+    {
+        // Add entity to vector of all entities
+        m_entities.push_back(entity);
 
-    // Remove the dead entities from the vector of all entities
+        // Add entity to vector of entities with corresponding tag in m_entityMap
+        m_entityMap[entity.getTag()].push_back(entity);
+    }
+
+
+    // Removing entities
+    // - Remove the dead entities from vector of all entities
     removeDeadEntities(m_entities);
 
-    // Remove dead entities from each vector in the entitiy map
+    // - Remove dead entities from each vector in the entitiy map
     for (auto& [tag, entityVector] : m_entityMap)
     {
         removeDeadEntities(entityVector);
@@ -28,6 +36,25 @@ void EntityManager::removeDeadEntities(EntityVector& vector)
     // To avoid iterator invalidation...
         // loop over all entities, checking which are dead (i.e. !isAlive())
         // then, loop over these marked entities and remove them from the vector
+
+    // To avoid iterator invalidation, iterate over and mark for removal, then iterate over again and remove
+
+    // First iteration for marking
+    EntityVector entitiesForRemoval;
+    for (auto& entity : m_entities)
+    {
+        if (!entity.isAlive())
+        {
+            entitiesForRemoval.push_back(entity);
+        }
+    }
+
+    // Second iteration for removal
+    for (auto& entity : m_entitiesForRemoval)
+    {
+       // WHAT IS GOING ON HERE
+       // m_entities.erase(std::remove_if(m_entities.begin(), m_entities.end(), [entity.getTag()](const Entity& entity) { return entity.}));
+    }
 }
 
 std::shared_ptr<Entity> EntityManager::addEntity(const std::string& tag)
