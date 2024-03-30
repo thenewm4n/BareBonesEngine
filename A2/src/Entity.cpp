@@ -9,4 +9,4 @@ const std::string& Entity::getTag() const { return m_tag; }
 
 const size_t Entity::getId() const { return m_id; }
 
-void Entity::destroy() { m_active = false; }
+void Entity::destroy() { m_alive = false; }

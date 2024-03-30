@@ -28,10 +28,8 @@ private:
     std::shared_ptr<Entity> m_player;
     int m_lastEnemySpawnTime = 0;
 
-public:
-    Game(const std::string& configFilePath);
+private:
     void init(const std::string& configFilePath);    
-    void run();
     
     void sMovement();
     void sUserInput();
@@ -46,4 +44,8 @@ public:
     void spawnSmallEnemies();
     void spawnBullet();
     void spawnSpecialWeapon();
+
+public:
+    Game(const std::string& configFilePath);
+    void run();
 };

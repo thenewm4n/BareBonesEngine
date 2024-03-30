@@ -14,7 +14,7 @@ private:
     std::string m_tag = "Default";
 
 private:
-    Entity(constr size_t if, const std::string& tag);
+    Entity(const size_t id, const std::string& tag);
 
 public:
     std::shared_ptr<CTransform> cTransform;
@@ -22,6 +22,7 @@ public:
     std::shared_ptr<CCollision> cCollision;
     std::shared_ptr<CScore> cScore;
     std::shared_ptr<CLifespan> cLifespan;
+    std::shared_ptr<CInput> cInput;
 
 public:
     bool isAlive() const;

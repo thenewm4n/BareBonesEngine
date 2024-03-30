@@ -24,7 +24,7 @@ public:
     CShape(float radius, int points, const sf::Color& fill, const sf::Color& outline, float thickness)
         : circle(radius, points)
     {
-        circle.setFillColor(color);
+        circle.setFillColor(fill);
         circle.setOutlineColor(outline);
         circle.setOutlineThickness(thickness);
         circle.setOrigin(radius, radius);
@@ -51,7 +51,7 @@ public:
         : score(s) {}
 };
 
-Class CLifespan
+class CLifespan
 {
 public:
     int remaining = 0;
@@ -62,7 +62,7 @@ public:
         :remaining(total), total(total) {}
 };
 
-Class CInput
+class CInput
 {
 public:
     bool up = false;

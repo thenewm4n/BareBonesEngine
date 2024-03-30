@@ -23,18 +23,22 @@ void Game::run()
     //  rendering system should still function; shapes should still rotate
     //  movement and input systems should stop
 
-    while(m_running)
+    while(m_isRunning)
     {
         m_entities.update();
 
         ImGui::SFML::Update(m_window, m_deltaClock.restart());
 
         // Call each systems
-        // use if(isPaused) here to determine whether movement and input should stop
-        sEnemySpawner();
-        sMovement();
+        // THIS MAY BE WRONG
+        if (!m_isPaused)
+        {
+            sEnemySpawner();
+            sMovement();
+        }
         sCollision();
         sUserInput();
+        sLifespan();
         sGUI();
         sRender();
 
@@ -42,12 +46,6 @@ void Game::run()
         // may need to be moved when pause implemented (?)
         m_currentFrame++;   
     }
-}
-
-// COULD REMOVE THIS AND JUST USE THE M_PAUSED VARIABLE
-void Game::setPaused(bool isPaused)
-{
-    m_isPaused = isPaused;
 }
 
 
@@ -214,8 +212,15 @@ void Game::sGUI()
 // Spawns the player entity in middle of screen
 void Game::spawnPlayer()
 {
-    // TODO: Finish addiing all properties of the player with the correct values from the config file
-    
+    // Attributes to set - LOOK AT PLAYERCONFIG STRUCT
+        // Shape radius (cShape)
+        // Collision radius (cCollision)
+        // Speed
+        // Fill colour & outline colour, outline thickness (cShape)
+        // Shape vertices (cShape)
+
+
+    // TODO: Finish adding all properties of the player with the correct values from the config file
     std::shared_ptr<Entity> entity = m_entities.addEntity("Player");
     
     // TODO: entity->cTransform = std::make_shared<CTransform>(Vec2(200.f, 200.f), Vec2(1.f, 1.f), 0.f);    ACCORDING TO CONFIG

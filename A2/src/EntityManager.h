@@ -2,6 +2,8 @@
 
 #include <vector>
 #include <map>
+#include <algorithm>
+
 #include "Entity.h"
 
 using EntityVector = std::vector<std::shared_ptr<Entity>>;
@@ -16,14 +18,15 @@ private:
 	size_t m_totalEntities = 0;
 
 private:
-	std::shared_ptr<Entity> addEntity(const std::string& tag);
 	void removeDeadEntities(EntityVector& vector);
 
 public:
 	EntityManager();
+	
 	void update();
+	std::shared_ptr<Entity> addEntity(const std::string& tag);
 
 	const EntityVector& getEntities();
 	const EntityVector& getEntities(const std::string& tag);
 	const std::map<std::string, EntityVector>& getEntityMap();
-}
+};

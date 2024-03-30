@@ -4,6 +4,42 @@ EntityManager::EntityManager()
 {
 }
 
+std::shared_ptr<Entity> EntityManager::addEntity(const std::string& tag)
+{
+    auto entity = std::shared_ptr<Entity>(new Entity(m_totalEntities++, tag));   // sets id as m_totalEntities, then increments it
+    m_entitiesToAdd.push_back(entity);
+    return entity;   
+}
+
+// Marks dead entities and removes them from the input vector
+void EntityManager::removeDeadEntities(EntityVector& vector)
+{
+    // To avoid iterator invalidation, iterate over and mark for removal, then iterate over again and remove
+
+    // First iteration for marking
+    EntityVector entitiesForRemoval;
+    for (auto& entity : vector)
+    {
+        if (!entity->isAlive())
+        {
+            entitiesForRemoval.push_back(entity);
+        }
+    }
+
+    // Second iteration for removal
+    for (auto& entityToRemove : entitiesForRemoval)
+    {
+        // Lambda function to pass to remove_if
+        auto predicate = [entityToRemove](const std::shared_ptr<Entity>& entity)
+        {
+            return entity->getId() == entityToRemove->getId();
+        };
+
+        // Move matching Entity objects to end of vector, and remove them
+        vector.erase(std::remove_if(vector.begin(), vector.end(), predicate), vector.end());
+    }
+}
+
 void EntityManager::update()
 {
     // Adding entities
@@ -13,7 +49,7 @@ void EntityManager::update()
         m_entities.push_back(entity);
 
         // Add entity to vector of entities with corresponding tag in m_entityMap
-        m_entityMap[entity.getTag()].push_back(entity);
+        m_entityMap[entity->getTag()].push_back(entity);
     }
 
 
@@ -21,47 +57,11 @@ void EntityManager::update()
     // - Remove the dead entities from vector of all entities
     removeDeadEntities(m_entities);
 
-    // - Remove dead entities from each vector in the entitiy map
+    // - Remove dead entities from each vector in the entity map
     for (auto& [tag, entityVector] : m_entityMap)
     {
         removeDeadEntities(entityVector);
     }
-}
-
-void EntityManager::removeDeadEntities(EntityVector& vector)
-{
-    // TODO: remove all dead entities from the input vector
-    // (this is called by update())
-
-    // To avoid iterator invalidation...
-        // loop over all entities, checking which are dead (i.e. !isAlive())
-        // then, loop over these marked entities and remove them from the vector
-
-    // To avoid iterator invalidation, iterate over and mark for removal, then iterate over again and remove
-
-    // First iteration for marking
-    EntityVector entitiesForRemoval;
-    for (auto& entity : m_entities)
-    {
-        if (!entity.isAlive())
-        {
-            entitiesForRemoval.push_back(entity);
-        }
-    }
-
-    // Second iteration for removal
-    for (auto& entity : m_entitiesForRemoval)
-    {
-       // WHAT IS GOING ON HERE
-       // m_entities.erase(std::remove_if(m_entities.begin(), m_entities.end(), [entity.getTag()](const Entity& entity) { return entity.}));
-    }
-}
-
-std::shared_ptr<Entity> EntityManager::addEntity(const std::string& tag)
-{
-    auto entity = std::shared_ptr<Entity>(new Entity(m_totalEntities++, tag));  // sets id as m_totalEntities, then increments it
-    m_entitiesToAdd.push_back(entity);
-    return entity;   
 }
 
 const EntityVector& EntityManager::getEntities()
@@ -71,8 +71,7 @@ const EntityVector& EntityManager::getEntities()
 
 const EntityVector& EntityManager::getEntities(const std::string& tag)
 {
-    // TODO return the vector of entities with the given tag from the map
-    return m_entities; // this is wrong
+    return m_entityMap[tag];
 }
 
 const std::map<std::string, EntityVector>& EntityManager::getEntityMap()
