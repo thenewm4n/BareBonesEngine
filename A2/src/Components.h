@@ -7,7 +7,7 @@ class CTransform
 {
 public:
     Vec2 position = { 0.f, 0.f };
-    Vec2 velocity = {0.f, 0.f};
+    Vec2 velocity = { 0.f, 0.f };
     float angle = 0.f;
 
 public:
@@ -18,16 +18,16 @@ public:
 class CShape
 {
 public:
-    sf::CircleShape circle;
+    sf::CircleShape shape;
 
 public:
-    CShape(float radius, int points, const sf::Color& fill, const sf::Color& outline, float thickness)
-        : circle(radius, points)
+    CShape(float radius, int vertices, const sf::Color& fill, const sf::Color& outline, float thickness)
+        : shape(radius, vertices)
     {
-        circle.setFillColor(fill);
-        circle.setOutlineColor(outline);
-        circle.setOutlineThickness(thickness);
-        circle.setOrigin(radius, radius);
+        shape.setFillColor(fill);
+        shape.setOutlineColor(outline);
+        shape.setOutlineThickness(thickness);
+        shape.setOrigin(radius, radius);
     }
 };
 

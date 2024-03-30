@@ -7,7 +7,7 @@
 #include "EntityManager.h"
 
 struct PlayerConfig { int shapeRadius, collisionRadius, fillR, fillG, fillB, outlineR, outlineG, outlineB, outlineThick, vertices; float speed; };
-struct EnemyConfig { int shapeRadius, collisionRadius, outlineR, outlineG, outlineB, outlineThick, verticesMax, verticesMin, lifespan, spawnInterval; float speedMax, speedMin;};
+struct EnemyConfig { int shapeRadius, collisionRadius, outlineR, outlineG, outlineB, outlineThick, verticesMax, verticesMin, smallLifespan, spawnInterval; float speedMax, speedMin;};
 struct BulletConfig { int shapeRadius, collisionRadius, fillR, fillG, fillB, outlineR, outlineG, outlineB, outlineThick, vertices, lifespan; float speed; };
 
 class Game
@@ -41,9 +41,9 @@ private:
 
     void spawnPlayer();
     void spawnEnemy();
-    void spawnSmallEnemies();
-    void spawnBullet();
-    void spawnSpecialWeapon();
+    void spawnSmallEnemies(std::shared_ptr<Entity> entity);
+    void spawnBullet(std::shared_ptr<Entity> entity, const Vec2& target);
+    void spawnSpecialWeapon(std::shared_ptr<Entity> entity);
 
 public:
     Game(const std::string& configFilePath);

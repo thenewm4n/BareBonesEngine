@@ -4,6 +4,6 @@
 
 int main()
 {
-	Game g("config.txt");
-	g.run();
+	Game game("config.txt");
+	game.run();
 }
