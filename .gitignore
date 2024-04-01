@@ -1,5 +1,6 @@
 */visualstudio
 */.vs
+*/.vscode
 *.o
 *.DS_Store
 *.ipch
