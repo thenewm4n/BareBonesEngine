@@ -7,7 +7,8 @@ EntityManager::EntityManager()
 std::shared_ptr<Entity> EntityManager::addEntity(const std::string& tag)
 {
     auto entity = std::shared_ptr<Entity>(new Entity(m_totalEntities++, tag));   // sets id as m_totalEntities, then increments it
-    m_entitiesToAdd.push_back(entity);
+    
+    ToAdd.push_back(entity);
     return entity;   
 }
 
@@ -18,7 +19,7 @@ void EntityManager::removeDeadEntities(EntityVector& vector)
 
     // First iteration for marking
     EntityVector entitiesForRemoval;
-    for (auto& entity : vector)
+    for (const auto& entity : vector)
     {
         if (!entity->isAlive())
         {
@@ -27,7 +28,7 @@ void EntityManager::removeDeadEntities(EntityVector& vector)
     }
 
     // Second iteration for removal
-    for (auto& entityToRemove : entitiesForRemoval)
+    for (const auto& entityToRemove : entitiesForRemoval)
     {
         // Lambda function to pass to remove_if
         auto predicate = [entityToRemove](const std::shared_ptr<Entity>& entity)
@@ -43,7 +44,7 @@ void EntityManager::removeDeadEntities(EntityVector& vector)
 void EntityManager::update()
 {
     // Adding entities
-    for (auto& entity : m_entitiesToAdd)        // use & to avoid copy of the shared_ptr, and therefore increase of its reference count
+    for (const auto& entity : m_entitiesToAdd)        // use & to avoid copy of the shared_ptr, and therefore increase of its reference count
     {
         // Add entity to vector of all entities
         m_entities.push_back(entity);
@@ -58,7 +59,7 @@ void EntityManager::update()
     removeDeadEntities(m_entities);
 
     // - Remove dead entities from each vector in the entity map
-    for (auto& [tag, entityVector] : m_entityMap)
+    for (const auto& [tag, entityVector] : m_entityMap)
     {
         removeDeadEntities(entityVector);
     }

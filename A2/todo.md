@@ -4,8 +4,10 @@
 	- [X] Implement EntityManager::addEntity() and ::update() (don't worry about deleting dead Entities yet).
 3. Implement basics of Game class.
 	- [X] Construct a player Entity using spawnPlayer() function.
-	- [ I'M HERE ] Implement basic drawing of entities using the Game::sRender function.
-	- Construct some enemies using the spawnEnemy() function.
+	- [X] Implement basic drawing of entities using the Game::sRender function.
+	- [ I'M HERE ]Construct some enemies using the spawnEnemy() function.
+		- Random velocity with %
+		- Random vertices with %
 	- Construct a bullet using the spawnBullet() function.
 4. Implement player movement in Game::sUserInput and Game::sMovement
 5. Implement the EntityManager::update() function so it deletes dead enemies
@@ -16,6 +18,6 @@
 10. Implement sLifespan using RGBA.
 
 - Where to set m_text position to top left, and make score update?
-- Where to rotate enemies? In render, along with player?
+- [ ] Check the position of bullets are set in sRender(), and their movement in sMovement() (should be fine since they have a Transform and Shape)
 
 

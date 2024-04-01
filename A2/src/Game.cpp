@@ -122,7 +122,27 @@ void Game::sMovement()
     // TODO: implement all entity movement within this function
     // - should read the m_player->cInput component to determine if player is moving
 
-// for (auto entity : m_entities.getEntities())
+    // Check if hit wall
+    for (const auto& entity : m_entities.getEntities())
+    {
+        sf::FloatRect shapeBounds = shape->m_sprite->getGlobalBounds();
+
+        // If bounds exceed window edge, reverse corresponding velocity
+        if (shapeBounds.left < 0 || shapeBounds.left + shapeBounds.width > windowDimensions.x)
+            shape->m_velocity.x *= -1.f;
+
+        if (shapeBounds.top < 0 || shapeBounds.top + shapeBounds.height > windowDimensions.y)
+            shape->m_velocity.y *= -1.f;
+    }
+
+    // Move all entities with a Transform component
+    for (const auto& entity : m_entities.getEntities())
+    {
+        if (entity->cTransform)
+        {
+            entity->cTransform.position += entity->cTransform.velocity;
+        }
+    }
 
     m_player->cTransform->position += m_player->cTransform->velocity;
 }
@@ -197,29 +217,37 @@ void Game::sUserInput()
 
 void Game::sRender()
 {
-    // TODO: change code to draw ALL entities
     m_window.clear();
-    
-    // Set position of player sprite
-    m_player->cShape->circle.setPosition(m_player->cTransform->position.x, m_player->cTransform->position.y);
 
-    // Rotate player sprite
-    m_player->cTransform.angle += 1.f;
-    if (m_player->cTransform.angle >= 360.f)
+    // Rotate player and all enemies
+    EntityVector rotatingEntities = m_entities.getEntities("Enemy");
+    rotatingEntities.push_back(m_player);
+
+    for (const auto& entity : rotatingEntities)
     {
-        m_player->cTransform.angle -= 360.f;
+        entity->cTransform.angle += 1.f;
+        if (entity->cTransform.angle >= 360.f)
+        {
+            entity->cTransform.angle -= 360.f;
+        }
+        entity->cShape->shape.setRotation(entity->cTransform.angle);
     }
-    m_player->cShape->circle.setRotation(m_player->cTransform->angle);
 
-    for (auto& entity : m_entities)
+    // THIS MAY BE WRONG; MAYBE SPLIT SETTING POSITION AND DRAWING
+    for (const auto& entity : m_entities.getEntities())
     {
-        // If entity has a shape component, draw it to window
+        // If entity has transform component, update entity position
+        if (entity->cTransform)
+        {
+            entity->cShape->shape.setPosition(entity->cTransform->position.x, entity->cTransform->position.y);
+        }
+
+        // If entity has shape component, draw it to window
         if (entity->cShape)
         {
             m_window.draw(entity->cShape.shape);
         }
     }
-
 
     // Draw the UI
     ImGui::SFML::Render(m_window);
@@ -235,15 +263,15 @@ void Game::sCollision()
     // - use COLLISION RADIUS, not shape radius
 
     // Collisions between bullet and enemies
-    for (auto bullet : m_entities.getEntities("Bullet"))
+    for (const auto& bullet : m_entities.getEntities("Bullet"))
     {
-        for (auto enemy : m_entities.getEntities("Enemy"))
+        for (const auto& enemy : m_entities.getEntities("Enemy"))
         {
             // if distance < bullet->cShape->radius + enement->cShape->radius
                 // destoy bullet, destroy enemy, spawn small enemies, update score
         }
 
-        for (auto smallEnemy : m_entities.getEntities("SmallEnemy"))
+        for (const auto& smallEnemy : m_entities.getEntities("SmallEnemy"))
         {
 
         }
@@ -311,9 +339,21 @@ void Game::spawnPlayer()
 void Game::spawnEnemy()
 {
     // TODO: make sure enemy is spawned properly with the m_enemyConfig variables
-        // the enemy must be spawned completely withiin bounds of window (check whether origin is radius away from border)
+        // the enemy must be spawned completely within bounds of window (check whether origin is radius away from border)
 
     // Create entity and add to entity manager (like in spawnPlayer())
+    std::shared_ptr<Entity> entity = m_entities.addEntity("Enemy");
+    
+    // TODO: random velocity between min and max range using % (see lecture
+    entity->cTransform = std::make_shared<CTransform>(Vec2(200.f, 200.f), Vec2(m_playerConfig.speed, m_playerConfig.speed), 0.f);
+
+    // TODO: random fill colour
+    sf::Color fillColour();
+    sf::Color outlineColour(m_enemyConfig.outlineR, m_enemyConfig.outlineG, m_enemyConfig.outlineB);
+    // TODO: Random vertices between min and max range using % (see lecture)      int numVertices = ...
+    entity->cShape = std::make_shared<CShape>(m_enemyConfig.shapeRadius, numVertices, fillColour, outlineColour, m_enemyConfig.outlineThick);
+
+    entity->cCollision = std::make_shared<CCollision>(m_enemyConfig.collisionRadius);
 
     m_lastEnemySpawnTime = m_currentFrame;
 }

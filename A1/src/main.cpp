@@ -198,7 +198,7 @@ int main(int argc, char* argv[])
 		currentShape->m_text.setString(sf::String(guiString));
 
 		// Update logic
-		for (auto& shape : shapes)
+		for (const auto& shape : shapes)
 		{
 			sf::FloatRect shapeBounds = shape->m_sprite->getGlobalBounds();
 
@@ -223,7 +223,7 @@ int main(int argc, char* argv[])
 		window.clear();
 
 		// Draw each shape to window
-		for (auto& shape : shapes)
+		for (const auto& shape : shapes)
 		{
 			if (shape->m_draw)
 			{

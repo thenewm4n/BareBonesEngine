@@ -1,4 +1,6 @@
-/A1/visualstudio
+*/visualstudio
+*/.vs
 *.o
 *.DS_Store
-*ipch
+*.ipch
+*.obj
