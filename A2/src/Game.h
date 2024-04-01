@@ -5,6 +5,7 @@
 
 #include "Entity.h"
 #include "EntityManager.h"
+// #include "Vec2.h"
 
 struct PlayerConfig { int shapeRadius, collisionRadius, fillR, fillG, fillB, outlineR, outlineG, outlineB, outlineThick, vertices; float speed; };
 struct EnemyConfig { int shapeRadius, collisionRadius, outlineR, outlineG, outlineB, outlineThick, verticesMax, verticesMin, smallLifespan, spawnInterval; float speedMax, speedMin;};
@@ -14,6 +15,7 @@ class Game
 {
 private:
     sf::RenderWindow m_window;
+    Vec2 m_resolution;
     EntityManager m_entities;
     sf::Font m_font;
     sf::Text m_text;
@@ -23,10 +25,10 @@ private:
     sf::Clock m_deltaClock;
     int m_score = 0;
     int m_currentFrame = 0;
+    int m_lastEnemySpawnFrame = 0;
     bool m_isRunning = true;
     bool m_isPaused = false;
     std::shared_ptr<Entity> m_player;
-    int m_lastEnemySpawnTime = 0;
 
 private:
     void init(const std::string& configFilePath);    

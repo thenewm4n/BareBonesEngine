@@ -1,6 +1,9 @@
+#include <random>
+
 #include "Game.h"
 
 Game::Game(const std::string& configFile)
+    : m_resolution(1920, 1080)
 {
     init(configFile);
 }
@@ -18,8 +21,6 @@ void Game::init(const std::string& configFile)
     // Read config.txt
     std::string line;
     std::string firstElement;
-    
-    Vec2 resolution(1920, 1080);
 
     while (std::getline(file, line))
     {
@@ -29,7 +30,7 @@ void Game::init(const std::string& configFile)
         {
             if (firstElement == "Window")
             {
-                lineStream >> resolution.x >> resolution.y;
+                lineStream >> m_resolution.x >> m_resolution.y;
             }
             else if (firstElement == "Font")
             {
@@ -75,7 +76,7 @@ void Game::init(const std::string& configFile)
 
     file.close();
 
-    m_window.create(sf::VideoMode(resolution.x, resolution.y), "Assignment 2");
+    m_window.create(sf::VideoMode(m_resolution.x, m_resolution.y), "Assignment 2");
     m_window.setFramerateLimit(60);
 
     ImGui::SFML::Init(m_window);
@@ -143,8 +144,6 @@ void Game::sMovement()
             entity->cTransform.position += entity->cTransform.velocity;
         }
     }
-
-    m_player->cTransform->position += m_player->cTransform->velocity;
 }
 
 void Game::sUserInput()
@@ -299,7 +298,7 @@ void Game::sEnemySpawner()
 {
     // TODO: code implementing enemy spawning
     // if no. frames since last enemy spawned > spawnInterval: spawnEnemy()
-    // - i.e. m_currentFrame - m_lastEnemySpawnTime
+    // - i.e. m_currentFrame - m_lastEnemySpawnFrame
 }
 
 void Game::sGUI()
@@ -338,24 +337,43 @@ void Game::spawnPlayer()
 // Spawn enemy at random position; trigger intermittently automatially
 void Game::spawnEnemy()
 {
-    // TODO: make sure enemy is spawned properly with the m_enemyConfig variables
-        // the enemy must be spawned completely within bounds of window (check whether origin is radius away from border)
-
     // Create entity and add to entity manager (like in spawnPlayer())
     std::shared_ptr<Entity> entity = m_entities.addEntity("Enemy");
     
-    // TODO: random velocity between min and max range using % (see lecture
-    entity->cTransform = std::make_shared<CTransform>(Vec2(200.f, 200.f), Vec2(m_playerConfig.speed, m_playerConfig.speed), 0.f);
+    // Engine for all RNG
+    std::default_random_engine generator;
 
-    // TODO: random fill colour
-    sf::Color fillColour();
+    // Generate random position
+    std::uniform_int_distribution<int> xDistribution(entity->m_enemyConfig.shapeRadius, m_resolution.x - entity->m_enemyConfig.shapeRadius);
+    std::uniform_int_distribution<int> yDistribution(entity->m_enemyConfig.shapeRadius, m_resolution.y - entity->m_enemyConfig.shapeRadius);
+    Vec2 position(xDistribution(generator), yDistribution(generator);
+
+    // Generate random speed
+    std::uniform_real_distribution<float> velocityDistribution(m_enemyConfig.speedMin, m_enemyConfig.speedMax);
+    Vec2 velocity(velocityDistribution(generator), velocityDistribution(generator));
+
+    // Generate random angle
+    std::uniform_real_distribution<float> angleDistribution(0, 360);
+    float angle = angleDistribution(generator);
+
+    // Instantiate Transform component with randomly generated position, velocity, angle
+    entity->cTransform = std::make_shared<CTransform>(position, velocity, angle);
+
+    // Generate random fill colour
+    std::uniform_int_distribution<int> colourDistribution(0, 255);
+    sf::Color fillColour(colourDistribution(generator), colourDistribution(generator), colourDistribution(generator));
     sf::Color outlineColour(m_enemyConfig.outlineR, m_enemyConfig.outlineG, m_enemyConfig.outlineB);
-    // TODO: Random vertices between min and max range using % (see lecture)      int numVertices = ...
+
+    // Generate random no. vertices
+    std::uniform_int_distribution<int> verticesDistribution(3, 8);
+    int numVertices = verticesDistrbution(generator);
+
+    // Instantiation Shape sprite component with radius, no. vertices, colours, and outline thickness
     entity->cShape = std::make_shared<CShape>(m_enemyConfig.shapeRadius, numVertices, fillColour, outlineColour, m_enemyConfig.outlineThick);
 
     entity->cCollision = std::make_shared<CCollision>(m_enemyConfig.collisionRadius);
 
-    m_lastEnemySpawnTime = m_currentFrame;
+    m_lastEnemySpawnFrame = m_currentFrame;
 }
 
 void Game::spawnSmallEnemies(std::shared_ptr<Entity> entity)
