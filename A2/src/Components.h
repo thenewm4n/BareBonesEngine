@@ -59,7 +59,7 @@ public:
 
 public:
     CLifespan(int total)
-        :remaining(total), total(total) {}
+        : remaining(total), total(total) {}
 };
 
 class CInput

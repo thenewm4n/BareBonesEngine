@@ -338,14 +338,14 @@ void Game::spawnPlayer()
 void Game::spawnEnemy()
 {
     // Create entity and add to entity manager (like in spawnPlayer())
-    std::shared_ptr<Entity> entity = m_entities.addEntity("Enemy");
+    std::shared_ptr<Entity> enemyEntity = m_entities.addEntity("Enemy");
     
     // Engine for all RNG
     std::default_random_engine generator;
 
     // Generate random position
-    std::uniform_int_distribution<int> xDistribution(entity->m_enemyConfig.shapeRadius, m_resolution.x - entity->m_enemyConfig.shapeRadius);
-    std::uniform_int_distribution<int> yDistribution(entity->m_enemyConfig.shapeRadius, m_resolution.y - entity->m_enemyConfig.shapeRadius);
+    std::uniform_int_distribution<int> xDistribution(enemyEntity->m_enemyConfig.shapeRadius, m_resolution.x - enemyEntity->m_enemyConfig.shapeRadius);
+    std::uniform_int_distribution<int> yDistribution(enemyEntity->m_enemyConfig.shapeRadius, m_resolution.y - enemyEntity->m_enemyConfig.shapeRadius);
     Vec2 position(xDistribution(generator), yDistribution(generator);
 
     // Generate random speed
@@ -357,7 +357,7 @@ void Game::spawnEnemy()
     float angle = angleDistribution(generator);
 
     // Instantiate Transform component with randomly generated position, velocity, angle
-    entity->cTransform = std::make_shared<CTransform>(position, velocity, angle);
+    enemyEntity->cTransform = std::make_shared<CTransform>(position, velocity, angle);
 
     // Generate random fill colour
     std::uniform_int_distribution<int> colourDistribution(0, 255);
@@ -369,9 +369,9 @@ void Game::spawnEnemy()
     int numVertices = verticesDistrbution(generator);
 
     // Instantiation Shape sprite component with radius, no. vertices, colours, and outline thickness
-    entity->cShape = std::make_shared<CShape>(m_enemyConfig.shapeRadius, numVertices, fillColour, outlineColour, m_enemyConfig.outlineThick);
+    enemyEntity->cShape = std::make_shared<CShape>(m_enemyConfig.shapeRadius, numVertices, fillColour, outlineColour, m_enemyConfig.outlineThick);
 
-    entity->cCollision = std::make_shared<CCollision>(m_enemyConfig.collisionRadius);
+    enemyEntity->cCollision = std::make_shared<CCollision>(m_enemyConfig.collisionRadius);
 
     m_lastEnemySpawnFrame = m_currentFrame;
 }
@@ -391,6 +391,14 @@ void Game::spawnBullet(std::shared_ptr<Entity> entity, const Vec2& target)  // t
     // TODO: implement spawning of the bullet which travels toward target
     // - bullet speed is given as a scalar speed
     // - must set velocity using formula in notes (?)
+    std::shared_ptr<Entity> bulletEntity = m_entities.addEntity("Bullet");
+
+    bulletEntity->cLifespan = make_shared<CLifespan>(m_bulletConfig.lifespan);
+
+    diff = mousePos - m_player->cTransform->position;
+    Vec2 velocity = diff.normalise() * m_bulletConfig.speed;
+
+
 }
 
 void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity)
