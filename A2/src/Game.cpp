@@ -1,4 +1,5 @@
 #include <random>
+#include <iostream>
 
 #include "Game.h"
 
@@ -102,10 +103,10 @@ void Game::run()
         {
             sEnemySpawner();
             sMovement();
+            sLifespan();
         }
         sCollision();
         sUserInput();
-        sLifespan();
         sGUI();
         sRender();
 
@@ -120,23 +121,35 @@ void Game::run()
 
 void Game::sMovement()
 {
-    // TODO: implement all entity movement within this function
-    // - should read the m_player->cInput component to determine if player is moving
-
-    // Check if hit wall
-    for (const auto& entity : m_entities.getEntities())
+    // Update Y velocity according to player input
+    if (m_player->cInput->down)
     {
-        sf::FloatRect shapeBounds = shape->m_sprite->getGlobalBounds();
-
-        // If bounds exceed window edge, reverse corresponding velocity
-        if (shapeBounds.left < 0 || shapeBounds.left + shapeBounds.width > windowDimensions.x)
-            shape->m_velocity.x *= -1.f;
-
-        if (shapeBounds.top < 0 || shapeBounds.top + shapeBounds.height > windowDimensions.y)
-            shape->m_velocity.y *= -1.f;
+        m_player->cTransform->velocity.y = m_playerConfig.speed;
+    }
+    else if (m_player->cInput->up)
+    {
+        m_player->cTransform->velocity.y = -1 * m_playerConfig.speed;
+    }
+    else
+    {
+        m_player->cTransform->velocity.y = 0;
     }
 
-    // Move all entities with a Transform component
+    // Update X velocity according to player input
+    if (m_player->cInput->right)
+    {
+        m_player->cTransform->velocity.x = m_playerConfig.speed;
+    }
+    else if (m_player->cInput->left)
+    {
+        m_player->cTransform->velocity.x = -1 * m_playerConfig.speed;
+    }
+    else
+    {
+        m_player->cTransform->velocity.x = 0;
+    }
+
+    // Move all entities with a Transform component according to their velocity
     for (const auto& entity : m_entities.getEntities())
     {
         if (entity->cTransform)
@@ -159,10 +172,6 @@ void Game::sUserInput()
 
         if (event.type == sf::Event::Closed)
             m_isRunning = false;
-        
-        /* if (event.type == escape key)
-            quit game
-        */
 
         if (event.type == sf::Event::KeyPressed)
         {
@@ -175,10 +184,19 @@ void Game::sUserInput()
                     m_isPaused = true;
                     break;
                 case sf::Keyboard::W:
-                    std::cout << "W key pressed." << std::endl;
-                    // TODO: set player's input component "up" to true
+                    m_player->cInput->up = true;
                     break;
-                default: break;
+                case sf::Keyboard::S:
+                    m_player->cInput->down = true;
+                    break;
+                case sf::Keyboard::A:
+                    m_player->cInput->left = true;
+                    break;
+                case sf::Keyboard::D:
+                    m_player->cInput->right = true;
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -187,10 +205,19 @@ void Game::sUserInput()
             switch (event.key.code)
             {
             case sf::Keyboard::W:
-                std::cout << "W key released." << std::endl;
-                // TODO: set player's input component "up" to false
+                m_player->cInput->up = false;
                 break;
-            default: break;
+            case sf::Keyboard::S:
+                m_player->cInput->down = false;
+                break;
+            case sf::Keyboard::A:
+                m_player->cInput->left = false;
+                break;
+            case sf::Keyboard::D:
+                m_player->cInput->right = false;
+                break;
+            default:
+                break;
             }
         }
 
@@ -201,8 +228,7 @@ void Game::sUserInput()
 
             if (event.mouseButton.button == sf::Mouse::Left)
             {
-                std::cout << "Left mouse button clicked at (" << event.MouseButton.x << ", " << event.mouseButton.y << ")" << std::endl;
-                // Call spawnBullet() here
+                spawnBullet(m_player, Vec2(event.mouseButton.x, event.mouseButton.y));
             }
 
             if (event.mouseButton.button == sf::Mouse::Right)
@@ -251,36 +277,77 @@ void Game::sRender()
     // Draw the UI
     ImGui::SFML::Render(m_window);
 
+    // Draw the score text
+    m_window.draw(m_text);
+
     m_window.display()
 }
 
 void Game::sCollision()
 {
-    // Don't use square root: use if (distance^2 < (r1+r2)^2)
-
     // TODO: implement all proper collisions between entities
-    // - use COLLISION RADIUS, not shape radius
+
+     // If entity has Collision component and touches wall, velocity is reversed
+    for (const auto& entity : m_entities.getEntities())
+    {   
+        if (entity->cCollision)
+        {
+            sf::FloatRect shapeBounds = entity->cShape->shape.getGlobalBounds();
+
+            // If bounds exceed window edge, reverse corresponding velocity
+            if (shapeBounds.left < 0 || shapeBounds.left + shapeBounds.width > m_resolution.x)
+                entity->cTransform->velocity.x *= -1.f;
+
+            if (shapeBounds.top < 0 || shapeBounds.top + shapeBounds.height > m_resolution.y)
+                entity->cTransform->velocity.y *= -1.f;
+        }
+    }
 
     // Collisions between bullet and enemies
     for (const auto& bullet : m_entities.getEntities("Bullet"))
     {
         for (const auto& enemy : m_entities.getEntities("Enemy"))
         {
+            /*
             // if distance < bullet->cShape->radius + enement->cShape->radius
                 // destoy bullet, destroy enemy, spawn small enemies, update score
+            Vec2 diff = bullet->cTransform->position - enemy->cTransform->position;
+            float sumOfRadii = bullet->cCollision->radius + enemy->cCollision->radius;
+             */
+
+            if (isCollision(bullet, enemy))
+            {
+                m_score += enemy->cScore->score;
+                bullet->destroy();
+                enemy->destroy();
+                spawnSmallEnemies();
+            }
         }
 
         for (const auto& smallEnemy : m_entities.getEntities("SmallEnemy"))
         {
-
+            if (isCollision(bullet, smallEnemy))
+            {
+                m_score += smallEnemy->cScore->score;
+                bullet.destroy();
+                smallEnemy.destroy();
+            }
         }
     }
 
-    // Collisions with edge of screen
-        // 
-
-    // Collisions between player and enemy
-        // set player to dead
+    // If player collides with big or small enemy, destroy enemy, set score to 0 and reset player position to centre
+    EntityVector enemies = m_entities.getEntities("Enemy");
+    enemies.push_back(m_entities.getEntities("SmallEnemy");
+    for (const auto& enemy : enemies)
+    {
+        if (isCollision(m_player, enemy))
+        {
+            enemy.destroy();
+            spawnSmallEnemies();
+            m_score = 0;
+            m_player->cTransform->position = m_resolution / 2;
+        }
+    }
 }
 
 void Game::sLifespan()
@@ -373,6 +440,8 @@ void Game::spawnEnemy()
 
     enemyEntity->cCollision = std::make_shared<CCollision>(m_enemyConfig.collisionRadius);
 
+    enemyEntity->cScore = std::make_shared<CScore>(10);
+
     m_lastEnemySpawnFrame = m_currentFrame;
 }
 
@@ -386,22 +455,63 @@ void Game::spawnSmallEnemies(std::shared_ptr<Entity> entity)
     // - small enemies are worth double points of original enemy
 }
 
-void Game::spawnBullet(std::shared_ptr<Entity> entity, const Vec2& target)  // takes entity that fired bullet i.e. player and target based in mouse position
+// Spawn a bullet at the position of entity, firing at target
+void Game::spawnBullet(std::shared_ptr<Entity> entity, const Vec2& target)
 {
-    // TODO: implement spawning of the bullet which travels toward target
-    // - bullet speed is given as a scalar speed
-    // - must set velocity using formula in notes (?)
     std::shared_ptr<Entity> bulletEntity = m_entities.addEntity("Bullet");
 
+    // Set velocity according to mouse position and speed from config file
+    Vec2 diff = target - entity->cTransform->position;
+    Vec2 normDiff = diff.normalise();
+    Vec2 velocity = normDiff * m_bulletConfig.speed;
+
+    // Set the bullet position ensuring player and bullet Collision component radii don't overlap
+    Vec2 bulletPosition;
+    if (entity->cCollision)
+    {
+        // Set position of bullet in direction of target
+        bulletPosition = entity->cTransform->position + (entity->cCollision->radius + m_bulletConfig.collisionRadius) * normDiff;
+    }
+    else
+    {
+        bulletPosition = entity->cTransform->position;
+    } 
+    
+    // Instantiate Transform component
+    bulletEntity->cTransform = make_shared<CTransform>(bulletPosition, velocity, 0);     // What should the angle be set to?
+
+    // Instantiate Shape component
+    sf::Color fillColour(m_bulletConfig.fillR, m_bulletConfig.fillG, m_bulletConfig.fillB);
+    sf::Color outlineColour(m_bulletConfig.outlineR, m_bulletConfig.outlineG, m_bulletConfig.outlineB);
+    bulletEntity->cShape = make_shared<CShape>(m_bulletConfig.shapeRadius, m_bulletConfig.vertices, fillColour, outlineColour, m_bulletConfig.outlineThick);
+
+    // Instantiate Collision component
+    bulletEntity->cCollision = make_shared<CCollision>(m_bulletConfig.collisionRadius);
+    
+    // Instantiate Lifespan component
     bulletEntity->cLifespan = make_shared<CLifespan>(m_bulletConfig.lifespan);
-
-    diff = mousePos - m_player->cTransform->position;
-    Vec2 velocity = diff.normalise() * m_bulletConfig.speed;
-
-
 }
 
 void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity)
 {
     //TODO
+}
+
+// Assumes that both input 
+bool Game::isCollision(const std::shared_ptr<Entity>& entity1, const std::shared_ptr<Entity>& entity2)
+{
+    if (!entity1->cCollision || !entity2->cCollision)
+    {
+        std::cerr << "One of the input entities has no Collision component." << std::endl;
+        return 3;
+    }
+
+    Vec2 diff = entity1->cTransform->position - entity2->cTransform->position;
+    float sumOfRadii = entity1->cCollision->radius + entity2->cCollision->radius;
+
+    // If distance^2 < (r1+r2)^2
+    if (diff.x * diff.x + diff.y * diff.y < sumOfRadii * sumOfRadii)
+        return true;
+    else
+        return false;
 }

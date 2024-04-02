@@ -8,7 +8,7 @@ std::shared_ptr<Entity> EntityManager::addEntity(const std::string& tag)
 {
     auto entity = std::shared_ptr<Entity>(new Entity(m_totalEntities++, tag));   // sets id as m_totalEntities, then increments it
     
-    ToAdd.push_back(entity);
+    m_entitiesToAdd.push_back(entity);
     return entity;   
 }
 
@@ -52,13 +52,14 @@ void EntityManager::update()
         // Add entity to vector of entities with corresponding tag in m_entityMap
         m_entityMap[entity->getTag()].push_back(entity);
     }
-
+    
+    m_entitiesToAdd.clear();
 
     // Removing entities
-    // - Remove the dead entities from vector of all entities
+    // Remove the dead entities from vector of all entities
     removeDeadEntities(m_entities);
 
-    // - Remove dead entities from each vector in the entity map
+    // Remove dead entities from each vector in the entity map
     for (const auto& [tag, entityVector] : m_entityMap)
     {
         removeDeadEntities(entityVector);

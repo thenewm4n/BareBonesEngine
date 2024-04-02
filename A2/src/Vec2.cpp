@@ -10,6 +10,16 @@ Vec2::Vec2(float xIn, float yIn)
 {
 }
 
+Vec2::Vec2(const sf::Vector2f& vec)
+    : x(vec.x), y(vec.y)
+{
+}
+
+Vec2::Vec2(const sf::Vector2i& vector)
+    : x(vec.x), y(vec.y)
+{
+}
+
 Vec2 Vec2::operator + (const Vec2& other) const
 {
     return Vec2(this->x + other.x, this->y + other.y);
@@ -77,8 +87,10 @@ float Vec2::distance(const Vec2& other) const
     return sqrtf(diff.x * diff.x + diff.y * diff.y);
 }
 
-/*
-void normalise()
+void Vec2::normalise()
 {
+    // Distance distance from (0,0) to end of vector
+    float length = distance(Vec2(0, 0));
+    // float length = sqrtf(this->x * this->x + this->y * this->y);
+    *this /= length;
 }
-*/

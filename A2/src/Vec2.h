@@ -9,6 +9,8 @@ public:
 public:
     Vec2();
     Vec2(float xIn, float yIn);
+    Vec2(const sf::Vector2f& vector);
+    Vec2(const sf::Vector2i& vector);
 
     bool operator == (const Vec2& other) const;
     bool operator != (const Vec2& other) const;
@@ -24,5 +26,5 @@ public:
     void operator /= (const float scalar);
 
     float distance(const Vec2& other) const;
-    //void normalise();
+    void normalise();
 };
