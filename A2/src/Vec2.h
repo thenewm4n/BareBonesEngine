@@ -1,5 +1,7 @@
 #pragma once
 
+#include "SFML/Graphics.hpp"
+
 class Vec2
 {
 public:

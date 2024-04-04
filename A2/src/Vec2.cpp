@@ -15,7 +15,7 @@ Vec2::Vec2(const sf::Vector2f& vec)
 {
 }
 
-Vec2::Vec2(const sf::Vector2i& vector)
+Vec2::Vec2(const sf::Vector2i& vec)
     : x(vec.x), y(vec.y)
 {
 }

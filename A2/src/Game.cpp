@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "Game.h"
+#include "Components.h"
 
 Game::Game(const std::string& configFile)
     : m_resolution(1920, 1080)
@@ -411,9 +412,9 @@ void Game::spawnEnemy()
     std::default_random_engine generator;
 
     // Generate random position
-    std::uniform_int_distribution<int> xDistribution(enemyEntity->m_enemyConfig.shapeRadius, m_resolution.x - enemyEntity->m_enemyConfig.shapeRadius);
-    std::uniform_int_distribution<int> yDistribution(enemyEntity->m_enemyConfig.shapeRadius, m_resolution.y - enemyEntity->m_enemyConfig.shapeRadius);
-    Vec2 position(xDistribution(generator), yDistribution(generator);
+    std::uniform_int_distribution<int> xDistribution(m_enemyConfig.shapeRadius, m_resolution.x - m_enemyConfig.shapeRadius);
+    std::uniform_int_distribution<int> yDistribution(m_enemyConfig.shapeRadius, m_resolution.y - m_enemyConfig.shapeRadius);
+    Vec2 position(xDistribution(generator), yDistribution(generator));
 
     // Generate random speed
     std::uniform_real_distribution<float> velocityDistribution(m_enemyConfig.speedMin, m_enemyConfig.speedMax);
@@ -433,7 +434,7 @@ void Game::spawnEnemy()
 
     // Generate random no. vertices
     std::uniform_int_distribution<int> verticesDistribution(3, 8);
-    int numVertices = verticesDistrbution(generator);
+    int numVertices = verticesDistribution(generator);
 
     // Instantiation Shape sprite component with radius, no. vertices, colours, and outline thickness
     enemyEntity->cShape = std::make_shared<CShape>(m_enemyConfig.shapeRadius, numVertices, fillColour, outlineColour, m_enemyConfig.outlineThick);
@@ -445,14 +446,48 @@ void Game::spawnEnemy()
     m_lastEnemySpawnFrame = m_currentFrame;
 }
 
-void Game::spawnSmallEnemies(std::shared_ptr<Entity> entity)
+void Game::spawnSmallEnemies(std::shared_ptr<Entity> bigEnemy)
 {
-    // TODO: spawn small enemies at location of input enemy e
+    // Error handling
+    if (!bigEnemy->cTransform || !bigEnemy->cShape || !bigEnemy->cCollision || !bigEnemy->cScore)
+    {
+        std::cerr << "Input entity is missing a component." << std::endl;
+        exit(-3);
+    }
+    
+    // Calculate angle between small enemies
+    int numVertices = bigEnemy->cShape->shape.getPointCount();
+    float angle = 360 / numVertices;
 
-    // when we create the smaller enemy, we have to read the values of the original enemy
-    // - spawn a number of small enemies equal to vertices of original enemy
-    // - set each small enemy to same colours as original, half the size, set lifespan
-    // - small enemies are worth double points of original enemy
+     // Set to same colours as original
+    sf::Color fillColour = bigEnemy->cShape->shape.getFillColor();
+    sf::Color outlineColour = bigEnemy->cShape->shape.getOutlineColor();
+    float outlineThickness = bigEnemy->cShape->shape.getOutlineThickness();
+
+    // Set Shape and Collision components to half the scale 
+    float shapeRadius = bigEnemy->cShape->shape.getRadius() / 2;
+    float collisionRadius = bigEnemy->cCollision->radius / 2;
+
+    // Set position and speed of transform component Transform component
+
+    for (int i = 0; i < numVertices; i++)
+    {
+        std::shared_ptr<Entity> smallEnemy = m_entities.addEntity("Enemy");
+
+        // Set velocity at angle of i * angle
+            // Change X and Y components of velocity components to reflect angle
+        float xSquared = bigEnemy->cTransform->velocity.x * bigEnemy->cTransform->velocity.x;
+        float ySquared = bigEnemy->cTransform->velocity.y * bigEnemy->cTransform->velocity.y;
+        float speed = sqrtf(xSquared + ySquared);
+        Vec2 velocity(cosf(angle * i) * speed, sinf(angle * i) * speed);
+
+        // Instantiate components
+        smallEnemy->cTransform = std::make_shared<CTransform>(bigEnemy->cTransform->position, velocity, 0);
+        smallEnemy->cShape = std::make_shared<CShape>(shapeRadius, numVertices, fillColour, outlineColour, outlineThickness);
+        smallEnemy->cCollision = std::make_shared<CCollision>(collisionRadius);
+        smallEnemy->cLifespan = std::make_shared<CLifespan>(m_enemyConfig.smallLifespan);
+        smallEnemy->cScore = std::make_shared<CScore>(bigEnemy->cScore->score * 2);
+    }
 }
 
 // Spawn a bullet at the position of entity, firing at target
@@ -462,15 +497,15 @@ void Game::spawnBullet(std::shared_ptr<Entity> entity, const Vec2& target)
 
     // Set velocity according to mouse position and speed from config file
     Vec2 diff = target - entity->cTransform->position;
-    Vec2 normDiff = diff.normalise();
-    Vec2 velocity = normDiff * m_bulletConfig.speed;
+    diff.normalise();
+    Vec2 velocity = diff * m_bulletConfig.speed;
 
     // Set the bullet position ensuring player and bullet Collision component radii don't overlap
     Vec2 bulletPosition;
     if (entity->cCollision)
     {
         // Set position of bullet in direction of target
-        bulletPosition = entity->cTransform->position + (entity->cCollision->radius + m_bulletConfig.collisionRadius) * normDiff;
+        bulletPosition = entity->cTransform->position + (entity->cCollision->radius + m_bulletConfig.collisionRadius) * diff;
     }
     else
     {
@@ -478,18 +513,18 @@ void Game::spawnBullet(std::shared_ptr<Entity> entity, const Vec2& target)
     } 
     
     // Instantiate Transform component
-    bulletEntity->cTransform = make_shared<CTransform>(bulletPosition, velocity, 0);     // What should the angle be set to?
+    bulletEntity->cTransform = std::make_shared<CTransform>(bulletPosition, velocity, 0);     // What should the angle be set to?
 
     // Instantiate Shape component
     sf::Color fillColour(m_bulletConfig.fillR, m_bulletConfig.fillG, m_bulletConfig.fillB);
     sf::Color outlineColour(m_bulletConfig.outlineR, m_bulletConfig.outlineG, m_bulletConfig.outlineB);
-    bulletEntity->cShape = make_shared<CShape>(m_bulletConfig.shapeRadius, m_bulletConfig.vertices, fillColour, outlineColour, m_bulletConfig.outlineThick);
+    bulletEntity->cShape = std::make_shared<CShape>(m_bulletConfig.shapeRadius, m_bulletConfig.vertices, fillColour, outlineColour, m_bulletConfig.outlineThick);
 
     // Instantiate Collision component
-    bulletEntity->cCollision = make_shared<CCollision>(m_bulletConfig.collisionRadius);
+    bulletEntity->cCollision = std::make_shared<CCollision>(m_bulletConfig.collisionRadius);
     
     // Instantiate Lifespan component
-    bulletEntity->cLifespan = make_shared<CLifespan>(m_bulletConfig.lifespan);
+    bulletEntity->cLifespan = std::make_shared<CLifespan>(m_bulletConfig.lifespan);
 }
 
 void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity)
