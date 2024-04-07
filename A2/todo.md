@@ -1,3 +1,15 @@
+# Problems
+- sMovement(): rebounding off walls doesn't work -> moves into wall.
+- sMovement()/sUserInput(): player movement doesn't work.
+- spawnEnemies(): RNG seems disfunctional...
+	- Enemies spawn in same place.
+	- Enemies have same fill and outline colours.
+	- Enemies have same velocities
+- spawnSmallEnemies(): small enemies spawn more small enemies.
+- spawnBullet(): Shooting has opposite velocity.
+- sLifespan(): alpha of small enemies and bullets doesn't fade.
+
+
 # Order of Implementation
 1. [X] Implement Vec2 class -> then test in main.cpp.
 2. [X] Implement basic functionality of EntityManager class.
@@ -23,7 +35,7 @@
 		- Each small enemy has same number of vertices and colour, and are fired off at every (360 / vertices) degrees.
 8. [X] Implement rest of game's functionality including config file reading
 9. Implement GUI functionality (can do this earlier to help debug).
-10. [ I'M HERE ] Implement sLifespan using RGBA.
+10. [X] Implement sLifespan using RGBA.
+11. [ ] Implement special weapon.
 
 - Where to set m_text position to top left, and update m_text so it reflects m_score?
-- [ ] Check the position of bullets are set in sRender(), and their movement in sMovement() (should be fine since they have a Transform and Shape)

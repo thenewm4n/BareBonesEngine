@@ -1,5 +1,7 @@
 #include <random>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 #include "Game.h"
 #include "Components.h"
@@ -42,13 +44,13 @@ void Game::init(const std::string& configFile)
 
                 lineStream >> fontPath >> textSize >> textColour[0] >> textColour[1] >> textColour[2];
 
-                if (!font.loadFromFile(fontPath))
+                if (!m_font.loadFromFile(fontPath))
                 {
                     std::cerr << "Could not load font." << std::endl;
                     exit(-2);
                 }
 
-                m_text.setFont(fontPath);
+                m_text.setFont(m_font);
                 m_text.setCharacterSize(textSize);
                 m_text.setFillColor(sf::Color(textColour[0], textColour[1], textColour[2]));
             }
@@ -78,7 +80,7 @@ void Game::init(const std::string& configFile)
 
     file.close();
 
-    m_window.create(sf::VideoMode(m_resolution.x, m_resolution.y), "Assignment 2");
+    m_window.create(sf::VideoMode(static_cast<unsigned int>(m_resolution.x), static_cast<unsigned int>(m_resolution.y)), "Assignment 2");
     m_window.setFramerateLimit(60);
 
     ImGui::SFML::Init(m_window);
@@ -155,7 +157,7 @@ void Game::sMovement()
     {
         if (entity->cTransform)
         {
-            entity->cTransform.position += entity->cTransform.velocity;
+            entity->cTransform->position += entity->cTransform->velocity;
         }
     }
 }
@@ -166,7 +168,7 @@ void Game::sUserInput()
     // you should not implement the player's movement logic here
     // the movement system will read the variables you set in this function
 
-    sf::Event;
+    sf::Event event;
     while (m_window.pollEvent(event))
     {
         ImGui::SFML::ProcessEvent(m_window, event);
@@ -229,12 +231,12 @@ void Game::sUserInput()
 
             if (event.mouseButton.button == sf::Mouse::Left)
             {
-                spawnBullet(m_player, Vec2(event.mouseButton.x, event.mouseButton.y));
+                spawnBullet(m_player, Vec2(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)));
             }
 
             if (event.mouseButton.button == sf::Mouse::Right)
             {
-                std::cout << "Right mouse button clicked at (" << event.MouseButton.x << ", " << event.mouseButton.y << ")" << std::endl;
+                std::cout << "Right mouse button clicked at (" << event.mouseButton.x << ", " << event.mouseButton.y << ")" << std::endl;
                 // call spawnSpecialWeapon() here
             }
         }
@@ -251,12 +253,12 @@ void Game::sRender()
 
     for (const auto& entity : rotatingEntities)
     {
-        entity->cTransform.angle += 1.f;
-        if (entity->cTransform.angle >= 360.f)
+        entity->cTransform->angle += 1.f;
+        if (entity->cTransform->angle >= 360.f)
         {
-            entity->cTransform.angle -= 360.f;
+            entity->cTransform->angle -= 360.f;
         }
-        entity->cShape->shape.setRotation(entity->cTransform.angle);
+        entity->cShape->shape.setRotation(entity->cTransform->angle);
     }
 
     // THIS MAY BE WRONG; MAYBE SPLIT SETTING POSITION AND DRAWING
@@ -271,7 +273,7 @@ void Game::sRender()
         // If entity has shape component, draw it to window
         if (entity->cShape)
         {
-            m_window.draw(entity->cShape.shape);
+            m_window.draw(entity->cShape->shape);
         }
     }
 
@@ -281,13 +283,11 @@ void Game::sRender()
     // Draw the score text
     m_window.draw(m_text);
 
-    m_window.display()
+    m_window.display();
 }
 
 void Game::sCollision()
 {
-    // TODO: implement all proper collisions between entities
-
      // If entity has Collision component and touches wall, velocity is reversed
     for (const auto& entity : m_entities.getEntities())
     {   
@@ -321,7 +321,7 @@ void Game::sCollision()
                 m_score += enemy->cScore->score;
                 bullet->destroy();
                 enemy->destroy();
-                spawnSmallEnemies();
+                spawnSmallEnemies(enemy);
             }
         }
 
@@ -330,21 +330,22 @@ void Game::sCollision()
             if (isCollision(bullet, smallEnemy))
             {
                 m_score += smallEnemy->cScore->score;
-                bullet.destroy();
-                smallEnemy.destroy();
+                bullet->destroy();
+                smallEnemy->destroy();
             }
         }
     }
 
     // If player collides with big or small enemy, destroy enemy, set score to 0 and reset player position to centre
     EntityVector enemies = m_entities.getEntities("Enemy");
-    enemies.push_back(m_entities.getEntities("SmallEnemy");
+    EntityVector smallEnemies = m_entities.getEntities("SmallEnemy");
+    enemies.insert(enemies.end(), smallEnemies.begin(), smallEnemies.end());
     for (const auto& enemy : enemies)
     {
         if (isCollision(m_player, enemy))
         {
-            enemy.destroy();
-            spawnSmallEnemies();
+            enemy->destroy();
+            spawnSmallEnemies(enemy);
             m_score = 0;
             m_player->cTransform->position = m_resolution / 2;
         }
@@ -353,20 +354,36 @@ void Game::sCollision()
 
 void Game::sLifespan()
 {
-    // TODO
-
-    // for all entities
-    // - if entity has no lifespan component, skip
-    // - if entity has > 0 remaining lifespan, decrement
-    // - if it has lifespan and is alive: scale alpha channel properly
-    // - if it has lifespand and time is up: destroy the entity
+    EntityVector entities = m_entities.getEntities();
+    for (const auto& entity : entities)
+    {
+        // If entity has Lifespan component
+        if (entity->cLifespan)
+        {
+            // If has lives remaining and hasn't been destroyed elsewhere in code this loop
+            if (entity->cLifespan->remaining > 0)
+            {
+                entity->cLifespan->remaining--;
+                
+                // Set transparency to ratio of remaining life to total life
+                sf::Color colour = entity->cShape->shape.getFillColor();
+                colour.a = static_cast<sf::Uint8>((entity->cLifespan->remaining / entity->cLifespan->total) * 255);
+            }
+            // If entity has no lives left but is still alive, destroy it
+            else if (entity->isAlive())
+            {   
+                entity->destroy();
+            }
+        }
+    }
 }
 
 void Game::sEnemySpawner()
 {
-    // TODO: code implementing enemy spawning
-    // if no. frames since last enemy spawned > spawnInterval: spawnEnemy()
-    // - i.e. m_currentFrame - m_lastEnemySpawnFrame
+    if (m_currentFrame - m_lastEnemySpawnFrame > m_enemyConfig.spawnInterval)
+    {
+        spawnEnemy();
+    }
 }
 
 void Game::sGUI()
@@ -412,9 +429,9 @@ void Game::spawnEnemy()
     std::default_random_engine generator;
 
     // Generate random position
-    std::uniform_int_distribution<int> xDistribution(m_enemyConfig.shapeRadius, m_resolution.x - m_enemyConfig.shapeRadius);
-    std::uniform_int_distribution<int> yDistribution(m_enemyConfig.shapeRadius, m_resolution.y - m_enemyConfig.shapeRadius);
-    Vec2 position(xDistribution(generator), yDistribution(generator));
+    std::uniform_int_distribution<int> xDistribution(static_cast<int>(m_enemyConfig.shapeRadius), static_cast<int>(m_resolution.x - m_enemyConfig.shapeRadius));
+    std::uniform_int_distribution<int> yDistribution(static_cast<int>(m_enemyConfig.shapeRadius), static_cast<int>(m_resolution.y - m_enemyConfig.shapeRadius));
+    Vec2 position(static_cast<float>(xDistribution(generator)), static_cast<float>(yDistribution(generator)));
 
     // Generate random speed
     std::uniform_real_distribution<float> velocityDistribution(m_enemyConfig.speedMin, m_enemyConfig.speedMax);
@@ -456,8 +473,8 @@ void Game::spawnSmallEnemies(std::shared_ptr<Entity> bigEnemy)
     }
     
     // Calculate angle between small enemies
-    int numVertices = bigEnemy->cShape->shape.getPointCount();
-    float angle = 360 / numVertices;
+    size_t numVertices = bigEnemy->cShape->shape.getPointCount();
+    float angle = 360 / static_cast<float>(numVertices);
 
      // Set to same colours as original
     sf::Color fillColour = bigEnemy->cShape->shape.getFillColor();
@@ -538,7 +555,7 @@ bool Game::isCollision(const std::shared_ptr<Entity>& entity1, const std::shared
     if (!entity1->cCollision || !entity2->cCollision)
     {
         std::cerr << "One of the input entities has no Collision component." << std::endl;
-        return 3;
+        exit(-4);
     }
 
     Vec2 diff = entity1->cTransform->position - entity2->cTransform->position;

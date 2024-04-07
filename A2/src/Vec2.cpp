@@ -30,9 +30,15 @@ Vec2 Vec2::operator - (const Vec2& other) const
     return Vec2(this->x - other.x, this->y - other.y);
 }
 
-Vec2 Vec2::operator * (const float scalar) const
+Vec2 Vec2::operator * (float scalar) const
 {
     return Vec2(this->x * scalar, this->y * scalar);
+}
+
+// Note - not a member function
+Vec2 operator * (float scalar, const Vec2& vec)
+{
+    return Vec2(vec.x * scalar, vec.y * scalar);
 }
 
 Vec2 Vec2::operator / (const float scalar) const

@@ -19,7 +19,7 @@ public:
 
     Vec2 operator + (const Vec2& other) const;
     Vec2 operator - (const Vec2& other) const;
-    Vec2 operator * (const float scalar) const;
+    Vec2 operator * (float scalar) const;
     Vec2 operator / (const float scalar) const;
 
     void operator += (const Vec2& other);
@@ -30,3 +30,5 @@ public:
     float distance(const Vec2& other) const;
     void normalise();
 };
+
+Vec2 operator * (float scalar, const Vec2& vec);

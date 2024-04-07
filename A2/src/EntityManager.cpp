@@ -60,7 +60,7 @@ void EntityManager::update()
     removeDeadEntities(m_entities);
 
     // Remove dead entities from each vector in the entity map
-    for (const auto& [tag, entityVector] : m_entityMap)
+    for (auto& [tag, entityVector] : m_entityMap)
     {
         removeDeadEntities(entityVector);
     }
