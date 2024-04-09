@@ -102,13 +102,13 @@ void Game::run()
 
         // Call each systems
         // THIS MAY BE WRONG
+        sCollision();       // sCollision must come before sMovement for collision with walls
         if (!m_isPaused)
         {
             sEnemySpawner();
             sMovement();
             sLifespan();
         }
-        sCollision();
         sUserInput();
         sGUI();
         sRender();

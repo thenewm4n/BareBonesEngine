@@ -1,5 +1,5 @@
 # Problems
-- sMovement(): rebounding off walls doesn't work -> moves into wall.
+- sCollision: an area slightly outside each sprite collides with the wall -> try getLocalBounds()?
 - sMovement()/sUserInput(): player movement doesn't work.
 - spawnEnemies(): RNG seems disfunctional...
 	- Enemies spawn in same place.
