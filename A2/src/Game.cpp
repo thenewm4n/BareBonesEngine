@@ -90,7 +90,7 @@ void Game::init(const std::string& configFile)
 
 void Game::run()
 {
-    // TODO: add pause functionality here
+    // ?TODO: add pause functionality here
     //  rendering system should still function; shapes should still rotate
     //  movement and input systems should stop
 
@@ -112,6 +112,13 @@ void Game::run()
         sUserInput();
         sGUI();
         sRender();
+
+        if (m_player->cInput->shoot)
+        {
+            Vec2 mousePosition = sf::Mouse::getPosition();
+            spawnBullet(m_player, mousePosition);
+            m_player->cInput->shoot = false;
+        }
 
         // increment the current frame
         // may need to be moved when pause implemented (?)
@@ -164,10 +171,6 @@ void Game::sMovement()
 
 void Game::sUserInput()
 {
-    //TODO: note that you should only be setting the player's input component variables here
-    // you should not implement the player's movement logic here
-    // the movement system will read the variables you set in this function
-
     sf::Event event;
     while (m_window.pollEvent(event))
     {
@@ -231,13 +234,24 @@ void Game::sUserInput()
 
             if (event.mouseButton.button == sf::Mouse::Left)
             {
-                spawnBullet(m_player, Vec2(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)));
+                m_player->cInput->shoot = true;
             }
 
             if (event.mouseButton.button == sf::Mouse::Right)
             {
                 std::cout << "Right mouse button clicked at (" << event.mouseButton.x << ", " << event.mouseButton.y << ")" << std::endl;
                 // call spawnSpecialWeapon() here
+            }
+        }
+
+        if (event.type == sf::Event::MouseButtonReleased)
+        {
+            // If ImGui is being clicked, ignores the mouse event
+            if (ImGui::GetIO().WantCaptureMouse) { continue; }
+
+            if (event.mouseButton.button == sf::Mouse::Left)
+            {
+                m_player->cInput->shoot = false;
             }
         }
     }
