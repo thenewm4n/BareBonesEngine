@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <chrono>
 
 #include "Game.h"
 #include "Components.h"
@@ -57,7 +58,7 @@ void Game::init(const std::string& configFile)
             else if (firstElement == "Player")
             {
                 // Output to PlayerConfig struct
-                lineStream >> m_playerConfig.shapeRadius >> m_playerConfig.collisionRadius >> m_playerConfig.fillR >>
+                lineStream >> m_playerConfig.shapeRadius >> m_playerConfig.collisionRadius >> m_playerConfig.speed >> m_playerConfig.fillR >>
                     m_playerConfig.fillG >> m_playerConfig.fillB >> m_playerConfig.outlineR >> m_playerConfig.outlineG >>
                     m_playerConfig.outlineB >> m_playerConfig.outlineThick >> m_playerConfig.vertices;
             }
@@ -103,26 +104,27 @@ void Game::run()
         // Call each systems
         // THIS MAY BE WRONG
         sCollision();       // sCollision must come before sMovement for collision with walls
+        sUserInput();
         if (!m_isPaused)
         {
             sEnemySpawner();
             sMovement();
             sLifespan();
+
+            // Spawn bullet if user left-clicks
+            if (m_player->cInput->shoot)
+            {
+                Vec2 mousePosition = sf::Mouse::getPosition();
+                spawnBullet(m_player, mousePosition);
+                m_player->cInput->shoot = false;
+            }
         }
-        sUserInput();
         sGUI();
         sRender();
 
-        if (m_player->cInput->shoot)
-        {
-            Vec2 mousePosition = sf::Mouse::getPosition();
-            spawnBullet(m_player, mousePosition);
-            m_player->cInput->shoot = false;
-        }
-
         // increment the current frame
         // may need to be moved when pause implemented (?)
-        m_currentFrame++;   
+        m_currentFrame++;
     }
 }
 
@@ -440,7 +442,7 @@ void Game::spawnEnemy()
     std::shared_ptr<Entity> enemyEntity = m_entities.addEntity("Enemy");
     
     // Engine for all RNG
-    std::default_random_engine generator;
+    std::default_random_engine generator(std::chrono::system_clock::now().time_since_epoch().count());
 
     // Generate random position
     std::uniform_int_distribution<int> xDistribution(static_cast<int>(m_enemyConfig.shapeRadius), static_cast<int>(m_resolution.x - m_enemyConfig.shapeRadius));
@@ -448,15 +450,17 @@ void Game::spawnEnemy()
     Vec2 position(static_cast<float>(xDistribution(generator)), static_cast<float>(yDistribution(generator)));
 
     // Generate random speed
-    std::uniform_real_distribution<float> velocityDistribution(m_enemyConfig.speedMin, m_enemyConfig.speedMax);
-    Vec2 velocity(velocityDistribution(generator), velocityDistribution(generator));
+    std::uniform_real_distribution<float> speedDistribution(m_enemyConfig.speedMin, m_enemyConfig.speedMax);
+    float speed = speedDistribution(generator);
 
     // Generate random angle
     std::uniform_real_distribution<float> angleDistribution(0, 360);
     float angle = angleDistribution(generator);
 
+    Vec2 velocity(speed * cosf(angle), speed * sinf(angle));
+
     // Instantiate Transform component with randomly generated position, velocity, angle
-    enemyEntity->cTransform = std::make_shared<CTransform>(position, velocity, angle);
+    enemyEntity->cTransform = std::make_shared<CTransform>(position, velocity, 0);
 
     // Generate random fill colour
     std::uniform_int_distribution<int> colourDistribution(0, 255);

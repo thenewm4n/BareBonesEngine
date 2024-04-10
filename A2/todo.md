@@ -1,12 +1,7 @@
 # Problems
-- sCollision: an area slightly outside each sprite collides with the wall -> try getLocalBounds()?
-- sMovement()/sUserInput(): player movement doesn't work.
-- spawnEnemies(): RNG seems disfunctional...
-	- Enemies spawn in same place.
-	- Enemies have same fill and outline colours.
-	- Enemies have same velocities
 - spawnSmallEnemies(): small enemies spawn more small enemies.
-- spawnBullet(): Shooting has opposite velocity.
+	- Game crashes due to infinitely spawning enemies if you die at the respawn position.
+- spawnBullet(): Shooting has wrong velocity.
 - sLifespan(): alpha of small enemies and bullets doesn't fade.
 
 
