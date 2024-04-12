@@ -1,8 +1,7 @@
 # Problems
-- spawnSmallEnemies(): small enemies spawn more small enemies.
-	- Game crashes due to infinitely spawning enemies if you die at the respawn position.
-- spawnBullet(): Shooting has wrong velocity.
+- spawnBullet(): Shooting has opposite velocity to correct.
 - sLifespan(): alpha of small enemies and bullets doesn't fade.
+- Angles of projecion of small enemies incorrect.
 
 
 # Order of Implementation

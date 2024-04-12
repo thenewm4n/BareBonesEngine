@@ -114,7 +114,7 @@ void Game::run()
             // Spawn bullet if user left-clicks
             if (m_player->cInput->shoot)
             {
-                Vec2 mousePosition = sf::Mouse::getPosition();
+                Vec2 mousePosition = sf::Mouse::getPosition(m_window);
                 spawnBullet(m_player, mousePosition);
                 m_player->cInput->shoot = false;
             }
@@ -359,9 +359,13 @@ void Game::sCollision()
     for (const auto& enemy : enemies)
     {
         if (isCollision(m_player, enemy))
-        {
+        {   
+            // If collision with big enemy, spawn small enemies
+            if (enemy->getTag() == "Enemy")
+            {
+                spawnSmallEnemies(enemy);
+            }
             enemy->destroy();
-            spawnSmallEnemies(enemy);
             m_score = 0;
             m_player->cTransform->position = m_resolution / 2;
         }
@@ -507,7 +511,7 @@ void Game::spawnSmallEnemies(std::shared_ptr<Entity> bigEnemy)
 
     for (int i = 0; i < numVertices; i++)
     {
-        std::shared_ptr<Entity> smallEnemy = m_entities.addEntity("Enemy");
+        std::shared_ptr<Entity> smallEnemy = m_entities.addEntity("SmallEnemy");
 
         // Set velocity at angle of i * angle
             // Change X and Y components of velocity components to reflect angle
@@ -529,6 +533,7 @@ void Game::spawnSmallEnemies(std::shared_ptr<Entity> bigEnemy)
 void Game::spawnBullet(std::shared_ptr<Entity> entity, const Vec2& target)
 {
     std::shared_ptr<Entity> bulletEntity = m_entities.addEntity("Bullet");
+    std::cout << target.x << ", " << target.y << std::endl;
 
     // Set velocity according to mouse position and speed from config file
     Vec2 diff = target - entity->cTransform->position;
