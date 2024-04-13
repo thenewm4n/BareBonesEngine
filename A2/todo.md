@@ -1,8 +1,4 @@
 # Problems
-- spawnBullet(): Shooting has opposite velocity to correct.
-	- Velocity gets negated between spawnBullet() and sMovement()
-	- CAUSED BY LINE 317-321 of Game.cpp
-	- Problem is that the position of the bullet shape isn't set until sRender(), hence shapeBounds.left is - 12.0249
 - sLifespan(): alpha of small enemies and bullets doesn't fade.
 - Angles of projecion of small enemies incorrect.
 
