@@ -1,5 +1,6 @@
 # Problems
 - sLifespan(): alpha of small enemies and bullets doesn't fade.
+	- Maybe tie lifespan to delta time, not frames (might be fading too quickly) -> actually doesn't seem like it. 
 - Angles of projecion of small enemies incorrect.
 
 

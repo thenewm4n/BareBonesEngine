@@ -382,6 +382,7 @@ void Game::sLifespan()
                 // Set transparency to ratio of remaining life to total life
                 sf::Color colour = entity->cShape->shape.getFillColor();
                 colour.a = static_cast<sf::Uint8>((entity->cLifespan->remaining / entity->cLifespan->total) * 255);
+                entity->cShape->shape.setFillColor(colour);
             }
             // If entity has no lives left but is still alive, destroy it
             else if (entity->isAlive())
