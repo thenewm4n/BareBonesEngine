@@ -97,6 +97,5 @@ void Vec2::normalise()
 {
     // Distance distance from (0,0) to end of vector
     float length = distance(Vec2(0, 0));
-    // float length = sqrtf(this->x * this->x + this->y * this->y);
     *this /= length;
 }

@@ -189,7 +189,10 @@ void Game::sUserInput()
                     m_isRunning = false;
                     break;
                 case sf::Keyboard::P:
-                    m_isPaused = true;
+                    if (m_isPaused)
+                        m_isPaused = false;
+                    else
+                        m_isPaused = true;
                     break;
                 case sf::Keyboard::W:
                     m_player->cInput->up = true;
@@ -311,6 +314,10 @@ void Game::sCollision()
         {
             sf::FloatRect shapeBounds = entity->cShape->shape.getGlobalBounds();
 
+            if (entity->getTag() == "Bullet")
+            {
+                std::cout << "shapeBounds.left: " << shapeBounds.left << "shapeBounds.width: " << shapeBounds.width << std::endl;
+            }
             // If bounds exceed window edge, reverse corresponding velocity
             if (shapeBounds.left < 0 || shapeBounds.left + shapeBounds.width > m_resolution.x)
                 entity->cTransform->velocity.x *= -1.f;
@@ -320,44 +327,31 @@ void Game::sCollision()
         }
     }
 
-    // Collisions between bullet and enemies
-    for (const auto& bullet : m_entities.getEntities("Bullet"))
-    {
-        for (const auto& enemy : m_entities.getEntities("Enemy"))
-        {
-            /*
-            // if distance < bullet->cShape->radius + enement->cShape->radius
-                // destoy bullet, destroy enemy, spawn small enemies, update score
-            Vec2 diff = bullet->cTransform->position - enemy->cTransform->position;
-            float sumOfRadii = bullet->cCollision->radius + enemy->cCollision->radius;
-             */
-
-            if (isCollision(bullet, enemy))
-            {
-                m_score += enemy->cScore->score;
-                bullet->destroy();
-                enemy->destroy();
-                spawnSmallEnemies(enemy);
-            }
-        }
-
-        for (const auto& smallEnemy : m_entities.getEntities("SmallEnemy"))
-        {
-            if (isCollision(bullet, smallEnemy))
-            {
-                m_score += smallEnemy->cScore->score;
-                bullet->destroy();
-                smallEnemy->destroy();
-            }
-        }
-    }
-
-    // If player collides with big or small enemy, destroy enemy, set score to 0 and reset player position to centre
     EntityVector enemies = m_entities.getEntities("Enemy");
     EntityVector smallEnemies = m_entities.getEntities("SmallEnemy");
     enemies.insert(enemies.end(), smallEnemies.begin(), smallEnemies.end());
+
+    // Checks all enemies for collision with bullets or player
     for (const auto& enemy : enemies)
     {
+        // Check collision between bullets and enemy
+        for (const auto& bullet : m_entities.getEntities("Bullet"))
+        {
+            if (isCollision(bullet, enemy))
+            {
+                // If big enemy destroyed, spawn small enemies
+                if (enemy->getTag() == "Enemy")
+                {
+                    spawnSmallEnemies(enemy);
+                }   
+
+                m_score += enemy->cScore->score;
+                bullet->destroy();
+                enemy->destroy();
+            }
+        }
+
+        // If player collides with big or small enemy, destroy enemy, set score to 0 and reset player position to centre
         if (isCollision(m_player, enemy))
         {   
             // If collision with big enemy, spawn small enemies
@@ -533,7 +527,6 @@ void Game::spawnSmallEnemies(std::shared_ptr<Entity> bigEnemy)
 void Game::spawnBullet(std::shared_ptr<Entity> entity, const Vec2& target)
 {
     std::shared_ptr<Entity> bulletEntity = m_entities.addEntity("Bullet");
-    std::cout << target.x << ", " << target.y << std::endl;
 
     // Set velocity according to mouse position and speed from config file
     Vec2 diff = target - entity->cTransform->position;
@@ -559,6 +552,9 @@ void Game::spawnBullet(std::shared_ptr<Entity> entity, const Vec2& target)
     sf::Color fillColour(m_bulletConfig.fillR, m_bulletConfig.fillG, m_bulletConfig.fillB);
     sf::Color outlineColour(m_bulletConfig.outlineR, m_bulletConfig.outlineG, m_bulletConfig.outlineB);
     bulletEntity->cShape = std::make_shared<CShape>(m_bulletConfig.shapeRadius, m_bulletConfig.vertices, fillColour, outlineColour, m_bulletConfig.outlineThick);
+    
+    // Setting the position of the shape before the sRender call because the shape is spawned at origin -> collision problem
+    bulletEntity->cShape->shape.setPosition(sf::Vector2f(bulletPosition.x, bulletPosition.y));
 
     // Instantiate Collision component
     bulletEntity->cCollision = std::make_shared<CCollision>(m_bulletConfig.collisionRadius);
