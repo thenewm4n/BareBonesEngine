@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <chrono>
+// #include <cmath>
 
 #include "Game.h"
 #include "Components.h"
@@ -91,10 +92,6 @@ void Game::init(const std::string& configFile)
 
 void Game::run()
 {
-    // ?TODO: add pause functionality here
-    //  rendering system should still function; shapes should still rotate
-    //  movement and input systems should stop
-
     while(m_isRunning)
     {
         m_entities.update();
@@ -300,6 +297,7 @@ void Game::sRender()
     ImGui::SFML::Render(m_window);
 
     // Draw the score text
+    m_text.setString("Score: " + std::to_string(m_score));
     m_window.draw(m_text);
 
     m_window.display();
@@ -314,10 +312,6 @@ void Game::sCollision()
         {
             sf::FloatRect shapeBounds = entity->cShape->shape.getGlobalBounds();
 
-            if (entity->getTag() == "Bullet")
-            {
-                std::cout << "shapeBounds.left: " << shapeBounds.left << "shapeBounds.width: " << shapeBounds.width << std::endl;
-            }
             // If bounds exceed window edge, reverse corresponding velocity
             if (shapeBounds.left < 0 || shapeBounds.left + shapeBounds.width > m_resolution.x)
                 entity->cTransform->velocity.x *= -1.f;
@@ -380,9 +374,19 @@ void Game::sLifespan()
                 entity->cLifespan->remaining--;
                 
                 // Set transparency to ratio of remaining life to total life
-                sf::Color colour = entity->cShape->shape.getFillColor();
-                colour.a = static_cast<sf::Uint8>((entity->cLifespan->remaining / entity->cLifespan->total) * 255);
-                entity->cShape->shape.setFillColor(colour);
+                sf::Uint8 newAlpha = static_cast<sf::Uint8>((static_cast<float>(entity->cLifespan->remaining) / static_cast<float>(entity->cLifespan->total)) * 255);
+                
+                // Get original colours
+                sf::Color fillColour = entity->cShape->shape.getFillColor();
+                sf::Color outlineColour = entity->cShape->shape.getOutlineColor();
+                
+                // Change alpha values
+                fillColour.a = newAlpha;
+                outlineColour.a = newAlpha;
+
+                // Set new colours with new alphas
+                entity->cShape->shape.setFillColor(fillColour);
+                entity->cShape->shape.setOutlineColor(outlineColour);
             }
             // If entity has no lives left but is still alive, destroy it
             else if (entity->isAlive())
@@ -491,7 +495,7 @@ void Game::spawnSmallEnemies(std::shared_ptr<Entity> bigEnemy)
     
     // Calculate angle between small enemies
     size_t numVertices = bigEnemy->cShape->shape.getPointCount();
-    float angle = 360 / static_cast<float>(numVertices);
+    float angle = 2 * M_PI / static_cast<float>(numVertices);
 
      // Set to same colours as original
     sf::Color fillColour = bigEnemy->cShape->shape.getFillColor();
@@ -503,7 +507,6 @@ void Game::spawnSmallEnemies(std::shared_ptr<Entity> bigEnemy)
     float collisionRadius = bigEnemy->cCollision->radius / 2;
 
     // Set position and speed of transform component Transform component
-
     for (int i = 0; i < numVertices; i++)
     {
         std::shared_ptr<Entity> smallEnemy = m_entities.addEntity("SmallEnemy");

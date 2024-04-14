@@ -1,8 +1,5 @@
-# Problems
-- sLifespan(): alpha of small enemies and bullets doesn't fade.
-	- Maybe tie lifespan to delta time, not frames (might be fading too quickly) -> actually doesn't seem like it. 
-- Angles of projecion of small enemies incorrect.
-
+# To-do
+- sGUI().
 
 # Order of Implementation
 1. [X] Implement Vec2 class -> then test in main.cpp.
@@ -28,7 +25,7 @@
 		- When (large) enemies collide with bullet or player, are destroyed, and N small enemies are spawn in its place (where N is number of vertices).
 		- Each small enemy has same number of vertices and colour, and are fired off at every (360 / vertices) degrees.
 8. [X] Implement rest of game's functionality including config file reading
-9. Implement GUI functionality (can do this earlier to help debug).
+9. [ ] Implement GUI functionality (can do this earlier to help debug).
 10. [X] Implement sLifespan using RGBA.
 11. [ ] Implement special weapon.
 
