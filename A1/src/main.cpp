@@ -20,7 +20,7 @@ public:
 	float m_scale = 1.f;
 
 public:
-	NewShape(sf::Vector2f velocity)					// std::string text
+	NewShape(sf::Vector2f velocity)
 		: m_velocity(velocity) {}
 
 	void move()

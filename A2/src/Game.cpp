@@ -1,12 +1,15 @@
+#define _USE_MATH_DEFINES
+
 #include <random>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <chrono>
-// #include <cmath>
+#include <cmath>
 
 #include "Game.h"
 #include "Components.h"
+#include "imgui_demo.cpp"
 
 Game::Game(const std::string& configFile)
     : m_resolution(1920, 1080)
@@ -406,10 +409,20 @@ void Game::sEnemySpawner()
 }
 
 void Game::sGUI()
-{
-    ImGui::Begin("Assignment 2");
+{   
+    // THIS IS ALREADY DONE IN INIT
+    //ImGui::SFML::Init(m_window);
 
-    ImGui::Text("Stuff goes here.");
+    ImGui::GetStyle().ScaleAllSizes(3.5f);		// Scales imgui GUI
+    ImGui::GetIO().FontGlobalScale = 1.3f;		// Scale imgui text size
+
+    ImGui::SFML::Update(m_window, m_deltaClock.restart());
+
+    ImGui::ShowDemoWindow();
+
+    ImGui::Begin("Shape Shooter");
+
+    ImGui::Text("Hello");
 
     ImGui::End();
 }

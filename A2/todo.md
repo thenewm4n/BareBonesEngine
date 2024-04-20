@@ -1,5 +1,15 @@
 # To-do
-- sGUI().
+- sGUI()
+	- Tabs: Systems, Entity Manager, 
+	- Systems tab
+		- Toggles to activate/deactivate each system
+		- For sSpawner - slider for spawn rate/interval; manual spawn button
+	- Entity Manager tab
+		- Delete button (with colour of shape); unique identity; tag; position 
+		- Collapsing headers for:
+			- All entities
+			- Entities by tag
+				- For all tags, whether an object with that tag exists or not
 
 # Order of Implementation
 1. [X] Implement Vec2 class -> then test in main.cpp.
@@ -28,5 +38,3 @@
 9. [ ] Implement GUI functionality (can do this earlier to help debug).
 10. [X] Implement sLifespan using RGBA.
 11. [ ] Implement special weapon.
-
-- Where to set m_text position to top left, and update m_text so it reflects m_score?
