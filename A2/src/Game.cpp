@@ -89,6 +89,8 @@ void Game::init(const std::string& configFile)
     m_window.setFramerateLimit(60);
 
     ImGui::SFML::Init(m_window);
+    ImGui::GetStyle().ScaleAllSizes(3.5f);		// Scales imgui GUI
+    ImGui::GetIO().FontGlobalScale = 1.3f;		// Scale imgui text size
 
     spawnPlayer();
 }
@@ -98,8 +100,6 @@ void Game::run()
     while(m_isRunning)
     {
         m_entities.update();
-
-        ImGui::SFML::Update(m_window, m_deltaClock.restart());
 
         // Call each systems
         // THIS MAY BE WRONG
@@ -410,19 +410,31 @@ void Game::sEnemySpawner()
 
 void Game::sGUI()
 {   
-    // THIS IS ALREADY DONE IN INIT
-    //ImGui::SFML::Init(m_window);
-
-    ImGui::GetStyle().ScaleAllSizes(3.5f);		// Scales imgui GUI
-    ImGui::GetIO().FontGlobalScale = 1.3f;		// Scale imgui text size
-
     ImGui::SFML::Update(m_window, m_deltaClock.restart());
 
     ImGui::ShowDemoWindow();
 
     ImGui::Begin("Shape Shooter");
 
-    ImGui::Text("Hello");
+    // Tabs
+        // Systems
+        // Entity Manager
+            // Collapsing headers - all entities; entities by tag
+ 
+    if (ImGui::BeginTabBar("MyTabBar"))
+    {
+        if (ImGui::BeginTabItem("Systems"))
+        {
+            ImGui::Text("This is the Avocado tab!\nblah blah blah blah blah");
+            ImGui::EndTabItem();
+        }
+        if (ImGui::BeginTabItem("Entity Manager"))
+        {
+            ImGui::Text("This is the Broccoli tab!\nblah blah blah blah blah");
+            ImGui::EndTabItem();
+        }
+        ImGui::EndTabBar();
+    }
 
     ImGui::End();
 }
