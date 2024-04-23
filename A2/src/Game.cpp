@@ -9,7 +9,7 @@
 
 #include "Game.h"
 #include "Components.h"
-#include "imgui_demo.cpp"
+//#include "imgui_demo.cpp"
 
 Game::Game(const std::string& configFile)
     : m_resolution(1920, 1080)
@@ -425,7 +425,13 @@ void Game::sGUI()
     {
         if (ImGui::BeginTabItem("Systems"))
         {
-            ImGui::Text("This is the Avocado tab!\nblah blah blah blah blah");
+            // Change the bool refs
+            ImGui::Checkbox("Rendering", &check);
+            ImGui::Checkbox("Movement", &check);
+            ImGui::Checkbox("Enemy Spawner", &check);
+            ImGui::Checkbox("User Input", &check);
+            ImGui::Checkbox("Collisions", &check);
+            ImGui::Checkbox("Lifespan", &check);
             ImGui::EndTabItem();
         }
         if (ImGui::BeginTabItem("Entity Manager"))

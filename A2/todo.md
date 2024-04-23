@@ -1,6 +1,5 @@
 # To-do
 - sGUI()
-	- Tabs: Systems, Entity Manager, 
 	- Systems tab
 		- Toggles to activate/deactivate each system
 		- For sSpawner - slider for spawn rate/interval; manual spawn button
