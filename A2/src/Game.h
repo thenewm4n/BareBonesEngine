@@ -29,6 +29,13 @@ private:
     int m_score = 0;
     int m_currentFrame = 0;
     int m_lastEnemySpawnFrame = 0;
+    
+    bool m_renderActive = true;
+    bool m_enemySpawnerActive = true;
+    bool m_movementActive = true;
+    bool m_collisionActive = true;
+    bool m_lifespanActive = true;
+    bool m_userInputActive = true;
 
 private:
     void init(const std::string& configFilePath);    

@@ -9,7 +9,7 @@
 
 #include "Game.h"
 #include "Components.h"
-//#include "imgui_demo.cpp"
+#include "imgui_demo.cpp"       // Needs to be commented on Mac
 
 Game::Game(const std::string& configFile)
     : m_resolution(1920, 1080)
@@ -102,23 +102,20 @@ void Game::run()
         m_entities.update();
 
         // Call each systems
-        // THIS MAY BE WRONG
         sCollision();       // sCollision must come before sMovement for collision with walls
         sUserInput();
-        if (!m_isPaused)
-        {
-            sEnemySpawner();
-            sMovement();
-            sLifespan();
+        sEnemySpawner();
+        sMovement();
+        sLifespan();
 
-            // Spawn bullet if user left-clicks
-            if (m_player->cInput->shoot)
-            {
-                Vec2 mousePosition = sf::Mouse::getPosition(m_window);
-                spawnBullet(m_player, mousePosition);
-                m_player->cInput->shoot = false;
-            }
+        // Spawn bullet if user left-clicks
+        if (m_player->cInput->shoot)
+        {
+            Vec2 mousePosition = sf::Mouse::getPosition(m_window);
+            spawnBullet(m_player, mousePosition);
+            m_player->cInput->shoot = false;
         }
+
         sGUI();
         sRender();
 
@@ -133,6 +130,11 @@ void Game::run()
 
 void Game::sMovement()
 {
+    if (!m_movementActive || m_isPaused)
+    {
+        return;
+    }
+
     // Update Y velocity according to player input
     if (m_player->cInput->down)
     {
@@ -173,6 +175,11 @@ void Game::sMovement()
 
 void Game::sUserInput()
 {
+    if (!m_userInputActive)
+    {
+        return;
+    }
+
     sf::Event event;
     while (m_window.pollEvent(event))
     {
@@ -264,6 +271,12 @@ void Game::sUserInput()
 
 void Game::sRender()
 {
+    if (!m_renderActive)
+    {
+        ImGui::SFML::Render(m_window);
+        return;
+    }
+
     m_window.clear();
 
     // Rotate player and all enemies
@@ -308,6 +321,11 @@ void Game::sRender()
 
 void Game::sCollision()
 {
+    if (!m_collisionActive)
+    {
+        return;
+    }
+
      // If entity has Collision component and touches wall, velocity is reversed
     for (const auto& entity : m_entities.getEntities())
     {   
@@ -365,6 +383,11 @@ void Game::sCollision()
 
 void Game::sLifespan()
 {
+    if (!m_lifespanActive || m_isPaused)
+    {
+        return;
+    }
+
     EntityVector entities = m_entities.getEntities();
     for (const auto& entity : entities)
     {
@@ -402,6 +425,11 @@ void Game::sLifespan()
 
 void Game::sEnemySpawner()
 {
+    if (!m_enemySpawnerActive || m_isPaused)
+    {
+        return;
+    }
+
     if (m_currentFrame - m_lastEnemySpawnFrame > m_enemyConfig.spawnInterval)
     {
         spawnEnemy();
@@ -417,7 +445,6 @@ void Game::sGUI()
     ImGui::Begin("Shape Shooter");
 
     // Tabs
-        // Systems
         // Entity Manager
             // Collapsing headers - all entities; entities by tag
  
@@ -426,17 +453,34 @@ void Game::sGUI()
         if (ImGui::BeginTabItem("Systems"))
         {
             // Change the bool refs
-            ImGui::Checkbox("Rendering", &check);
-            ImGui::Checkbox("Movement", &check);
-            ImGui::Checkbox("Enemy Spawner", &check);
-            ImGui::Checkbox("User Input", &check);
-            ImGui::Checkbox("Collisions", &check);
-            ImGui::Checkbox("Lifespan", &check);
+            ImGui::Checkbox("Rendering", &m_renderActive);
+            ImGui::Checkbox("Movement", &m_movementActive);
+            ImGui::Checkbox("Enemy Spawner", &m_enemySpawnerActive);
+            ImGui::Indent();
+            ImGui::SliderInt("Spawn Interval", &m_enemyConfig.spawnInterval, 0, 250);
+            if (ImGui::Button("Spawn Enemy"))
+                spawnEnemy();
+            ImGui::Unindent();
+            ImGui::Checkbox("User Input", &m_userInputActive);
+            ImGui::Checkbox("Collisions", &m_collisionActive);
+            ImGui::Checkbox("Lifespan", &m_lifespanActive);
             ImGui::EndTabItem();
         }
         if (ImGui::BeginTabItem("Entity Manager"))
         {
-            ImGui::Text("This is the Broccoli tab!\nblah blah blah blah blah");
+            if (ImGui::CollapsingHeader("All Entities"))
+            {
+                ImGui::Text("IsItemHovered: %d", ImGui::IsItemHovered());
+                for (int i = 0; i < 5; i++)
+                    ImGui::Text("Some content %d", i);
+            }
+
+            if (ImGui::CollapsingHeader("Entities by Tag"))
+            {
+                ImGui::Text("IsItemHovered: %d", ImGui::IsItemHovered());
+                for (int i = 0; i < 5; i++)
+                    ImGui::Text("Some content %d", i);
+            }
             ImGui::EndTabItem();
         }
         ImGui::EndTabBar();
@@ -561,6 +605,11 @@ void Game::spawnSmallEnemies(std::shared_ptr<Entity> bigEnemy)
 // Spawn a bullet at the position of entity, firing at target
 void Game::spawnBullet(std::shared_ptr<Entity> entity, const Vec2& target)
 {
+    if (m_isPaused)
+    {
+        return;
+    }
+
     std::shared_ptr<Entity> bulletEntity = m_entities.addEntity("Bullet");
 
     // Set velocity according to mouse position and speed from config file

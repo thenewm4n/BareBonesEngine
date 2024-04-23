@@ -1,14 +1,16 @@
 # To-do
 - sGUI()
-	- Systems tab
-		- Toggles to activate/deactivate each system
-		- For sSpawner - slider for spawn rate/interval; manual spawn button
 	- Entity Manager tab
 		- Delete button (with colour of shape); unique identity; tag; position 
 		- Collapsing headers for:
 			- All entities
 			- Entities by tag
 				- For all tags, whether an object with that tag exists or not
+
+- sCollision problems
+	- Sometimes, shapes collide with wall and don't bounce - velocity reverses rapidly.
+	- Sometimes, shape reverse velocity before touching wall.
+- Player doesn't collide with wall.
 
 # Order of Implementation
 1. [X] Implement Vec2 class -> then test in main.cpp.
