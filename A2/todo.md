@@ -1,41 +1,7 @@
 # To-do
-- sGUI()
-	- Entity Manager tab
-		- Delete button (with colour of shape); unique identity; tag; position 
-		- Collapsing headers for:
-			- All entities
-			- Entities by tag
-				- For all tags, whether an object with that tag exists or not
-
-- sCollision problems
+- Make button colour match fill colour of shape.
+- Correct window size on Mac.
+- Fix sCollision
 	- Sometimes, shapes collide with wall and don't bounce - velocity reverses rapidly.
 	- Sometimes, shape reverse velocity before touching wall.
-- Player doesn't collide with wall.
-
-# Order of Implementation
-1. [X] Implement Vec2 class -> then test in main.cpp.
-2. [X] Implement basic functionality of EntityManager class.
-	- [X] Implement EntityManager::addEntity() and ::update() (don't worry about deleting dead Entities yet).
-3. Implement basics of Game class.
-	- [X] Construct a player Entity using spawnPlayer() function.
-	- [X] Implement basic drawing of entities using the Game::sRender function.
-	- [X] Construct some enemies using the spawnEnemy() function.
-		- [X] Random position
-		- [X] Random velocity
-		- [X] Random vertices
-	- [X] Construct a bullet using the spawnBullet() function.
-		- [X] cTransform
-		- [X] cCollision
-		- [X] cLifespan
-		- [X] cShape
-4. [X] Implement player movement in Game::sUserInput and Game::sMovement
-5. [X] Implement the EntityManager::update() function so it deletes dead enemies
-6. [X] Implement the EntityManager::getEntities(tag) functionality
-7. [X] Implement collisions in sCollision and entity.destroy() if it's dead
-	- [X] Implement spawnSmallEnemies().
-		- When (large) enemies collide with bullet or player, are destroyed, and N small enemies are spawn in its place (where N is number of vertices).
-		- Each small enemy has same number of vertices and colour, and are fired off at every (360 / vertices) degrees.
-8. [X] Implement rest of game's functionality including config file reading
-9. [ ] Implement GUI functionality (can do this earlier to help debug).
-10. [X] Implement sLifespan using RGBA.
-11. [ ] Implement special weapon.
+	- Player doesn't collide with wall.

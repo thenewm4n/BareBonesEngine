@@ -86,7 +86,7 @@ void Game::init(const std::string& configFile)
 
     file.close();
 
-    // This isn' allowed?
+    // This isn't allowed?
     m_window = sf::RenderWindow(sf::VideoMode(1920, 1080), "Assignment 2");
     // m_window.create(sf::VideoMode(static_cast<unsigned int>(m_resolution.x), static_cast<unsigned int>(m_resolution.y)), "Assignment 2");
     //m_window.create(sf::VideoMode(1920, 1080), "Assignment 2");

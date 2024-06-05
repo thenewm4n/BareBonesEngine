@@ -1,5 +1,5 @@
 CXX := g++
-OUTPUT := sfmlgame
+OUTPUT := A1
 
 SFML_DIR := /opt/homebrew/Cellar/sfml/2.6.1
 
@@ -19,7 +19,7 @@ $(OUTPUT):$(OBJ_FILES) Makefile
 	$(CXX) -c $(CXX_FLAGS) $(INCLUDES) $< -o $@
 
 clean:
-	rm -f $(OBJ_FILES) ./bin/sfmlgame
+	rm -f $(OBJ_FILES) ./bin/A1
 
 run: $(OUTPUT)
-	cd bin && ./sfmlgame && cd ..
+	cd bin && ./A1 && cd ..
