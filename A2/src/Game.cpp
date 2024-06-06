@@ -87,9 +87,9 @@ void Game::init(const std::string& configFile)
     file.close();
 
     // This isn' allowed?
-    m_window = sf::RenderWindow(sf::VideoMode(1920, 1080), "Assignment 2");
-    // m_window.create(sf::VideoMode(static_cast<unsigned int>(m_resolution.x), static_cast<unsigned int>(m_resolution.y)), "Assignment 2");
-    //m_window.create(sf::VideoMode(1920, 1080), "Assignment 2");
+    //m_window = sf::RenderWindow(sf::VideoMode(1920, 1080), "Assignment 2");
+    //m_window.create(sf::VideoMode(static_cast<unsigned int>(m_resolution.x), static_cast<unsigned int>(m_resolution.y)), "Assignment 2");
+    m_window.create(sf::VideoMode(1920, 1080), "Assignment 2");
     m_window.setFramerateLimit(60);
 
     // Why is the window size 1440, 847?
@@ -447,7 +447,7 @@ void Game::sGUI()
 {   
     ImGui::SFML::Update(m_window, m_deltaClock.restart());
 
-    ImGui::ShowDemoWindow();
+    // ImGui::ShowDemoWindow();
 
     ImGui::Begin("Shape Shooter");
 
