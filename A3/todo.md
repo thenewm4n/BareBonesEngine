@@ -12,14 +12,10 @@
 
 # To complete
 - GameEngine.cpp
-- Action.h
-- Action.cpp
 - Physics.h
 - Scene.cpp
 
-# Questions
-- Why include sstream in Action.h?
-- What do getWidth() (width()) and getHeight() (height()) in Scene class do?
+# Recommended order of implementation
 
 1. Rendering system already done (maybe...) -> T (textures), C (bounding boxes) and G (grid) can be used to debug
 2. Can implement Animation::update() and Animation::hasEnded() at any time -> only effects animation, not gameplay

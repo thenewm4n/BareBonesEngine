@@ -13,7 +13,7 @@ private:
     size_t m_framesInAnimation = 1; // No. frames in the animation
     size_t m_currentFrame = 0;      // Current animation frame
     size_t m_frameDuration = 0;     // Number of game frames each animation frame persists
-    Vec2 m_size = { 1, 1 };         // Size of the animation frame relative to the grid
+    Vec2i m_size = { 1, 1 };         // Size of the animation frame relative to the grid
 
 public:
     Animation();
@@ -23,6 +23,6 @@ public:
     void update();
     bool hasEnded() const;
     const std::string& getName() const;
-    const Vec2& getSize() const;
+    const Vec2i& getSize() const;
     sf::Sprite& getSprite();
 };

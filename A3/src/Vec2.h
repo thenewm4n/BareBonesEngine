@@ -2,9 +2,6 @@
 
 #include <cmath>
 
-using Vec2f = Vec2<float>;
-using Vec2i = Vec2<int>;
-
 template <typename T>
 class Vec2
 {
@@ -35,7 +32,8 @@ public:
 
 
 // Method implementations
-Vec2::Vec2()
+template <typename T>
+Vec2<T>::Vec2()
 {
 }
 
@@ -77,7 +75,7 @@ void Vec2<T>::operator += (const Vec2<T>& other)
 }
 
 template <typename T>
-void Vec<T>::operator -= (const Vec2<T>& other)
+void Vec2<T>::operator -= (const Vec2<T>& other)
 {
     x -= other.x;
     y -= other.y;
@@ -103,6 +101,7 @@ bool Vec2<T>::operator == (const Vec2<T>& other) const
     return x == other.x && y == other.y;
 }
 
+template <typename T>
 bool Vec2<T>::operator != (const Vec2<T>& other) const
 {
     return !(*this == other);
@@ -132,3 +131,7 @@ Vec2<T> operator * (float scalar, const Vec2<T>& vec)
 {
     return Vec2<T>(vec.x * scalar, vec.y * scalar);
 }
+
+
+using Vec2f = Vec2<float>;
+using Vec2i = Vec2<int>;
