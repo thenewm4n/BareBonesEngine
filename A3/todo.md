@@ -1,10 +1,9 @@
 
 # What is needed to compile?
-- ScenePlatformer::sRender() - what is going on with m_drawGrid?
+- ScenePlatformer, line 286 (ScenePlatformer::sRender()) - what is going on with m_drawGrid?
 - Animation class implemented, so we can load sprites/textures from file
 
 ### Next
-- What is Scene(m_game) in SceneStartMenu constructor? Do you have to instantiate a base class object every time? And should I set m_title in the initialiser list or init()?
 - Anything else in SceneStartMenu?
     - init() - initialising m_levelPaths using level.txt? Maybe make a levels directory to iterate through?
 - Implementation of sDoAction() for derived classes
@@ -17,8 +16,6 @@
 - Action.cpp
 - Physics.h
 - Scene.cpp
-- Scene_Menu.h
-- Scene_Menu.cpp (!)
 
 # Questions
 - Why include sstream in Action.h?
@@ -69,3 +66,4 @@
 
 # Improvements
 - SceneStartMenu: make initialisation of title, menu strings & level paths dynamic according to e.g. config file, levels file.
+- Decouple logic from framerate using delta time.

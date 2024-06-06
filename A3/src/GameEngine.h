@@ -11,6 +11,7 @@ class GameEngine
 {
 protected:
     sf::RenderWindow m_window;
+    sf::View m_view;
     Assets m_assets;
     std::string m_currentScene;
     SceneMap m_sceneMap;

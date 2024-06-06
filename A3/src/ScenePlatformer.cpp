@@ -228,22 +228,24 @@ void ScenePlatformer::sAnimation()
 
 void ScenePlatformer::sRender()
 {
+    sf::Window& window = m_game->getWindow();
+
     // Different colour background to indicate game paused
-    if (!m_paused)
+    if (m_paused)
     {
-        m_game->getWindow().clear(sf::Color(100, 100, 255));        // Indigo 
+        window.clear(sf::Color(50, 50, 150));          // Dark blue
     }
     else
     {
-        m_game->getWindow().clear(sf::Color(50, 50, 150));          // Dark blue
+        window.clear(sf::Color(100, 100, 255));        // Indigo 
     }
 
     // Centres view on player if further to right than middle of screen
     auto& playerPosition = m_player->getComponent<CTransform>.position;
-    float windowCentreX = std::max(m_game->getWindow().getSize().x / 2.f, playerPosition.x);
-    sf::View view = m_game->getWindow().getView();
-    view.setCenter(windowCentreX, view.getCenter().y);    // This was m_game->getWindow().getSize().y - view.getCenter().y -> used to mirror the view in the vertical midline
-    m_game->getWindow().setView(view);
+    float newViewCentreX = std::max(window.getSize().x / 2.f, playerPosition.x);
+    sf::View view = window.getView();
+    view.setCenter(newViewCentreX, view.getCenter().y);    // This was m_game->getWindow().getSize().y - view.getCenter().y -> used to mirror the view in the vertical midline
+    window.setView(view);
 
     // Drawing of textures/animations and bounding boxes
     for (auto entity : m_entityManager.getEntities())
@@ -256,7 +258,7 @@ void ScenePlatformer::sRender()
             animation.getSprite().setPosition(transform.position.x, transform.position.y);
             animation.getSprite().setScale(transform.scale.x, transform.scale.y);
             animation.getSprite().setRotation(transform.angle);
-            m_game->getWindow().draw(animation.getSprite());
+            window.draw(animation.getSprite());
         }
 
         // Draw Entity bounding boxes
@@ -272,16 +274,16 @@ void ScenePlatformer::sRender()
             rectangle.setFillColor(sf::Color(0, 0, 0, 0));                  // Sets alpha of fill colour to 0 i.e. transparent
             rectangle.setOutlineColor(sf::Color(255, 255, 255, 255));       // Sets alpha of outline to 255 i.e. opaque
             rectangle.setOutlineThickness(1);
-            m_game->getWindow().draw(rectangle);
+            window.draw(rectangle);
         }
     }
 
     // Draw grid for debugging
     if (m_drawGrid)
     {
-        float leftEdgeX = m_game->getWindow().getView().getCenter().x - getWidth() / 2;     // Left edge of viewable area
-        float rightEdgeX = leftEdgeX + getWidth() + m_gridCellSize.x;                        // Right edge of viewable area
-        float nextGridX = leftEdgeX - (static_cast<int>(leftEdgeX) % static_cast<int>(m_gridCellSize.x));
+        float leftEdgeX = window.getView().getCenter().x - window.getSize().x / 2;                      // Left edge of viewable area: takes half of window size from center of view
+        float rightEdgeX = leftEdgeX + window.getSize()x + m_gridCellSize.x;                            // Right edge of viewable area: the width of a cell is added to ensure full coverage
+        float nextCellX = leftEdgeX - (static_cast<int>(leftEdgeX) % static_cast<int>(m_gridCellSize.x));
 
         for (float x = nextGridX; x < rightEdgeX; x += gridCellSize.x)
         {
@@ -298,7 +300,7 @@ void ScenePlatformer::sRender()
                 std::string yCell = std::to_string(static_cast<int>(y) / static_cast<int>(m_gridCellSize.y));
                 m_gridText.setString("(" + xCell + ", " + yCell + ")");
                 m_gridText.setPosition(x + 3, getHeight() - y - m_gridSize.y + 2);
-                m_game->getWindow().draw(m_gridText);
+                window.draw(m_gridText);
             }
         }
     }

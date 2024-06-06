@@ -24,7 +24,7 @@ void SceneStartMenu::update()
 
 void SceneStartMenu::sRender()
 {
-    const sf::Window& window = m_game->getWindow();
+    sf::Window& window = m_game->getWindow();
     int midScreen = window.getSize().x / 2;
     int distanceBetweenStrings = window.getSize().y / (m_menuStrings.size() + 1);
     

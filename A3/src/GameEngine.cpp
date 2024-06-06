@@ -46,6 +46,9 @@ void GameEngine::init(const std::string& configFilePath)
     m_window.create(sf::VideoMode(resolution.x, resolution.y, "Assignment 3"));
     m_window.setFramerateLimit(framerateCap);
 
+    // Set View to match resolution
+    m_view.setSize(sf::FloatRect(0, 0, static_cast<float>(resolution.x), static_cast<float>(resolution.y)));
+
     // Creates GUI
     /*
     ImGui::SFML::Init(m_window);
@@ -77,6 +80,16 @@ void GameEngine::sUserInput()
         {
             quit();
         }
+        else if (event.type == sf::Event::Resized)
+        {
+            sf::Vector2f resolution(static_cast<float>(m_window.getSize().x), static_cast<float>(m_window.getSize().y));
+            // float aspectRatio = static_cast<float>(m_window.getSize().x) / static_cast<float>(m_window.getSize().y);     maybe to better handle resizing?
+            sf::View view = m_window.getView();
+            view.setSize(resolution);
+            m_window.setView(view);
+
+            continue;
+        }
 
         // Scene-agnostic screenshot key
         if (event.type == sf::Event::KeyPressed)
@@ -92,6 +105,9 @@ void GameEngine::sUserInput()
                 {
                     std::cout << "Screenshot saved as test.png." << std::endl;
                 }
+                
+                // Continue to next event
+                continue;
             }
         }
 
