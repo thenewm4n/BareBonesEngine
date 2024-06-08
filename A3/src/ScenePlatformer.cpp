@@ -229,6 +229,7 @@ void ScenePlatformer::sAnimation()
 void ScenePlatformer::sRender()
 {
     sf::Window& window = m_game->getWindow();
+    sf::Vector2f resolution = window.getSize();
 
     // Different colour background to indicate game paused
     if (m_paused)
@@ -242,7 +243,7 @@ void ScenePlatformer::sRender()
 
     // Centres view on player if further to right than middle of screen
     auto& playerPosition = m_player->getComponent<CTransform>.position;
-    float newViewCentreX = std::max(window.getSize().x / 2.f, playerPosition.x);
+    float newViewCentreX = std::max(resolution.x / 2.f, playerPosition.x);
     sf::View view = window.getView();
     view.setCenter(newViewCentreX, view.getCenter().y);    // This was m_game->getWindow().getSize().y - view.getCenter().y -> used to mirror the view in the vertical midline
     window.setView(view);
@@ -281,28 +282,41 @@ void ScenePlatformer::sRender()
     // Draw grid for debugging
     if (m_drawGrid)
     {
-        float leftEdgeX = window.getView().getCenter().x - window.getSize().x / 2;                      // Left edge of viewable area: takes half of window size from center of view
-        float rightEdgeX = leftEdgeX + window.getSize()x + m_gridCellSize.x;                            // Right edge of viewable area: the width of a cell is added to ensure full coverage
-        float nextCellX = leftEdgeX - (static_cast<int>(leftEdgeX) % static_cast<int>(m_gridCellSize.x));
+        float leftEdgeX = window.getView().getCenter().x - (resolution.x / 2);              // Left edge of viewable area
+        float rightEdgeX = leftEdgeX + resolution.x + m_gridCellSize.x;                     // Right edge of viewable area - width of a cell is added to ensure full coverage
+        float firstCellX = leftEdgeX - (static_cast<int>(leftEdgeX) % m_gridCellSize.x);    // X position of leftmost cell starting just outside of window
 
-        for (float x = nextGridX; x < rightEdgeX; x += gridCellSize.x)
+        float topEdgeY = window.getView().getCenter().y - (resolution.y / 2);               // Top of viewable area
+        float bottomEdgeY = topEdgeY + resolution.y + m_gridCellSize.y;                     // Bottom of viewable area - height of cell added to ensure full coverage
+        float firstCellY = topEdgeY - (static_cast<int>(topEdgeY) % m_gridCellSize.y);      // Y position of top cell starting just outside of window
+
+        sf::VertexArray lines(sf::Lines);
+
+        // Adds vertical lines to VertexArray
+        for (float x = firstCellX; x < rightEdgeX; x += m_gridCellSize.x)
         {
-            drawLine(Vec2(x, 0), Vec2(x, getHeight()));
+            lines.append(sf::Vertex(sf::Vector2f(x, topEdgeY)));
+            lines.append(sf::Vertex(sf::Vector2f(x, bottomEdgeY)));
         }
 
-        for (float y = 0; y < getHeight(); y += m_gridCellSize.y)
+        // Adds horizontal line to VertexArray and draws coordinate text for each cell
+        for (float y = firstCellY; y < bottomEdgeY; y += m_gridCellSize.y)
         {
-            drawLine(Vec2(leftEdgeX, getHeight() - y), Vec2(rightEdgeX, getHeight() - y));
+            lines.append(sf::Vertex(sf::Vector2f(leftEdgeX, y)));
+            lines.append(sf::Vertex(sf::Vector2f(rightEdgeX, y)));
 
-            for (float x = nextGridX; x < rightEdgeX; x += m_gridCellSize.x)
+            // For each cell, adds coordinate text
+            for (float x = firstCellX; x < rightEdgeX; x += m_gridCellSize.x)
             {
-                std::string xCell = std::to_string(static_cast<int>(x) / static_cast<int>(m_gridCellSize.x));
-                std::string yCell = std::to_string(static_cast<int>(y) / static_cast<int>(m_gridCellSize.y));
-                m_gridText.setString("(" + xCell + ", " + yCell + ")");
-                m_gridText.setPosition(x + 3, getHeight() - y - m_gridSize.y + 2);
+                std::string xCellCoord = std::to_string(static_cast<int>(x) / m_gridCellSize.x);
+                std::string yCellCoord = std::to_string(static_cast<int>(y) / m_gridCellSize.y);
+                m_gridText.setString("(" + xCellCoord + ", " + yCellCoord + ")");
+                m_gridText.setPosition(x + 3, bottomEdgeY - y - m_gridCellSize.y + 2);      // OR m_gridText.setPosition(x + 3, y + 2); ?
                 window.draw(m_gridText);
             }
         }
+
+        window.draw(lines);
     }
 
     window.display();
@@ -327,7 +341,7 @@ void ScenePlatformer::spawnBullet(std::shared_ptr<Entity> entity)
     // TODO: this should spawn a bullet at a given entity, going in direction entity is facing
 }
 
-Vec2 ScenePlatformer::gridToMidPixel(float gridPositionX, float gridPositionY, std::shared_ptr<Entity> entity)
+Vec2f ScenePlatformer::gridToMidPixel(float gridPositionX, float gridPositionY, std::shared_ptr<Entity> entity)
 {
     // TODO: Takes in a grid position where the bottom left of the entity is, and an Entity object
     // Returns Vec2 indicating the actual centre position of the entity (not a grid position)
@@ -336,4 +350,14 @@ Vec2 ScenePlatformer::gridToMidPixel(float gridPositionX, float gridPositionY, s
     // Bottom left corner of animation should align with the bottom left of the grid cell
 
     return Vec2(0, 0);
+}
+
+void simulate(const size_t frames)
+{
+
+}
+
+void drawLine(const Vec2& point1, const Vec2& point2);
+{
+
 }
