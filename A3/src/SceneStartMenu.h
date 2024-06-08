@@ -18,8 +18,8 @@ private:
 
 private:
     void init();
-    void update();
-    void sRender();
-    void endScene();
-    void sDoAction(const Action& action);
+    void update() override;
+    void sRender() override;
+    void endScene() override;
+    void sDoAction(const Action& action) override;
 };

@@ -2,17 +2,15 @@
 
 #include <map>
 #include <memory>
-// #include <string>
 
 #include <SFML/Graphics.hpp>
 
 #include "Action.h"
 
-class GameEngine;
-
 using ActionMap = std::map<int, std::string>;
 
-// Abstract base class
+class GameEngine;
+
 class Scene
 {
 protected:
@@ -22,12 +20,12 @@ protected:
     bool m_hasEnded = false;
     size_t m_currentFrame = 0;
 
-protected:      // Called by derived Scene object
+protected:
     virtual void sRender() = 0;
     virtual void endScene() = 0;
-    void setPaused(bool paused);
+    void setPaused(bool paused);        // Necessary in most scenes, hence in Scene base class
 
-public:         // Called by GameEngine object
+public:
     Scene();
     Scene(GameEngine* gameEngine = nullptr);
 
@@ -39,8 +37,4 @@ public:         // Called by GameEngine object
     size_t getCurrentFrame() const;
     const ActionMap& getActionMap() const;
     bool hasEnded() const;
-    /*
-    size_t getWidth() const;
-    size_t getHeight() const;
-    */
 };

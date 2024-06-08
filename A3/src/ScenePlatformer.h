@@ -43,5 +43,4 @@ private:
     
     Vec2 gridToMidPixel(float gridPositionX, float gridPositionY, std::shared_ptr<Entity> entity);
     void simulate(const size_t frames);
-    void drawLine(const Vec2& point1, const Vec2& point2);
 };

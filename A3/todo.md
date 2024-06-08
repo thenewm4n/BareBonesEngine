@@ -1,14 +1,11 @@
 
 # What is needed to compile?
-- ScenePlatformer, line 286 (ScenePlatformer::sRender()) - what is going on with m_drawGrid?
 - Animation class implemented, so we can load sprites/textures from file
 
 ### Next
-- Anything else in SceneStartMenu?
-    - init() - initialising m_levelPaths using level.txt? Maybe make a levels directory to iterate through?
+- SceneStartMenu::init() - initialising m_levelPaths using level.txt? Maybe make a levels directory to iterate through?
 - Implementation of sDoAction() for derived classes
 - ScenePlatformer functions
-
 
 # To complete
 - GameEngine.cpp
@@ -16,7 +13,6 @@
 - Scene.cpp
 
 # Recommended order of implementation
-
 1. Rendering system already done (maybe...) -> T (textures), C (bounding boxes) and G (grid) can be used to debug
 2. Can implement Animation::update() and Animation::hasEnded() at any time -> only effects animation, not gameplay
 3. Implement Scene_Play::loadLevel()
