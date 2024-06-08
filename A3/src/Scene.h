@@ -27,12 +27,13 @@ protected:
 
 public:
     Scene();
-    Scene(GameEngine* gameEngine = nullptr);
+    Scene(GameEngine* gameEngine);
 
     virtual void update() = 0;
-    virtual void sDoAction(const Action &action) = 0;
+    virtual void sDoAction(const Action& action) = 0;
 
     void registerAction(int inputKey, const std::string& actionName);
+    void simulate(const size_t frames);
 
     size_t getCurrentFrame() const;
     const ActionMap& getActionMap() const;

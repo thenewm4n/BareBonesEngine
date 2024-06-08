@@ -12,17 +12,17 @@ public:
 class CTransform : public Component
 {
 public:
-    Vec2 position = { 0.f, 0.f };
-    Vec2 previousPosition = { 0.f, 0.f };
-    Vec2 scale = { 1.f, 1.f };
-    Vec2 velocity = { 0.f, 0.f };
+    Vec2f position = { 0.f, 0.f };
+    Vec2f previousPosition = { 0.f, 0.f };
+    Vec2f scale = { 1.f, 1.f };
+    Vec2f velocity = { 0.f, 0.f };
     float angle = 0.f;
 
 public:
-    CTransform() {};
-    CTransform(const Vec& pos)
+    CTransform() {}
+    CTransform(const Vec2f& pos)
         : position(pos) {}
-    CTransform(const Vec2& pos, const Vec2& vel, float ang)
+    CTransform(const Vec2f& pos, const Vec2f& vel, float ang)
         : position(pos), previousPosition(pos), velocity(vel), angle(ang) {}
 };
 
@@ -32,6 +32,7 @@ public:
     float radius = 0.f;
 
 public:
+    CCollision() {}
     CCollision(float rad)
         : radius(rad) {}
 };
@@ -43,7 +44,8 @@ public:
     int frameCreated = 0;
 
 public:
-    CLifespan(int duration, frame)
+    CLifespan() {}
+    CLifespan(int duration, int frame)
         : framesDuration(duration), frameCreated(frame) {}
 };
 
@@ -88,12 +90,12 @@ public:
 class CBoundingBox : public Component
 {
 public:
-    Vec2 size;
-    Vec2 halfSize;
+    Vec2f size;
+    Vec2f halfSize;
 
 public:
     CBoundingBox() {}
-    CBoundingBox(const Vec2& size)
+    CBoundingBox(const Vec2f& size)
         : size(size), halfSize(size / 2) {}
 };
 

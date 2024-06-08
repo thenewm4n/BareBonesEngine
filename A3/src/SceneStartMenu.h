@@ -7,7 +7,7 @@
 class SceneStartMenu : public Scene
 {
 public:
-    SceneStartMenu(GameEngine* gameEngine = nullptr);
+    SceneStartMenu(GameEngine* gameEngine);
 
 private:
     std::string m_title;

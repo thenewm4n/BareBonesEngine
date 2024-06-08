@@ -1,6 +1,13 @@
+#include <iostream>
+
 #include "Scene.h"
 
-Scene::Scene(GameEngine* gameEngine = nullptr)
+Scene::Scene()
+	: m_game(nullptr)
+{
+}
+
+Scene::Scene(GameEngine* gameEngine)
     : m_game(gameEngine)
 {
     if (!m_game)
@@ -10,33 +17,30 @@ Scene::Scene(GameEngine* gameEngine = nullptr)
     }
 }
 
-Scene::registerAction(int inputKey, const std::string& actionName)
+void Scene::registerAction(int inputKey, const std::string& actionName)
 {
     m_actionMap[inputKey] = actionName;
 }
 
-void simulate(const size_t frames);
-
-void drawLine(const Vec2& point1, const Vec2& point2)
+void Scene::simulate(const size_t frames)
 {
-    sf::Vertex line[] = { sf::Vertex(point1), sf::Vertex(point2) };
-    window.draw(line, 2, sf::Lines);
+	for (size_t i = 0; i < frames; i++)
+	{
+		update();
+	}
 }
 
-size_t getWidth() const;
-size_t getHeight() const;
-
-size_t getCurrentFrame() const;
+size_t Scene::getCurrentFrame() const
 {
     return m_currentFrame;
 }
 
-const ActionMap& getActionMap() const
+const ActionMap& Scene::getActionMap() const
 {
     return m_actionMap;
 }
 
-bool hasEnded() const
+bool Scene::hasEnded() const
 {
     return m_hasEnded;
 }

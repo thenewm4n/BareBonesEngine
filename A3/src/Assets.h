@@ -6,7 +6,7 @@
 
 class Animation;
 
-using AnimationMap = std::map<std::string, Animation>:
+using AnimationMap = std::map<std::string, Animation>;
 using FontMap = std::map<std::string, sf::Font>;
 using TextureMap = std::map<std::string, sf::Texture>;
 

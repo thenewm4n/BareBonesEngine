@@ -26,7 +26,7 @@ private:
     bool m_alive = true;
     size_t m_id = 0;
     std::string m_tag = "default";
-    ComponentTuple = m_components;
+    ComponentTuple m_components;
 
 private:
     Entity(const size_t id, const std::string& tag);

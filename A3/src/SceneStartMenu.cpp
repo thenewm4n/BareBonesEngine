@@ -1,6 +1,6 @@
 #include "SceneStartMenu.h"
 
-SceneStartMenu::SceneStartMenu(GameEngine* gameEngine = nullptr)
+SceneStartMenu::SceneStartMenu(GameEngine* gameEngine)
     : Scene(gameEngine), m_title("Platformer"), m_menuStrings({ "Level 1", "Quit" }), m_levelPaths({ "level.txt" })
 {
     init();

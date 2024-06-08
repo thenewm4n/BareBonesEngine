@@ -5,7 +5,7 @@
 #include "Components.h"
 #include "GameEngine.h"
 #include "Physics.h"
-#include "Scene_Level.h"
+#include "ScenePlatformer.h"
 
 ScenePlatformer::ScenePlatformer(GameEngine* game, const std::string& levelPath)
     : Scene(game), m_levelPath(levelPath)
@@ -25,13 +25,18 @@ void ScenePlatformer::init(const std::string& levelPath)
     registerAction(sf::Keyboard::W, "UP");
 
     m_gridText.setCharacterSize(12);
-    m_gridText.setFont(m_game->assets().getFont("Tech"));
+    m_gridText.setFont(m_game->getAssets().getFont("Tech"));
 
     loadLevel(levelPath);
 }
 
 void ScenePlatformer::update()
 {
+    if (m_paused)
+	{
+		return;
+	}
+
     m_entityManager.update();
 
     // TODO: implement pause functionality
@@ -60,7 +65,7 @@ void ScenePlatformer::loadLevel(const std::string& filename)
     // some sample entities
     auto brick = m_entityManager.addEntity("tile");
     // IMPORTANT: always add CAnimatio component first so gridToMidPixel can compute correctly
-    brick->addComponent<CAnimation>(m_game->assets().getAnimation("Brick"), true);
+    brick->addComponent<CAnimation>(m_game->getAssets().getAnimation("Brick"), true);
     brick->addComponent<CTransform>(Vec2(96, 480));
     // NOTE: final code should position entity with grid x,y position read from file:
     // brick->addComponent<CTransform>(gridToMidPixel(gridX, gridY, brick));
@@ -86,7 +91,7 @@ void ScenePlatformer::loadLevel(const std::string& filename)
 
 void ScenePlatformer::endScene()
 {
-    m_game->changeScene("MENU", std::make_shared<Scene_Menu>(m_game));
+    m_game->changeScene("MENU", std::make_shared<SceneStartMenu>(m_game));
 }
 
 void ScenePlatformer::sMovement()
@@ -149,7 +154,7 @@ void ScenePlatformer::sCollision()
     // TODO: Don't let player walk off left side of map
 }
 
-void ScenePlatformer::sActions(const Action& action)
+void ScenePlatformer::sDoAction(const Action& action)
 {
     if (action.type() == "START")
     {
@@ -167,7 +172,7 @@ void ScenePlatformer::sActions(const Action& action)
         }
         else if (action.getName() == "PAUSE")
         {
-            setPaused(!m_paused);   // What does this line mean?
+            m_paused = !m_paused;
         }
         else if (action.getName() == "QUIT")
         {
@@ -350,14 +355,4 @@ Vec2f ScenePlatformer::gridToMidPixel(float gridPositionX, float gridPositionY, 
     // Bottom left corner of animation should align with the bottom left of the grid cell
 
     return Vec2(0, 0);
-}
-
-void simulate(const size_t frames)
-{
-
-}
-
-void drawLine(const Vec2& point1, const Vec2& point2);
-{
-
 }

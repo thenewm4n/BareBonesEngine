@@ -1,3 +1,5 @@
+#include <fstream>
+#include <iostream>
 #include <string>
 #include <sstream>
 
@@ -9,7 +11,7 @@ Assets::Assets()
 {
 }
 
-void loadFromFile(std::string assetsFilePath)
+void Assets::loadFromFile(const std::string& assetsFilePath)
 {
     std::ifstream file(assetsFilePath);
     if (!file.is_open())
@@ -55,7 +57,7 @@ void loadFromFile(std::string assetsFilePath)
                 // Add loaded font to map
                 m_fontMap[name] = font;
             }
-            else if (firstElement) == "Texture"
+            else if (firstElement == "Texture")
             {
                 std::string name, path;
 
@@ -76,39 +78,39 @@ void loadFromFile(std::string assetsFilePath)
     file.close();
 }
 
-const Animation& Assets::getAnimation(const std::string& animationName)
+const Animation& Assets::getAnimation(const std::string& animationName) const
 {
     try
     {
         return m_animationMap.at(animationName);
     }
-    catch (const std::out_of_range& e)
+    catch (const std::out_of_range&)
     {
         std::cerr << "Animation not found: " << animationName << std::endl;
         exit(-4);
     }
 }
 
-const sf::Font& Assets::getFont(const std::string& fontName)
+const sf::Font& Assets::getFont(const std::string& fontName) const
 {
     try
     {
         return m_fontMap.at(fontName);
     }
-    catch (const std::out_of_range& e)
+    catch (const std::out_of_range&)
     {
         std::cerr << "Font not found: " << fontName << std::endl;
         exit(-5);
     }
 }
 
-const sf::Texture&  getTexture(const std::string& textureName)
+const sf::Texture& Assets::getTexture(const std::string& textureName) const
 {    
     try
     {
         return m_textureMap.at(textureName);
     }
-    catch (const std::out_of_range& e)
+    catch (const std::out_of_range&)
     {
         std::cerr << "Texture not found: " << textureName << std::endl;
         exit(-6);

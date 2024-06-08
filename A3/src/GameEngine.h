@@ -26,7 +26,7 @@ protected:
     std::shared_ptr<Scene> getCurrentScene();
 
 public:
-    GameEngine(const std::string& configFilePath);   //
+    GameEngine(const std::string& configFilePath);
 
     void run();
     void quit();

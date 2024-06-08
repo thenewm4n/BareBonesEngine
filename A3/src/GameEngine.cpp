@@ -1,8 +1,11 @@
 #include <fstream>
+#include <iostream>
+#include <sstream>
 
 #include "Action.h"
 #include "GameEngine.h"
-#include "Scene_Menu.h"
+#include "SceneStartMenu.h"
+#include "Vec2.h"  
 
 GameEngine::GameEngine(const std::string& configFilePath)
 {
@@ -43,11 +46,11 @@ void GameEngine::init(const std::string& configFilePath)
     file.close();
 
     // Create window using values from config.txt
-    m_window.create(sf::VideoMode(resolution.x, resolution.y, "Assignment 3"));
+    m_window.create(sf::VideoMode(resolution.x, resolution.y), "Assignment 3");
     m_window.setFramerateLimit(framerateCap);
 
     // Set View to match resolution
-    m_view.setSize(sf::FloatRect(0, 0, static_cast<float>(resolution.x), static_cast<float>(resolution.y)));
+    m_view.setSize(resolution.x, resolution.y);
 
     // Creates GUI
     /*
@@ -57,10 +60,10 @@ void GameEngine::init(const std::string& configFilePath)
     */
 
     // Load assets into Assets object
-    m_assets.loadFromFile("bin/assets.txt")
+    m_assets.loadFromFile("bin/assets.txt");
 
     // Create new menu scene, add it to scene map, and make it the current scene
-    changeScene("MENU", std::make_shared<Scene_Menu>(this));
+    changeScene("MENU", std::make_shared<SceneStartMenu>(this));
 }
 
 void GameEngine::update()
@@ -149,7 +152,7 @@ void GameEngine::quit()
     m_running = false;
 }
 
-void GameEngine::changeScene(const std::string& sceneName, std::shared_ptr<Scene> scene, bool endCurrentScene)      // Is this bool needed?
+void GameEngine::changeScene(const std::string& sceneName, std::shared_ptr<Scene> scene)
 {
     m_sceneMap[sceneName] = scene;  // Automatically adds new scene to map, or reassigns an already existing scene
     m_currentScene = sceneName;
@@ -157,7 +160,7 @@ void GameEngine::changeScene(const std::string& sceneName, std::shared_ptr<Scene
 
 bool GameEngine::isRunning()
 {
-    return m_running & m_window.isOpen();   // true if game is running and sf::Window exists
+    return m_running && m_window.isOpen();   // true if game is running and sf::Window exists
 }
 
 sf::RenderWindow& GameEngine::getWindow()
