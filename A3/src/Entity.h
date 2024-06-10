@@ -38,9 +38,9 @@ public:
     const size_t getId() const;
 
     template <typename T>
-    bool hasComponent() const
+    bool hasComponent()
     {
-        return getComponent<T>().has();
+        return getComponent<T>().has;
     }
 
     template <typename T, typename... TArgs>        // TArgs is 1 or more arguments, in this case the arguments passed to the constructor
@@ -53,7 +53,7 @@ public:
     }
     
     template <typename T>
-    const T& getComponent() const
+    T& getComponent()
     {
         return std::get<T>(m_components);
     }

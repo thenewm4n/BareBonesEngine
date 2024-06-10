@@ -6,6 +6,7 @@
 #include "GameEngine.h"
 #include "Physics.h"
 #include "ScenePlatformer.h"
+#include "SceneStartMenu.h"
 
 ScenePlatformer::ScenePlatformer(GameEngine* game, const std::string& levelPath)
     : Scene(game), m_levelPath(levelPath)
@@ -66,7 +67,7 @@ void ScenePlatformer::loadLevel(const std::string& filename)
     auto brick = m_entityManager.addEntity("tile");
     // IMPORTANT: always add CAnimatio component first so gridToMidPixel can compute correctly
     brick->addComponent<CAnimation>(m_game->getAssets().getAnimation("Brick"), true);
-    brick->addComponent<CTransform>(Vec2(96, 480));
+    brick->addComponent<CTransform>(Vec2f(96.f, 480.f));
     // NOTE: final code should position entity with grid x,y position read from file:
     // brick->addComponent<CTransform>(gridToMidPixel(gridX, gridY, brick));
 
@@ -76,8 +77,8 @@ void ScenePlatformer::loadLevel(const std::string& filename)
     }
 
     auto question = m_entityManager.addEntity("tile");
-    question->addComponent<CAnimation>(m_game->assets().getAnimation("Question"), true);
-    question->addComponent<CTransform>(Vec2(352, 480));
+    question->addComponent<CAnimation>(m_game->getAssets().getAnimation("Question"), true);
+    question->addComponent<CTransform>(Vec2f(352.f, 480.f));
 
     // NOTE - THIS IS IMPORTANT, READ THIS SAMPLE
         // Components are now returned as references, not pointers.
@@ -102,7 +103,7 @@ void ScenePlatformer::sMovement()
     // TODO: Implement max player speed in both X and Y directions
 
     // Update player velocity according to input
-    Vec2 velocity(0, m_player->getComponent<CTransform>().velocity.y);
+    Vec2f velocity(0, m_player->getComponent<CTransform>().velocity.y);
     if (m_player->getComponent<CInput>().up)
     {
         // m_player.getComponent<CState>().state = "jumping";      // Used for changing player animation
@@ -156,7 +157,7 @@ void ScenePlatformer::sCollision()
 
 void ScenePlatformer::sDoAction(const Action& action)
 {
-    if (action.type() == "START")
+    if (action.getType() == "START")
     {
         if (action.getName() == "TOGGLE_TEXTURE")
         {
@@ -164,7 +165,7 @@ void ScenePlatformer::sDoAction(const Action& action)
         }
         else if (action.getName() == "TOGGLE_COLLISION")
         {
-            m_drawCollision = !m_drawCollision;
+            m_drawBoundingBoxes = !m_drawBoundingBoxes;
         }
         else if (action.getName() == "TOGGLE_GRID")
         {
@@ -180,38 +181,38 @@ void ScenePlatformer::sDoAction(const Action& action)
         }
         else if (action.getName() == "UP")
         {
-            m_player->getComponent<CInput>.up = true;
+            m_player->getComponent<CInput>().up = true;
         }
         else if (action.getName() == "DOWN")
         {
-            m_player->getComponent<CInput>.down = true;
+            m_player->getComponent<CInput>().down = true;
         }
         else if (action.getName() == "LEFT")
         {
-            m_player->getComponent<CInput>.left = true;
+            m_player->getComponent<CInput>().left = true;
         }
         else if (action.getName() == "RIGHT")
         {
-            m_player->getComponent<CInput>.right = true;
+            m_player->getComponent<CInput>().right = true;
         }
     }
     else if (action.getType() == "END")
     {
         if (action.getName() == "UP")
         {
-            m_player->getComponent<CInput>.up = false;
+            m_player->getComponent<CInput>().up = false;
         }
         else if (action.getName() == "DOWN")
         {
-            m_player->getComponent<CInput>.up = false;
+            m_player->getComponent<CInput>().up = false;
         }
         else if (action.getName() == "LEFT")
         {
-            m_player->getComponent<CInput>.up = false;
+            m_player->getComponent<CInput>().up = false;
         }
         else if (action.getName() == "RIGHT")
         {
-            m_player->getComponent<CInput>.up = false;
+            m_player->getComponent<CInput>().up = false;
         }
     }
 }
@@ -223,9 +224,8 @@ void ScenePlatformer::sAnimation()
     // Set player animation based on state
     if (m_player->getComponent<CState>().state == "air")
     {
-        m_player->addComponent<CAnimation>(m_game->assets().getAnimation("Air"));   // Look at constructor params
+        m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("Air"), true);   // Params are const Animation&, bool toRepeat
     }
-
     // TODO: set animation of the player based on its CState component
     // TODO: for each entity with an animation, call entity->getComponent<CAnimation>().animation.update()
         // If the animation is not repeated, and it has ended, destroy the entity
@@ -233,8 +233,9 @@ void ScenePlatformer::sAnimation()
 
 void ScenePlatformer::sRender()
 {
-    sf::Window& window = m_game->getWindow();
-    sf::Vector2f resolution = window.getSize();
+    sf::RenderWindow& window = m_game->getWindow();
+    Vec2f resolution(static_cast<float>(window.getSize().x), static_cast<float>(window.getSize().y));
+
 
     // Different colour background to indicate game paused
     if (m_paused)
@@ -247,7 +248,7 @@ void ScenePlatformer::sRender()
     }
 
     // Centres view on player if further to right than middle of screen
-    auto& playerPosition = m_player->getComponent<CTransform>.position;
+    auto& playerPosition = m_player->getComponent<CTransform>().position;
     float newViewCentreX = std::max(resolution.x / 2.f, playerPosition.x);
     sf::View view = window.getView();
     view.setCenter(newViewCentreX, view.getCenter().y);    // This was m_game->getWindow().getSize().y - view.getCenter().y -> used to mirror the view in the vertical midline
@@ -268,7 +269,7 @@ void ScenePlatformer::sRender()
         }
 
         // Draw Entity bounding boxes
-        if (m_drawCollisions && entity->hasComponent<CBoundingBox>())
+        if (m_drawBoundingBoxes && entity->hasComponent<CBoundingBox>())
         {
             auto& bBox = entity->getComponent<CBoundingBox>();
             auto& transform = entity->getComponent<CTransform>();
@@ -333,10 +334,10 @@ void ScenePlatformer::spawnPlayer()
 
     // sample player entity which you can use to construct other entities
     m_player = m_entityManager.addEntity("player");
-    m_player->addComponent<CAnimation>(m_game->assets().getAnimation("Stand"), true);
-    m_player->addComponent<CTransform>(Vec2(224, 352));
-    m_player->addComponenet<CBoundingBox>(Vec2(48, 48));
-    m_player->addComponnent<CGravity>(0.1);
+    m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("Stand"), true);
+    m_player->addComponent<CTransform>(Vec2f(224.f, 352.f));
+    m_player->addComponent<CBoundingBox>(Vec2f(48.f, 48.f));
+    m_player->addComponent<CGravity>(0.1f);
 
     // TODO: add remaining components to player
 }
@@ -354,5 +355,5 @@ Vec2f ScenePlatformer::gridToMidPixel(float gridPositionX, float gridPositionY, 
     // Grid width and height is stored in m_gridCellSize
     // Bottom left corner of animation should align with the bottom left of the grid cell
 
-    return Vec2(0, 0);
+    return Vec2f(0, 0);
 }

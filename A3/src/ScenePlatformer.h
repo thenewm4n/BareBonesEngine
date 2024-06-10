@@ -22,7 +22,7 @@ private:
     PlayerConfig m_playerConfig;
     std::string m_levelPath;
     EntityManager m_entityManager;
-    bool m_drawCollision = false;
+    bool m_drawBoundingBoxes = false;
     bool m_drawGrid = false;
     bool m_drawTextures = true;
     const Vec2i m_gridCellSize = { 64, 64 };

@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include "GameEngine.h"
 #include "Scene.h"
 
 class SceneStartMenu : public Scene

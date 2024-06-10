@@ -24,9 +24,9 @@ void SceneStartMenu::update()
 
 void SceneStartMenu::sRender()
 {
-    sf::Window& window = m_game->getWindow();
-    int midScreen = window.getSize().x / 2;
-    int distanceBetweenStrings = window.getSize().y / (m_menuStrings.size() + 1);
+    sf::RenderWindow& window = m_game->getWindow();
+    float midScreen = static_cast<float>(window.getSize().x) / 2.f;
+    float distanceBetweenStrings = static_cast<float>(window.getSize().y) / (static_cast<float>(m_menuStrings.size() + 1));
     
     // Sets outline colour & thickness (same for all title screen text)
     m_menuText.setOutlineColor(sf::Color::Black);
@@ -45,7 +45,7 @@ void SceneStartMenu::sRender()
     // Draw selectable menu text
     m_menuText.setCharacterSize(45);
     m_menuText.setOutlineThickness(2.f);
-    for (int i = 0; i < m_menuStrings.size(); i++)
+    for (size_t i = 0; i < m_menuStrings.size(); i++)
     {
         m_menuText.setString(m_menuStrings[i]);
         m_menuText.setPosition(midScreen, (i + 2) * distanceBetweenStrings);
