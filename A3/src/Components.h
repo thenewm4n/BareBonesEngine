@@ -79,12 +79,12 @@ class CAnimation : public Component     // For textures and animations
 {
 public:
     Animation animation;
-    bool repeat = false;
+    bool toRepeat = false;
 
 public:
     CAnimation() {}
     CAnimation(const Animation& animation, bool toRepeat)
-        : animation(animation), repeat(toRepeat) {}
+        : animation(animation), toRepeat(toRepeat) {}
 };
 
 class CBoundingBox : public Component

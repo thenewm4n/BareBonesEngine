@@ -16,17 +16,19 @@ ScenePlatformer::ScenePlatformer(GameEngine* game, const std::string& levelPath)
 
 void ScenePlatformer::init(const std::string& levelPath)
 {
-    // TODO: register all other gameplay actions
-
     registerAction(sf::Keyboard::P, "PAUSE");
     registerAction(sf::Keyboard::Escape, "QUIT");
-    registerAction(sf::Keyboard::T, "TOGGLE_TEXTURE");
-    registerAction(sf::Keyboard::C, "TOGGLE_COLLISION");    // Toggle visible bounding boxes
+    registerAction(sf::Keyboard::T, "TOGGLE_TEXTURES");
+    registerAction(sf::Keyboard::C, "TOGGLE_BBOXES");
     registerAction(sf::Keyboard::G, "TOGGLE_GRID");
     registerAction(sf::Keyboard::W, "UP");
+    registerAction(sf::Keyboard::A, "LEFT");
+    registerAction(sf::Keyboard::S, "DOWN");
+    registerAction(sf::Keyboard::D, "RIGHT");
+    registerAction(sf::Keyboard::Space, "SHOOT");
 
     m_gridText.setCharacterSize(12);
-    m_gridText.setFont(m_game->getAssets().getFont("Tech"));
+    m_gridText.setFont(m_game->getAssets().getFont("Dune"));
 
     loadLevel(levelPath);
 }
@@ -38,9 +40,8 @@ void ScenePlatformer::update()
 		return;
 	}
 
+    // Adds and removes entities while avoiding iterator invalidation
     m_entityManager.update();
-
-    // TODO: implement pause functionality
 
     sMovement();
     sLifespan();
@@ -76,9 +77,9 @@ void ScenePlatformer::loadLevel(const std::string& filename)
         std::cout << "This could be good way of identifying if a tile is a brick" << std::endl;
     }
 
-    auto question = m_entityManager.addEntity("tile");
-    question->addComponent<CAnimation>(m_game->getAssets().getAnimation("Question"), true);
-    question->addComponent<CTransform>(Vec2f(352.f, 480.f));
+    auto questionMarkBlock = m_entityManager.addEntity("tile");
+    questionMarkBlock->addComponent<CAnimation>(m_game->getAssets().getAnimation("QuestionMark"), true);
+    questionMarkBlock->addComponent<CTransform>(Vec2f(352.f, 480.f));
 
     // NOTE - THIS IS IMPORTANT, READ THIS SAMPLE
         // Components are now returned as references, not pointers.
@@ -157,78 +158,108 @@ void ScenePlatformer::sCollision()
 
 void ScenePlatformer::sDoAction(const Action& action)
 {
+    const std::string& actionName = action.getName();
+
     if (action.getType() == "START")
     {
-        if (action.getName() == "TOGGLE_TEXTURE")
+        if (actionName == "TOGGLE_TEXTURE")
         {
             m_drawTextures = !m_drawTextures;
         }
-        else if (action.getName() == "TOGGLE_COLLISION")
+        else if (actionName == "TOGGLE_COLLISION")
         {
             m_drawBoundingBoxes = !m_drawBoundingBoxes;
         }
-        else if (action.getName() == "TOGGLE_GRID")
+        else if (actionName == "TOGGLE_GRID")
         {
             m_drawGrid = !m_drawGrid;
         }
-        else if (action.getName() == "PAUSE")
+        else if (actionName == "PAUSE")
         {
             m_paused = !m_paused;
         }
-        else if (action.getName() == "QUIT")
+        else if (actionName == "QUIT")
         {
             endScene();
         }
-        else if (action.getName() == "UP")
+        else if (actionName == "UP")
         {
             m_player->getComponent<CInput>().up = true;
         }
-        else if (action.getName() == "DOWN")
+        else if (actionName == "DOWN")
         {
             m_player->getComponent<CInput>().down = true;
         }
-        else if (action.getName() == "LEFT")
+        else if (actionName == "LEFT")
         {
             m_player->getComponent<CInput>().left = true;
         }
-        else if (action.getName() == "RIGHT")
+        else if (actionName == "RIGHT")
         {
             m_player->getComponent<CInput>().right = true;
         }
     }
     else if (action.getType() == "END")
     {
-        if (action.getName() == "UP")
+        if (actionName == "UP")
         {
             m_player->getComponent<CInput>().up = false;
         }
-        else if (action.getName() == "DOWN")
+        else if (actionName == "DOWN")
         {
-            m_player->getComponent<CInput>().up = false;
+            m_player->getComponent<CInput>().down = false;
         }
-        else if (action.getName() == "LEFT")
+        else if (actionName == "LEFT")
         {
-            m_player->getComponent<CInput>().up = false;
+            m_player->getComponent<CInput>().left = false;
         }
-        else if (action.getName() == "RIGHT")
+        else if (actionName == "RIGHT")
         {
-            m_player->getComponent<CInput>().up = false;
+            m_player->getComponent<CInput>().right = false;
         }
     }
 }
 
 void ScenePlatformer::sAnimation()
 {
-    // TODO: Complete Animation class code first
-
     // Set player animation based on state
-    if (m_player->getComponent<CState>().state == "air")
+    for (auto& entity : m_entityManager.getEntities())
     {
-        m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("Air"), true);   // Params are const Animation&, bool toRepeat
+        // Change player Animation according to player CState
+        const auto& stateComponent = m_player->getComponent<CState>();
+
+        if (stateComponent.state == "running")
+        {
+            m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("Run"), true);
+        }
+        else if (stateComponent.state == "standing")
+        {
+            m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("Stand"), true);
+        }
+        else if (stateComponent.state == "inAir")
+        {
+            m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("Air"), true);
+        }
+        else if (stateComponent.state == "shooting")
+        {
+            m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("Shoot"), false);
+        }
+
+        // If entity has Animation component, call update()
+        // if (entity->getComponent<CAnimation>())   AMEND THIS - WHAT DOES std::get RETURN WHEN SUCESSFULL?
+        {   
+            CAnimation& animationComponent = entity->getComponent<CAnimation>();
+
+            if (animationComponent.animation.hasEnded() && !animationComponent.toRepeat)
+            {
+                entity->removeComponent<CAnimation>();      // Is this always necessary? Or can we just change the animation to another?
+            }
+            else
+            {
+                animationComponent.animation.update();
+            }
+        }
     }
-    // TODO: set animation of the player based on its CState component
-    // TODO: for each entity with an animation, call entity->getComponent<CAnimation>().animation.update()
-        // If the animation is not repeated, and it has ended, destroy the entity
 }
 
 void ScenePlatformer::sRender()

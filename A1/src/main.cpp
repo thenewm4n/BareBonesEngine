@@ -169,7 +169,7 @@ int main(int argc, char* argv[])
 		std::shared_ptr<NewShape> currentShape = shapes[dropdownIndex];
 		
 		// Copies shape name to textbox buffer
-		strncpy_s(guiString, currentShape->m_text.getString().toAnsiString().c_str(), 254);	// strncpy_s on Windows; strncpy on Cac
+		strncpy(guiString, currentShape->m_text.getString().toAnsiString().c_str(), 254);	// strncpy_s on Windows; strncpy on Mac
 		//guiString[254] = '\0';		// only necessary with srncpy on Mac
 		
 		// Gets sf::Color of shape and convert to float array (imgui requires RGB values as floats from 0-1)

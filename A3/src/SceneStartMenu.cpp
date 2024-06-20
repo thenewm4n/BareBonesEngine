@@ -1,18 +1,17 @@
 #include "SceneStartMenu.h"
+#include "ScenePlatformer.h"
 
 SceneStartMenu::SceneStartMenu(GameEngine* gameEngine)
-    : Scene(gameEngine), m_title("Platformer"), m_menuStrings({ "Level 1", "Quit" }), m_levelPaths({ "level.txt" })
+    : Scene(gameEngine), m_title("Platformer"), m_menuStrings({ "Level 1", "Level 2", "Level 3" }), m_levelPaths({ "level.txt" })
 {
     init();
-    m_menuText.setFont(m_game->getAssets().getFont("/assets/fonts/Dune_Rise.ttf"));
+    m_menuText.setFont(m_game->getAssets().getFont("assets/fonts/Dune_Rise.ttf"));
 }
 
 void SceneStartMenu::init()
 {
     registerAction(sf::Keyboard::Escape, "QUIT");
     registerAction(sf::Keyboard::W, "UP");
-    registerAction(sf::Keyboard::A, "LEFT");
-    registerAction(sf::Keyboard::S, "DOWN");
     registerAction(sf::Keyboard::D, "RIGHT");
     registerAction(sf::Keyboard::Enter, "SELECT");
 }
@@ -72,13 +71,34 @@ void SceneStartMenu::endScene()
 
 void SceneStartMenu::sDoAction(const Action& action)
 {
+    const std::string& actionName = action.getName();
+
+    // Implement scene-specific consequences for Actions
     if (action.getType() == "START")
     {
-        // Register actions
-            // Up arrow -> decrement menu index
-            // Down arrow -> increment menu index
-            // Enter -> changeScene(selectedLevel)
-            // Esc -> quit (already implemented?)
+        if (actionName == "UP")
+        {
+            if (m_selectedMenuIndex > 0)
+            {
+                m_selectedMenuIndex--;
+            }
+        }
+        else if (actionName == "DOWN")
+        {
+            if (m_selectedMenuIndex < m_menuStrings.size() - 1)
+            {
+                m_selectedMenuIndex++;
+            }
+        }
+        else if (actionName == "SELECT")
+        {
+            const std::string sceneName("LEVEL_%i", m_selectedMenuIndex);
+            m_game->changeScene(sceneName, std::make_shared<ScenePlatformer>(m_game, m_levelPaths[m_selectedMenuIndex]));
+        }
+        else if (actionName == "QUIT")
+        {
+            m_game->quit();
+        }
     }
 }
 

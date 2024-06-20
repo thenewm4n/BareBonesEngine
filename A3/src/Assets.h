@@ -4,7 +4,7 @@
 
 #include <SFML/Graphics.hpp>
 
-class Animation;
+#include "Animation.h"
 
 using AnimationMap = std::map<std::string, Animation>;
 using FontMap = std::map<std::string, sf::Font>;

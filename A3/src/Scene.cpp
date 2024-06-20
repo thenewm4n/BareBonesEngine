@@ -3,7 +3,6 @@
 #include "Scene.h"
 
 Scene::Scene()
-	: m_game(nullptr)
 {
 }
 

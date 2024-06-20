@@ -1,16 +1,17 @@
+### ?
+- cmake error 255?
 
-# What is needed to compile?
-- Animation class implemented, so we can load sprites/textures from file
-
-### Next
-- SceneStartMenu::init() - initialising m_levelPaths using level.txt? Maybe make a levels directory to iterate through?
-- Implementation of sDoAction() for derived classes
-- ScenePlatformer functions
+### Questions
+- When using file paths e.g. to access config files, where is the root?
+- ScenePlatformer, line 246 - what does std::get return if successful? i.e. if m_components has the corresponding component?
 
 # To complete
-- GameEngine.cpp
+- ScenePlatformer::loadLevel()
+- Implementation of sDoAction() for ScenePlatformer; including change state of player so that Animation changes.
+- ScenePlatformer::sAnimation() - check player animations are correct, and all other animations (explosion, QMark etc) will work correctly
+- Rest of ScenePlatformer
 - Physics.h
-- Scene.cpp
+- Text for SceneStartMenu - levels, controls legend at bottom
 
 # Recommended order of implementation
 1. Rendering system already done (maybe...) -> T (textures), C (bounding boxes) and G (grid) can be used to debug

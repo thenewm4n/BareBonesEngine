@@ -28,7 +28,7 @@ void GameEngine::init(const std::string& configFilePath)
     Vec2i resolution;
     int framerateCap;
 
-    while(std::getline(file, line))
+    while (std::getline(file, line))
     {
         // Enables reading of tokens separated by whitespace
         std::istringstream lineStream(line);

@@ -25,7 +25,7 @@ public:
 	void update();
 	std::shared_ptr<Entity> addEntity(const std::string& tag);
 
-	const EntityVector& getEntities();
+	const EntityVector& getEntities();	// Shouldn't this return a non-const reference?
 	const EntityVector& getEntities(const std::string& tag);
 	const std::map<std::string, EntityVector>& getEntityMap();
 };
