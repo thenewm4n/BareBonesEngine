@@ -1,11 +1,13 @@
 ### ?
 - cmake error 255?
+- Make sure Mac is building for 64-bit (SFML is for 64-bit)
 
 ### Questions
 - When using file paths e.g. to access config files, where is the root?
 - ScenePlatformer, line 246 - what does std::get return if successful? i.e. if m_components has the corresponding component?
 
 # To complete
+- Why is there an error opening the config file?
 - ScenePlatformer::loadLevel()
 - Implementation of sDoAction() for ScenePlatformer; including change state of player so that Animation changes.
 - ScenePlatformer::sAnimation() - check player animations are correct, and all other animations (explosion, QMark etc) will work correctly

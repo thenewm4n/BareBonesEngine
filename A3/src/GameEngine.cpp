@@ -17,7 +17,7 @@ void GameEngine::init(const std::string& configFilePath)
     std::ifstream file(configFilePath);
     if (!file.is_open())
     {
-        std::cerr << "Error opening file." << std::endl;
+        std::cerr << "Error opening config file." << std::endl;
         exit(-1);
     }
 
