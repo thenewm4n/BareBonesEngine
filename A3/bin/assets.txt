@@ -1,19 +1,19 @@
-Texture TexStand images/megaman/stand.png
-Texture TexRun images/megaman/run.png
-Texture TexAir images/megaman/air.png
-Texture TexShoot images/megaman/shoot.png
-Texture TexExplosion images/misc/explosion.png
-Texture TexCoin images/mario/coinspin.png
-Texture TexBrick images/mario/brick.png
-Texture TexQMark images/mario/qmarkfade.png
-Texture TexQMarkDead images/mario/qmarkdead.png
-Texture TexPipe images/mario/pipetall.png
-Texture TexCloud images/mario/cloud.png
-Texture TexBush images/mario/bush.png
-Texture TexGround images/mario/ground.png
-Texture TexBlock images/mario/block.png
-Texture TexPole images/mario/flagpole.png
-Texture TexPoleTop images/mario/flagpoletop.png
+Texture TexStand assets/images/megaman/stand.png
+Texture TexRun assets/images/megaman/run.png
+Texture TexAir assets/images/megaman/air.png
+Texture TexShoot assets/images/megaman/shoot.png
+Texture TexExplosion assets/images/misc/explosion.png
+Texture TexCoin assets/images/mario/coinspin.png
+Texture TexBrick assets/images/mario/brick.png
+Texture TexQMark assets/images/mario/qmarkfade.png
+Texture TexQMarkDead assets/images/mario/qmarkdead.png
+Texture TexPipe assets/images/mario/pipe.png
+Texture TexCloud assets/images/mario/cloud.png
+Texture TexBush assets/images/mario/bush.png
+Texture TexGround assets/images/mario/ground.png
+Texture TexBlock assets/images/mario/block.png
+Texture TexPole assets/images/mario/flagpole.png
+Texture TexPoleTop assets/images/mario/flagpoletop.png
 Animation Stand TexStand 1 0
 Animation Run TexRun 4 10
 Animation Air TexAir 1 0
