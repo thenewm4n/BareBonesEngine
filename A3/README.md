@@ -13,11 +13,11 @@ Texture N P
 
 
 *Animations*
-Animation N T F S
+Animation N T F D
     N   AnimationName   std::string
     T   TextureName     std::string
     F   FrameCount      int (no. frames in Animation)
-    S   AnimationSpeed  int (no. game frames between anim frames AKA frameDuration)
+    D   FrameDuration   int (no. game frames between animation frames; inverse of speed)
 
 *Fonts*
 Font N P

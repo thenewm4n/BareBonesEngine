@@ -28,7 +28,7 @@ void ScenePlatformer::init(const std::string& levelPath)
     registerAction(sf::Keyboard::Space, "SHOOT");
 
     m_gridText.setCharacterSize(12);
-    m_gridText.setFont(m_game->getAssets().getFont("Dune"));
+    m_gridText.setFont(m_game->getAssets().getFont("Pixel"));
 
     loadLevel(levelPath);
 }

@@ -14,7 +14,7 @@ private:
     // size_t m_currentFrame = 0;       // Current animation frame   I'M NOT SURE THIS IS WHAT IT'S MEANT TO BE
     size_t m_gameFramesSinceStart; 
     uint8_t m_currentAnimationFrame = 0;
-    size_t m_frameDuration = 0;         // Number of game frames each animation frame persists
+    size_t m_frameDuration = 1;         // Number of game frames each animation frame persists
     Vec2f m_size = { 1, 1 };           // Size of each animation frame
 
 public:

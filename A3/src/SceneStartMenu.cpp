@@ -5,7 +5,7 @@ SceneStartMenu::SceneStartMenu(GameEngine* gameEngine)
     : Scene(gameEngine), m_title("Platformer"), m_menuStrings({ "Level 1", "Level 2", "Level 3" }), m_levelPaths({ "level.txt" })
 {
     init();
-    m_menuText.setFont(m_game->getAssets().getFont("assets/fonts/Dune_Rise.ttf"));
+    m_menuText.setFont(m_game->getAssets().getFont("Pixel"));
 }
 
 void SceneStartMenu::init()
@@ -29,21 +29,21 @@ void SceneStartMenu::sRender()
     
     // Sets outline colour & thickness (same for all title screen text)
     m_menuText.setOutlineColor(sf::Color::Black);
-    m_menuText.setOutlineThickness(4.f);
+    m_menuText.setOutlineThickness(1.f);
 
     // Clear screen with the background colour
-    window.clear(sf::Color::Green);
+    window.clear(sf::Color(244, 214, 204));
 
     // Draw title
     m_menuText.setString(m_title);
-    m_menuText.setCharacterSize(60);
+    m_menuText.setCharacterSize(80);
     m_menuText.setPosition(midScreen, distanceBetweenStrings);
-    m_menuText.setFillColor(sf::Color::Blue);
+    m_menuText.setFillColor(sf::Color(244, 180, 96));
     window.draw(m_menuText);
 
     // Draw selectable menu text
-    m_menuText.setCharacterSize(45);
-    m_menuText.setOutlineThickness(2.f);
+    m_menuText.setCharacterSize(60);
+    m_menuText.setOutlineThickness(0.f);
     for (size_t i = 0; i < m_menuStrings.size(); i++)
     {
         m_menuText.setString(m_menuStrings[i]);
@@ -51,7 +51,7 @@ void SceneStartMenu::sRender()
 
         if (i == m_selectedMenuIndex)
         {
-            m_menuText.setFillColor(sf::Color::Red);
+            m_menuText.setFillColor(sf::Color(74, 88, 89));
         }
         else
         {

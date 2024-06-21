@@ -7,7 +7,9 @@
 - ScenePlatformer, line 246 - what does std::get return if successful? i.e. if m_components has the corresponding component?
 
 # To complete
-- Why is there an error opening the config file?
+- SceneStartMenu::sDoAction() - are W & S incrementing/decrementing the index?
+    - Escape button works.   
+- SceneStartMenu::sRender() - Set centre of text correctly (not top left corner)
 - ScenePlatformer::loadLevel()
 - Implementation of sDoAction() for ScenePlatformer; including change state of player so that Animation changes.
 - ScenePlatformer::sAnimation() - check player animations are correct, and all other animations (explosion, QMark etc) will work correctly

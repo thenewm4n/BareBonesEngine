@@ -50,7 +50,7 @@ void Assets::loadFromFile(const std::string& assetsFilePath)
                 sf::Font font;
                 if (!font.loadFromFile(path))
                 {
-                    std::cerr << "Could not load font: " << name << std::endl;
+                    std::cerr << "Assets.cpp, Line 53 - Could not load font: " << name << std::endl;
                     exit(-2);
                 }
 

@@ -7,7 +7,7 @@ Animation::Animation()
 }
 
 Animation::Animation(const std::string& animationName, const sf::Texture& tex)
-    : Animation(animationName, tex, 1, 0)
+    : Animation(animationName, tex, 1, 1)
 {
 }
 

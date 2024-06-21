@@ -14,20 +14,20 @@ Texture TexGround assets/images/mario/ground.png
 Texture TexBlock assets/images/mario/block.png
 Texture TexPole assets/images/mario/flagpole.png
 Texture TexPoleTop assets/images/mario/flagpoletop.png
-Animation Stand TexStand 1 0
+Animation Stand TexStand 1 1
 Animation Run TexRun 4 10
-Animation Air TexAir 1 0
-Animation Shoot TexShoot 1 0
+Animation Air TexAir 1 1
+Animation Shoot TexShoot 1 1
 Animation Explosion TexExplosion 8 20
 Animation Coin TexCoin 4 5
 Animation QuestionMark TexQMark 5 10
-Animation Brick TexBrick 1 0
-Animation QuestionMarkDead TexQMarkDead 1 0
-Animation Pipe TexPipe 1 0
-Animation Cloud TexCloud 1 0
-Animation Bush TexBush 1 0
-Animation Ground TexGround 1 0
-Animation Block TexBlock 1 0
-Animation Pole TexPole 1 0
-Animation PoleTop TexPoleTop 1 0
-Font Dune fonts/Dune_Rise.ttf
+Animation Brick TexBrick 1 1
+Animation QuestionMarkDead TexQMarkDead 1 1
+Animation Pipe TexPipe 1 1
+Animation Cloud TexCloud 1 1
+Animation Bush TexBush 1 1
+Animation Ground TexGround 1 1
+Animation Block TexBlock 1 1
+Animation Pole TexPole 1 1
+Animation PoleTop TexPoleTop 1 1
+Font Dune assets/fonts/rainyhearts.ttf
