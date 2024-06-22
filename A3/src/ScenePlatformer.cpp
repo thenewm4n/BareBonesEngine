@@ -279,7 +279,6 @@ void ScenePlatformer::sRender()
 
     // Centres view on player if further to right than middle of screen
     auto& playerPosition = m_player->getComponent<CTransform>().position;
-    // float newViewCentreX = std::max(resolution.x / 2.f, playerPosition.x);
     float newViewCentreX = std::max(viewSize.x / 2.f, playerPosition.x);
     sf::View view = window.getView();
     view.setCenter(newViewCentreX, view.getCenter().y);    // This was m_game->getWindow().getSize().y - view.getCenter().y -> used to mirror the view in the vertical midline

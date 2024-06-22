@@ -26,7 +26,7 @@ void GameEngine::init(const std::string& configFilePath)
     std::string firstElement;
 
     Vec2i resolution;
-    int framerateCap;
+    int framerateCap = 60;
 
     while (std::getline(file, line))
     {
@@ -48,9 +48,6 @@ void GameEngine::init(const std::string& configFilePath)
     // Create window using values from config.txt
     m_window.create(sf::VideoMode(resolution.x, resolution.y), "Assignment 3");
     m_window.setFramerateLimit(framerateCap);
-
-    // Set View to match resolution
-    m_view.setSize(resolution.x, resolution.y);
 
     // Creates GUI
     /*
@@ -85,11 +82,13 @@ void GameEngine::sUserInput()
         }
         else if (event.type == sf::Event::Resized)
         {
-            sf::Vector2f resolution(static_cast<float>(m_window.getSize().x), static_cast<float>(m_window.getSize().y));
+            //sf::Vector2f resolution(static_cast<float>(m_window.getSize().x), static_cast<float>(m_window.getSize().y));
             // float aspectRatio = static_cast<float>(m_window.getSize().x) / static_cast<float>(m_window.getSize().y);     maybe to better handle resizing?
-            sf::View view = m_window.getView();
-            view.setSize(resolution);
-            m_window.setView(view);
+            //sf::View view = m_window.getView();
+            //view.setSize(resolution);
+            //m_window.setView(view);
+
+            m_window.setView(sf::View(m_window.getView().getCenter(), sf::Vector2f(event.size.width, event.size.height)));
 
             continue;
         }

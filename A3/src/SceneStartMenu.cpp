@@ -1,11 +1,21 @@
 #include "SceneStartMenu.h"
 #include "ScenePlatformer.h"
+#include <iostream>
 
 SceneStartMenu::SceneStartMenu(GameEngine* gameEngine)
-    : Scene(gameEngine), m_title("Platformer"), m_menuStrings({ "Level 1", "Level 2", "Level 3" }), m_levelPaths({ "level.txt" })
+    : Scene(gameEngine), m_title("Platformer"), m_menuStrings({ "Level 1", "Level 2", "Level 3" }), m_levelPaths({"level.txt"})
 {
     init();
+    
+    // Set universal menu text properties
+    m_menuText.setOutlineColor(sf::Color::Black);
+    m_menuText.setOutlineThickness(1.5f);
     m_menuText.setFont(m_game->getAssets().getFont("Pixel"));
+
+    // Set window view
+    //m_game->getWindow().setView(sf::View(sf::Vector2f(0.f, 0.f), sf::Vector2f(1920.f, 1080.f)));
+    sf::View titleScreenView(sf::FloatRect(0.f, 0.f, 1920.f, 1080.f)); // Adjust dimensions as needed
+    m_game->getWindow().setView(titleScreenView);
 }
 
 void SceneStartMenu::init()
@@ -24,30 +34,43 @@ void SceneStartMenu::update()
 void SceneStartMenu::sRender()
 {
     sf::RenderWindow& window = m_game->getWindow();
-    float midScreen = static_cast<float>(window.getSize().x) / 2.f;
-    float distanceBetweenStrings = static_cast<float>(window.getSize().y) / (static_cast<float>(m_menuStrings.size() + 1));
-
-    // Sets outline colour & thickness (same for all title screen text)
-    m_menuText.setOutlineColor(sf::Color::Black);
-    m_menuText.setOutlineThickness(1.f);
+    static float midScreenX = static_cast<float>(window.getView().getSize().x) / 2.f;
+    static float distanceBetweenStrings = static_cast<float>(window.getView().getSize().y) / (static_cast<float>(m_menuStrings.size() + 2));
 
     // Clear screen with the background colour
     window.clear(sf::Color(244, 214, 204));
 
-    // Draw title
+    // Set title text properties
     m_menuText.setString(m_title);
-    m_menuText.setCharacterSize(80);
-    m_menuText.setPosition(midScreen, distanceBetweenStrings);
+    m_menuText.setCharacterSize(120);
+    m_menuText.setPosition(midScreenX, distanceBetweenStrings);
     m_menuText.setFillColor(sf::Color(244, 180, 96));
+
+    // Set origin to center of text after character size change
+    static sf::FloatRect textRect = m_menuText.getLocalBounds();
+    m_menuText.setOrigin(textRect.left + textRect.width / 2.f, textRect.top + textRect.height / 2.f);
+
+    std::cout << "After setting title text... " "Left: " << textRect.left << " " << "Top: " << textRect.top << " " << "Width : " << textRect.width << " " << "Height : " << textRect.height << std::endl;
+    std::cout << "Origin X: " << m_menuText.getOrigin().x << " " << "Origin Y: " << m_menuText.getOrigin().y << std::endl;
+
+    // Draw title text
     window.draw(m_menuText);
 
+    // Set properties selectable menu text
+    m_menuText.setCharacterSize(70);
+
+    // Set origin according to new text size
+    textRect = m_menuText.getLocalBounds();
+    m_menuText.setOrigin(textRect.left + textRect.width / 2.f, textRect.top + textRect.height / 2.f);
+
+    std::cout << "After setting selectable text... " "Left: " << textRect.left << " " << "Top: " << textRect.top << " " << "Width : " << textRect.width << " " << "Height : " << textRect.height << std::endl;
+    std::cout << "Origin X: " << m_menuText.getOrigin().x << " " << "Origin Y: " << m_menuText.getOrigin().y << std::endl;
+
     // Draw selectable menu text
-    m_menuText.setCharacterSize(60);
-    m_menuText.setOutlineThickness(0.f);
     for (size_t i = 0; i < m_menuStrings.size(); i++)
     {
         m_menuText.setString(m_menuStrings[i]);
-        m_menuText.setPosition(midScreen, (i + 2) * distanceBetweenStrings);
+        m_menuText.setPosition(midScreenX, (i + 2) * distanceBetweenStrings);
 
         if (i == m_selectedMenuIndex)
         {

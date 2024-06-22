@@ -1,5 +1,7 @@
 # To complete
-- SceneStartMenu::sRender() - why has Mac version reverted to old code? Change to new colours and outline thicknesses
+- GameEngine::sUserInput, Line 91 - check that resizing correctly changes the view (it seems to change the resolution of the view).
+- SceneStartMenu constructor - check the view is set correctly -> OR JUST GET RID OF VIEW AND USE RESOLUTION VALUES (in sRender())
+- - Bullet animation: get bullet sprite
 - SceneStartMenu::sDoAction() - are W & S incrementing/decrementing the index?
     - Escape button works.   
 - SceneStartMenu::sRender() - Set centre of text correctly (not top left corner)
@@ -8,6 +10,7 @@
 - Implementation of sDoAction() for ScenePlatformer; including change state of player so that Animation changes.
 - ScenePlatformer::sAnimation() - check player animations are correct, and all other animations (explosion, QMark etc) will work correctly
 - Rest of ScenePlatformer
+    - sMovement(): remember that player Y speed is positive in level_1.txt, so must be negated in code
 - Physics.h
 - Text for SceneStartMenu - levels, controls legend at bottom
 - Ensure grid cells match size of sprites (16 pixels in length and height?)
