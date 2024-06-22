@@ -1,21 +1,15 @@
-### ?
-- cmake error 255?
-- Make sure Mac is building for 64-bit (SFML is for 64-bit)
-
-### Questions
-- When using file paths e.g. to access config files, where is the root?
-- ScenePlatformer, line 246 - what does std::get return if successful? i.e. if m_components has the corresponding component?
-
 # To complete
 - SceneStartMenu::sDoAction() - are W & S incrementing/decrementing the index?
     - Escape button works.   
 - SceneStartMenu::sRender() - Set centre of text correctly (not top left corner)
+- ScenePlatformer::sRender() - fix grid (doesn't show text and is half cell length off in x & y directions)
 - ScenePlatformer::loadLevel()
 - Implementation of sDoAction() for ScenePlatformer; including change state of player so that Animation changes.
 - ScenePlatformer::sAnimation() - check player animations are correct, and all other animations (explosion, QMark etc) will work correctly
 - Rest of ScenePlatformer
 - Physics.h
 - Text for SceneStartMenu - levels, controls legend at bottom
+- Ensure grid cells match size of sprites (16 pixels in length and height?)
 
 # Recommended order of implementation
 1. Rendering system already done (maybe...) -> T (textures), C (bounding boxes) and G (grid) can be used to debug

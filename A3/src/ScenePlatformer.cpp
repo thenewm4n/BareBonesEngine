@@ -246,13 +246,13 @@ void ScenePlatformer::sAnimation()
         }
 
         // If entity has Animation component, call update()
-        // if (entity->getComponent<CAnimation>())   AMEND THIS - WHAT DOES std::get RETURN WHEN SUCESSFULL?
-        {   
+        if (entity->hasComponent<CAnimation>())
+        {
             CAnimation& animationComponent = entity->getComponent<CAnimation>();
 
             if (animationComponent.animation.hasEnded() && !animationComponent.toRepeat)
             {
-                entity->removeComponent<CAnimation>();      // Is this always necessary? Or can we just change the animation to another?
+                entity->removeComponent<CAnimation>();
             }
             else
             {
@@ -265,8 +265,7 @@ void ScenePlatformer::sAnimation()
 void ScenePlatformer::sRender()
 {
     sf::RenderWindow& window = m_game->getWindow();
-    Vec2f resolution(static_cast<float>(window.getSize().x), static_cast<float>(window.getSize().y));
-
+    Vec2f viewSize(426.f, 240.f);   // 240p in 16:9
 
     // Different colour background to indicate game paused
     if (m_paused)
@@ -280,9 +279,11 @@ void ScenePlatformer::sRender()
 
     // Centres view on player if further to right than middle of screen
     auto& playerPosition = m_player->getComponent<CTransform>().position;
-    float newViewCentreX = std::max(resolution.x / 2.f, playerPosition.x);
+    // float newViewCentreX = std::max(resolution.x / 2.f, playerPosition.x);
+    float newViewCentreX = std::max(viewSize.x / 2.f, playerPosition.x);
     sf::View view = window.getView();
     view.setCenter(newViewCentreX, view.getCenter().y);    // This was m_game->getWindow().getSize().y - view.getCenter().y -> used to mirror the view in the vertical midline
+    view.setSize(viewSize.x, viewSize.y);
     window.setView(view);
 
     // Drawing of textures/animations and bounding boxes
@@ -319,12 +320,12 @@ void ScenePlatformer::sRender()
     // Draw grid for debugging
     if (m_drawGrid)
     {
-        float leftEdgeX = window.getView().getCenter().x - (resolution.x / 2);              // Left edge of viewable area
-        float rightEdgeX = leftEdgeX + resolution.x + m_gridCellSize.x;                     // Right edge of viewable area - width of a cell is added to ensure full coverage
+        float leftEdgeX = window.getView().getCenter().x - (viewSize.x / 2);              // Left edge of viewable area
+        float rightEdgeX = leftEdgeX + viewSize.x + m_gridCellSize.x;                     // Right edge of viewable area - width of a cell is added to ensure full coverage
         float firstCellX = leftEdgeX - (static_cast<int>(leftEdgeX) % m_gridCellSize.x);    // X position of leftmost cell starting just outside of window
 
-        float topEdgeY = window.getView().getCenter().y - (resolution.y / 2);               // Top of viewable area
-        float bottomEdgeY = topEdgeY + resolution.y + m_gridCellSize.y;                     // Bottom of viewable area - height of cell added to ensure full coverage
+        float topEdgeY = window.getView().getCenter().y - (viewSize.y / 2);               // Top of viewable area
+        float bottomEdgeY = topEdgeY + viewSize.y + m_gridCellSize.y;                     // Bottom of viewable area - height of cell added to ensure full coverage
         float firstCellY = topEdgeY - (static_cast<int>(topEdgeY) % m_gridCellSize.y);      // Y position of top cell starting just outside of window
 
         sf::VertexArray lines(sf::Lines);

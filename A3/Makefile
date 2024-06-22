@@ -22,4 +22,4 @@ clean:
 	rm -f $(OBJ_FILES) ./bin/A3
 
 run: $(OUTPUT)
-	cd bin && ./A3 && cd ..
+	./bin/A3

@@ -16,7 +16,7 @@ void Assets::loadFromFile(const std::string& assetsFilePath)
     std::ifstream file(assetsFilePath);
     if (!file.is_open())
     {
-        std::cerr << "Error opening assets file." << std::endl;
+        std::cerr << "Assets.cpp, Line 19: Error opening assets file." << std::endl;
         exit(-1);
     }
 
