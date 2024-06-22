@@ -1,4 +1,5 @@
 # To complete
+- SceneStartMenu::sRender() - why has Mac version reverted to old code? Change to new colours and outline thicknesses
 - SceneStartMenu::sDoAction() - are W & S incrementing/decrementing the index?
     - Escape button works.   
 - SceneStartMenu::sRender() - Set centre of text correctly (not top left corner)

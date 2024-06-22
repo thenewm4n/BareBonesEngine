@@ -5,7 +5,7 @@ SceneStartMenu::SceneStartMenu(GameEngine* gameEngine)
     : Scene(gameEngine), m_title("Platformer"), m_menuStrings({ "Level 1", "Level 2", "Level 3" }), m_levelPaths({ "level.txt" })
 {
     init();
-    m_menuText.setFont(m_game->getAssets().getFont("/assets/fonts/Dune_Rise.ttf"));
+    m_menuText.setFont(m_game->getAssets().getFont("Pixel"));
 }
 
 void SceneStartMenu::init()
