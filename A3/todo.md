@@ -1,10 +1,6 @@
 # To complete
-- GameEngine::sUserInput, Line 91 - check that resizing correctly changes the view (it seems to change the resolution of the view).
-- SceneStartMenu constructor - check the view is set correctly -> OR JUST GET RID OF VIEW AND USE RESOLUTION VALUES (in sRender())
-- - Bullet animation: get bullet sprite
-- SceneStartMenu::sDoAction() - are W & S incrementing/decrementing the index?
-    - Escape button works.   
-- SceneStartMenu::sRender() - Set centre of text correctly (not top left corner)
+- GameEngine::sUserInput, Line 91 - check that resizing to bigger window works.
+- Bullet animation: get bullet sprite
 - ScenePlatformer::sRender() - fix grid (doesn't show text and is half cell length off in x & y directions)
 - ScenePlatformer::loadLevel()
 - Implementation of sDoAction() for ScenePlatformer; including change state of player so that Animation changes.

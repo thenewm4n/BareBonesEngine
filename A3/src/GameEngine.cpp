@@ -48,6 +48,7 @@ void GameEngine::init(const std::string& configFilePath)
     // Create window using values from config.txt
     m_window.create(sf::VideoMode(resolution.x, resolution.y), "Assignment 3");
     m_window.setFramerateLimit(framerateCap);
+    m_aspectRatio = static_cast<float>(resolution.x) / static_cast<float>(resolution.y);
 
     // Creates GUI
     /*
@@ -82,13 +83,22 @@ void GameEngine::sUserInput()
         }
         else if (event.type == sf::Event::Resized)
         {
-            //sf::Vector2f resolution(static_cast<float>(m_window.getSize().x), static_cast<float>(m_window.getSize().y));
-            // float aspectRatio = static_cast<float>(m_window.getSize().x) / static_cast<float>(m_window.getSize().y);     maybe to better handle resizing?
-            //sf::View view = m_window.getView();
-            //view.setSize(resolution);
-            //m_window.setView(view);
+            float newAspectRatio = static_cast<float>(event.size.width) / static_cast<float>(event.size.height);
+            
+            // TODO: Ensure resizing to bigger window works; USE THESE
+            int windowHalfPerimeter = m_window.getSize().x + m_window.getSize().y;
+            int newWindowHalfPerimeter = event.size.width + event.size.height;
 
-            m_window.setView(sf::View(m_window.getView().getCenter(), sf::Vector2f(event.size.width, event.size.height)));
+            if (newAspectRatio > m_aspectRatio)
+            {
+                float newWidth = event.size.height * m_aspectRatio;
+                m_window.setSize(sf::Vector2u(newWidth, event.size.height));
+            }
+            else
+            {
+                float newHeight = event.size.width / m_aspectRatio;
+                m_window.setSize(sf::Vector2u(event.size.width, newHeight));
+            }
 
             continue;
         }
@@ -107,7 +117,7 @@ void GameEngine::sUserInput()
                 {
                     std::cout << "Screenshot saved as test.png." << std::endl;
                 }
-                
+
                 // Continue to next event
                 continue;
             }

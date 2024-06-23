@@ -12,6 +12,7 @@ class GameEngine
 protected:
     sf::RenderWindow m_window;
     sf::View m_view;
+    float m_aspectRatio;
     Assets m_assets;
     std::string m_currentScene;
     SceneMap m_sceneMap;
