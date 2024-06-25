@@ -85,19 +85,40 @@ void GameEngine::sUserInput()
         {
             float newAspectRatio = static_cast<float>(event.size.width) / static_cast<float>(event.size.height);
             
-            // TODO: Ensure resizing to bigger window works; USE THESE
             int windowHalfPerimeter = m_window.getSize().x + m_window.getSize().y;
             int newWindowHalfPerimeter = event.size.width + event.size.height;
 
+
+            // TODO: Fix this
+
+            // If aspect ratio increased
             if (newAspectRatio > m_aspectRatio)
             {
-                float newWidth = event.size.height * m_aspectRatio;
-                m_window.setSize(sf::Vector2u(newWidth, event.size.height));
+                // If window size increased
+                if (newWindowHalfPerimeter > windowHalfPerimeter)
+                {
+                    float newHeight = event.size.width / m_aspectRatio;
+                    m_window.setSize(sf::Vector2u(event.size.width, newHeight));
+                }
+                else      // If window size decreased 
+                {
+                    float newWidth = event.size.height * m_aspectRatio;
+                    m_window.setSize(sf::Vector2u(newWidth, event.size.height));
+                }
             }
-            else
+            else      // If aspect ratio decreased
             {
-                float newHeight = event.size.width / m_aspectRatio;
-                m_window.setSize(sf::Vector2u(event.size.width, newHeight));
+                // If window size increased
+                if (newWindowHalfPerimeter > windowHalfPerimeter)
+                {
+                    float newHeight = event.size.width / m_aspectRatio;
+                    m_window.setSize(sf::Vector2u(event.size.width, newHeight));
+                }
+                else      // If window size decreased 
+                {
+                    float newWidth = event.size.height * m_aspectRatio;
+                    m_window.setSize(sf::Vector2u(newWidth, event.size.height));
+                }
             }
 
             continue;

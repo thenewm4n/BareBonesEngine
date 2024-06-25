@@ -1,5 +1,5 @@
 # To complete
-- GameEngine::sUserInput, Line 91 - check that resizing to bigger window works.
+- GameEngine::sUserInput, Line 92 - fix resizing window (look at notes in notebook).
 - Bullet animation: get bullet sprite
 - ScenePlatformer::sRender() - fix grid (doesn't show text and is half cell length off in x & y directions)
 - ScenePlatformer::loadLevel()
