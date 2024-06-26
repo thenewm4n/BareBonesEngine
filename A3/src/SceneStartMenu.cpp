@@ -13,9 +13,8 @@ SceneStartMenu::SceneStartMenu(GameEngine* gameEngine)
     m_menuText.setFont(m_game->getAssets().getFont("Pixel"));
 
     // Set window view
-    sf::RenderWindow& window = m_game->getWindow();
-    sf::View view(sf::FloatRect(0.f, 0.f, window.getSize().x, window.getSize().y));   // View dimensions set to resolution of window
-    window.setView(view);
+    sf::View view(sf::FloatRect(0.f, 0.f, 1920.f, 1080.f));  // View size is hardcoded, as to be consistent after window resizing
+    m_game->getWindow().setView(view);
 }
 
 void SceneStartMenu::init()
@@ -42,7 +41,7 @@ void SceneStartMenu::sRender()
 
     // Set title text properties
     m_menuText.setString(m_title);
-    m_menuText.setCharacterSize(120);
+    m_menuText.setCharacterSize(150);
     m_menuText.setFillColor(sf::Color(244, 180, 96));
 
     // Set origin to center of text after changing string and character size, then set position with new origin
@@ -54,7 +53,7 @@ void SceneStartMenu::sRender()
     window.draw(m_menuText);
 
     // Set character size for selectable menu text
-    m_menuText.setCharacterSize(70);
+    m_menuText.setCharacterSize(100);
 
     // Draw selectable menu text
     for (size_t i = 0; i < m_menuStrings.size(); i++)

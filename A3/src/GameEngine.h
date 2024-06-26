@@ -11,7 +11,7 @@ class GameEngine
 {
 protected:
     sf::RenderWindow m_window;
-    sf::View m_view;
+    sf::Vector2u m_resolution;
     float m_aspectRatio;
     Assets m_assets;
     std::string m_currentScene;
@@ -35,5 +35,6 @@ public:
 
     bool isRunning();
     sf::RenderWindow& getWindow();
+    sf::Vector2u getResolution();
     const Assets& getAssets() const;
 };

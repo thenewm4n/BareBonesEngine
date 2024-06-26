@@ -25,7 +25,6 @@ void GameEngine::init(const std::string& configFilePath)
     std::string line;
     std::string firstElement;
 
-    Vec2i resolution;
     int framerateCap = 60;
 
     while (std::getline(file, line))
@@ -38,7 +37,7 @@ void GameEngine::init(const std::string& configFilePath)
         {
             if (firstElement == "Window")
             {
-                lineStream >> resolution.x >> resolution.y >> framerateCap;
+                lineStream >> m_resolution.x >> m_resolution.y >> framerateCap;
             }
         }
     }
@@ -46,9 +45,9 @@ void GameEngine::init(const std::string& configFilePath)
     file.close();
 
     // Create window using values from config.txt
-    m_window.create(sf::VideoMode(resolution.x, resolution.y), "Assignment 3");
+    m_window.create(sf::VideoMode(m_resolution.x, m_resolution.y), "Assignment 3");
     m_window.setFramerateLimit(framerateCap);
-    m_aspectRatio = static_cast<float>(resolution.x) / static_cast<float>(resolution.y);
+    m_aspectRatio = static_cast<float>(m_resolution.x) / static_cast<float>(m_resolution.y);
 
     // Creates GUI
     /*
@@ -83,43 +82,24 @@ void GameEngine::sUserInput()
         }
         else if (event.type == sf::Event::Resized)
         {
-            float newAspectRatio = static_cast<float>(event.size.width) / static_cast<float>(event.size.height);
-            
-            int windowHalfPerimeter = m_window.getSize().x + m_window.getSize().y;
-            int newWindowHalfPerimeter = event.size.width + event.size.height;
-
-
-            // TODO: Fix this
-
-            // If aspect ratio increased
-            if (newAspectRatio > m_aspectRatio)
+            // If window hasn't changed size, continue to next iteration of while loop
+            if (event.size.width == m_resolution.x && event.size.height == m_resolution.y)
             {
-                // If window size increased
-                if (newWindowHalfPerimeter > windowHalfPerimeter)
-                {
-                    float newHeight = event.size.width / m_aspectRatio;
-                    m_window.setSize(sf::Vector2u(event.size.width, newHeight));
-                }
-                else      // If window size decreased 
-                {
-                    float newWidth = event.size.height * m_aspectRatio;
-                    m_window.setSize(sf::Vector2u(newWidth, event.size.height));
-                }
+                continue;
             }
-            else      // If aspect ratio decreased
+
+            // If one dimension has changed, change the other according to aspect ratio
+            if (event.size.width != m_resolution.x)
             {
-                // If window size increased
-                if (newWindowHalfPerimeter > windowHalfPerimeter)
-                {
-                    float newHeight = event.size.width / m_aspectRatio;
-                    m_window.setSize(sf::Vector2u(event.size.width, newHeight));
-                }
-                else      // If window size decreased 
-                {
-                    float newWidth = event.size.height * m_aspectRatio;
-                    m_window.setSize(sf::Vector2u(newWidth, event.size.height));
-                }
+                m_window.setSize(sf::Vector2u(event.size.width, event.size.width / m_aspectRatio));
             }
+            else
+            {
+                m_window.setSize(sf::Vector2u(event.size.height * m_aspectRatio, event.size.height));
+            }
+
+            // Update local resolution variable
+            m_resolution = m_window.getSize();
 
             continue;
         }
@@ -196,6 +176,11 @@ bool GameEngine::isRunning()
 sf::RenderWindow& GameEngine::getWindow()
 {
     return m_window;
+}
+
+sf::Vector2u GameEngine::getResolution()
+{
+    return m_resolution;
 }
 
 const Assets& GameEngine::getAssets() const

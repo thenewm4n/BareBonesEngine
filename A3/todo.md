@@ -1,7 +1,7 @@
 # To complete
-- GameEngine::sUserInput, Line 92 - fix resizing window (look at notes in notebook).
-- Bullet animation: get bullet sprite
+- ScenePlatformer::sRender() - fix view (view should be set once, in ScenePlatformer constructor, according to a hardcoded value).
 - ScenePlatformer::sRender() - fix grid (doesn't show text and is half cell length off in x & y directions)
+- Bullet animation: get bullet sprite
 - ScenePlatformer::loadLevel()
 - Implementation of sDoAction() for ScenePlatformer; including change state of player so that Animation changes.
 - ScenePlatformer::sAnimation() - check player animations are correct, and all other animations (explosion, QMark etc) will work correctly
