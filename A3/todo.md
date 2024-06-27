@@ -1,6 +1,8 @@
 # To complete
-- ScenePlatformer::sRender() - fix view (view should be set once, in ScenePlatformer constructor, according to a hardcoded value).
-- ScenePlatformer::sRender() - fix grid (doesn't show text and is half cell length off in x & y directions)
+- ScenePlatformer::sRender() - fix position of grid (lines up with top, not bottom)
+    - Grid coords change with view; should it be this way?
+- ScenePlatformer::gridToMidPixel
+- ScenePlatformer::sRender() - fix position of grid text
 - Bullet animation: get bullet sprite
 - ScenePlatformer::loadLevel()
 - Implementation of sDoAction() for ScenePlatformer; including change state of player so that Animation changes.
@@ -9,7 +11,9 @@
     - sMovement(): remember that player Y speed is positive in level_1.txt, so must be negated in code
 - Physics.h
 - Text for SceneStartMenu - levels, controls legend at bottom
-- Ensure grid cells match size of sprites (16 pixels in length and height?)
+- ScenePlatformer::sRender()/sUserInput - fix colour change of pausing
+    - Also, can still toggle textures etc when paused -> probably because sDoAction is still called when paused?
+- Brick texture glitches at regular intervals
 
 # Recommended order of implementation
 1. Rendering system already done (maybe...) -> T (textures), C (bounding boxes) and G (grid) can be used to debug

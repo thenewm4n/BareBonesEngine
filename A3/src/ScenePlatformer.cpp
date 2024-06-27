@@ -16,19 +16,26 @@ ScenePlatformer::ScenePlatformer(GameEngine* game, const std::string& levelPath)
 
 void ScenePlatformer::init(const std::string& levelPath)
 {
+
     registerAction(sf::Keyboard::P, "PAUSE");
     registerAction(sf::Keyboard::Escape, "QUIT");
     registerAction(sf::Keyboard::T, "TOGGLE_TEXTURES");
-    registerAction(sf::Keyboard::C, "TOGGLE_BBOXES");
+    registerAction(sf::Keyboard::B, "TOGGLE_BBOXES");
     registerAction(sf::Keyboard::G, "TOGGLE_GRID");
     registerAction(sf::Keyboard::W, "UP");
     registerAction(sf::Keyboard::A, "LEFT");
     registerAction(sf::Keyboard::S, "DOWN");
     registerAction(sf::Keyboard::D, "RIGHT");
     registerAction(sf::Keyboard::Space, "SHOOT");
+    registerAction(sf::Keyboard::Equal, "ZOOM_IN");
+    registerAction(sf::Keyboard::Hyphen, "ZOOM_OUT");
 
-    m_gridText.setCharacterSize(12);
-    m_gridText.setFont(m_game->getAssets().getFont("Pixel"));
+    m_gridText.setFont(m_game->getAssets().getFont("Tech"));
+    m_gridText.setCharacterSize(50);
+    m_gridText.setScale(0.05, 0.05);
+
+    sf::View view(sf::FloatRect(0, 0, m_viewSize.x, m_viewSize.y));
+    m_game->getWindow().setView(view);
 
     loadLevel(levelPath);
 }
@@ -68,7 +75,8 @@ void ScenePlatformer::loadLevel(const std::string& filename)
     auto brick = m_entityManager.addEntity("tile");
     // IMPORTANT: always add CAnimatio component first so gridToMidPixel can compute correctly
     brick->addComponent<CAnimation>(m_game->getAssets().getAnimation("Brick"), true);
-    brick->addComponent<CTransform>(Vec2f(96.f, 480.f));
+    // brick->addComponent<CTransform>(Vec2f(96.f, 480.f));
+    brick->addComponent<CTransform>(Vec2f(0.f, 0.f));
     // NOTE: final code should position entity with grid x,y position read from file:
     // brick->addComponent<CTransform>(gridToMidPixel(gridX, gridY, brick));
 
@@ -79,7 +87,7 @@ void ScenePlatformer::loadLevel(const std::string& filename)
 
     auto questionMarkBlock = m_entityManager.addEntity("tile");
     questionMarkBlock->addComponent<CAnimation>(m_game->getAssets().getAnimation("QuestionMark"), true);
-    questionMarkBlock->addComponent<CTransform>(Vec2f(352.f, 480.f));
+    questionMarkBlock->addComponent<CTransform>(Vec2f(24.f, 24.f));
 
     // NOTE - THIS IS IMPORTANT, READ THIS SAMPLE
         // Components are now returned as references, not pointers.
@@ -162,11 +170,11 @@ void ScenePlatformer::sDoAction(const Action& action)
 
     if (action.getType() == "START")
     {
-        if (actionName == "TOGGLE_TEXTURE")
+        if (actionName == "TOGGLE_TEXTURES")
         {
             m_drawTextures = !m_drawTextures;
         }
-        else if (actionName == "TOGGLE_COLLISION")
+        else if (actionName == "TOGGLE_BBOXES")
         {
             m_drawBoundingBoxes = !m_drawBoundingBoxes;
         }
@@ -197,6 +205,16 @@ void ScenePlatformer::sDoAction(const Action& action)
         else if (actionName == "RIGHT")
         {
             m_player->getComponent<CInput>().right = true;
+        }
+        else if (actionName == "ZOOM_IN")
+        {
+            m_viewSize.y -= 20;
+            m_viewSize.x = m_viewSize.y * m_game->getAspectRatio();
+        }
+        else if (actionName == "ZOOM_OUT")
+        {
+            m_viewSize.y += 20;
+            m_viewSize.x = m_viewSize.y * m_game->getAspectRatio();
         }
     }
     else if (action.getType() == "END")
@@ -265,7 +283,6 @@ void ScenePlatformer::sAnimation()
 void ScenePlatformer::sRender()
 {
     sf::RenderWindow& window = m_game->getWindow();
-    Vec2f viewSize(426.f, 240.f);   // 240p in 16:9
 
     // Different colour background to indicate game paused
     if (m_paused)
@@ -277,12 +294,15 @@ void ScenePlatformer::sRender()
         window.clear(sf::Color(100, 100, 255));        // Indigo 
     }
 
-    // Centres view on player if further to right than middle of screen
-    auto& playerPosition = m_player->getComponent<CTransform>().position;
-    float newViewCentreX = std::max(viewSize.x / 2.f, playerPosition.x);
+    // Establishes variables for centring view
     sf::View view = window.getView();
-    view.setCenter(newViewCentreX, view.getCenter().y);    // This was m_game->getWindow().getSize().y - view.getCenter().y -> used to mirror the view in the vertical midline
-    view.setSize(viewSize.x, viewSize.y);
+    view.setSize(m_viewSize);
+    //sf::Vector2f viewSize = view.getSize();
+    Vec2f playerPosition = m_player->getComponent<CTransform>().position;
+
+    // Centres view on player if further to right than middle of screen
+    float newViewCentreX = std::max(m_viewSize.x / 2.f, playerPosition.x);        // Ensures view doesn't exceed left side of level
+    view.setCenter(newViewCentreX, view.getCenter().y);    // y value was window.getSize().y - view.getCenter().y
     window.setView(view);
 
     // Drawing of textures/animations and bounding boxes
@@ -292,11 +312,11 @@ void ScenePlatformer::sRender()
         if (m_drawTextures && entity->hasComponent<CAnimation>())
         {
             auto& transform = entity->getComponent<CTransform>();
-            auto& animation = entity->getComponent<CAnimation>().animation;
-            animation.getSprite().setPosition(transform.position.x, transform.position.y);
-            animation.getSprite().setScale(transform.scale.x, transform.scale.y);
-            animation.getSprite().setRotation(transform.angle);
-            window.draw(animation.getSprite());
+            auto& animationSprite = entity->getComponent<CAnimation>().animation.getSprite();
+            animationSprite.setPosition(transform.position.x, transform.position.y);
+            animationSprite.setScale(transform.scale.x, transform.scale.y);
+            animationSprite.setRotation(transform.angle);
+            window.draw(animationSprite);
         }
 
         // Draw Entity bounding boxes
@@ -319,12 +339,12 @@ void ScenePlatformer::sRender()
     // Draw grid for debugging
     if (m_drawGrid)
     {
-        float leftEdgeX = window.getView().getCenter().x - (viewSize.x / 2);              // Left edge of viewable area
-        float rightEdgeX = leftEdgeX + viewSize.x + m_gridCellSize.x;                     // Right edge of viewable area - width of a cell is added to ensure full coverage
+        float leftEdgeX = view.getCenter().x - (m_viewSize.x / 2);              // Left edge of viewable area
+        float rightEdgeX = leftEdgeX + m_viewSize.x + m_gridCellSize.x;                     // Right edge of viewable area - width of a cell is added to ensure full coverage
         float firstCellX = leftEdgeX - (static_cast<int>(leftEdgeX) % m_gridCellSize.x);    // X position of leftmost cell starting just outside of window
 
-        float topEdgeY = window.getView().getCenter().y - (viewSize.y / 2);               // Top of viewable area
-        float bottomEdgeY = topEdgeY + viewSize.y + m_gridCellSize.y;                     // Bottom of viewable area - height of cell added to ensure full coverage
+        float topEdgeY = view.getCenter().y - (m_viewSize.y / 2);               // Top of viewable area
+        float bottomEdgeY = topEdgeY + m_viewSize.y + m_gridCellSize.y;                     // Bottom of viewable area - height of cell added to ensure full coverage
         float firstCellY = topEdgeY - (static_cast<int>(topEdgeY) % m_gridCellSize.y);      // Y position of top cell starting just outside of window
 
         sf::VertexArray lines(sf::Lines);

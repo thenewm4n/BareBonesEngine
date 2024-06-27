@@ -25,7 +25,8 @@ private:
     bool m_drawBoundingBoxes = false;
     bool m_drawGrid = false;
     bool m_drawTextures = true;
-    const Vec2i m_gridCellSize = { 16, 16 };
+    sf::Vector2f m_viewSize{320.f, 180.f};
+    const Vec2i m_gridCellSize{16, 16};
     sf::Text m_gridText;
 
 private:

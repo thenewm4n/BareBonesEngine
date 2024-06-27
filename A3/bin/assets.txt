@@ -31,3 +31,4 @@ Animation Block TexBlock 1 1
 Animation Pole TexPole 1 1
 Animation PoleTop TexPoleTop 1 1
 Font Pixel assets/fonts/rainyhearts.ttf
+Font Tech assets/fonts/nulshock.otf

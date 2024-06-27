@@ -6,15 +6,6 @@ SceneStartMenu::SceneStartMenu(GameEngine* gameEngine)
     : Scene(gameEngine), m_title("Platformer"), m_menuStrings({ "Level 1", "Level 2", "Level 3" }), m_levelPaths({"level_1.txt"})
 {
     init();
-    
-    // Set universal menu text properties
-    m_menuText.setOutlineColor(sf::Color::Black);
-    m_menuText.setOutlineThickness(1.5f);
-    m_menuText.setFont(m_game->getAssets().getFont("Pixel"));
-
-    // Set window view
-    sf::View view(sf::FloatRect(0.f, 0.f, 1920.f, 1080.f));  // View size is hardcoded, as to be consistent after window resizing
-    m_game->getWindow().setView(view);
 }
 
 void SceneStartMenu::init()
@@ -23,6 +14,13 @@ void SceneStartMenu::init()
     registerAction(sf::Keyboard::S, "DOWN");
     registerAction(sf::Keyboard::Enter, "SELECT");
     registerAction(sf::Keyboard::Escape, "QUIT");
+
+    m_menuText.setOutlineColor(sf::Color::Black);
+    m_menuText.setOutlineThickness(1.5f);
+    m_menuText.setFont(m_game->getAssets().getFont("Pixel"));
+
+    sf::View view(sf::FloatRect(0.f, 0.f, 1920.f, 1080.f));  // View size is hardcoded, as to be consistent after window resizing
+    m_game->getWindow().setView(view);
 }
 
 void SceneStartMenu::update()

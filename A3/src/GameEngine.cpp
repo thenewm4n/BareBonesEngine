@@ -7,10 +7,40 @@
 #include "SceneStartMenu.h"
 #include "Vec2.h"  
 
-GameEngine::GameEngine(const std::string& configFilePath)
+// Public methods
+
+GameEngine::GameEngine(const std::string& configFilePath) { init(configFilePath); }
+
+void GameEngine::run()
 {
-    init(configFilePath);
+    while (isRunning())
+    {
+        update();
+    }
+
+    m_window.close();
 }
+
+void GameEngine::quit() { m_running = false; }
+
+void GameEngine::changeScene(const std::string& sceneName, std::shared_ptr<Scene> scene)
+{
+    m_sceneMap[sceneName] = scene;  // Automatically adds new scene to map, or reassigns an already existing scene
+    m_currentScene = sceneName;
+}
+
+bool GameEngine::isRunning() { return m_running && m_window.isOpen(); }   // true if game is running and sf::Window exists
+
+sf::RenderWindow& GameEngine::getWindow() { return m_window; }
+
+sf::Vector2u GameEngine::getResolution() { return m_resolution; }
+
+float GameEngine::getAspectRatio() { return m_aspectRatio; }
+
+const Assets& GameEngine::getAssets() const { return m_assets; }
+
+
+// Protected methods
 
 void GameEngine::init(const std::string& configFilePath)
 {
@@ -142,48 +172,4 @@ void GameEngine::sUserInput()
     }
 }
 
-std::shared_ptr<Scene> GameEngine::getCurrentScene()
-{
-    return m_sceneMap[m_currentScene];
-}
-
-void GameEngine::run()
-{
-    while (isRunning())
-    {
-        update();
-    }
-
-    m_window.close();
-}
-
-void GameEngine::quit()
-{
-    m_running = false;
-}
-
-void GameEngine::changeScene(const std::string& sceneName, std::shared_ptr<Scene> scene)
-{
-    m_sceneMap[sceneName] = scene;  // Automatically adds new scene to map, or reassigns an already existing scene
-    m_currentScene = sceneName;
-}
-
-bool GameEngine::isRunning()
-{
-    return m_running && m_window.isOpen();   // true if game is running and sf::Window exists
-}
-
-sf::RenderWindow& GameEngine::getWindow()
-{
-    return m_window;
-}
-
-sf::Vector2u GameEngine::getResolution()
-{
-    return m_resolution;
-}
-
-const Assets& GameEngine::getAssets() const
-{
-    return m_assets;
-}
+std::shared_ptr<Scene> GameEngine::getCurrentScene() { return m_sceneMap[m_currentScene]; }
