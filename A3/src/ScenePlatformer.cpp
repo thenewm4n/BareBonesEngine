@@ -300,7 +300,6 @@ void ScenePlatformer::sRender()
     // Establishes variables for centring view
     sf::View view = window.getView();
     view.setSize(m_viewSize);
-    //sf::Vector2f viewSize = view.getSize();
     Vec2f playerPosition = m_player->getComponent<CTransform>().position;
 
     // Centres view on player if further to right than middle of screen
@@ -342,13 +341,38 @@ void ScenePlatformer::sRender()
     // Draw grid for debugging
     if (m_drawGrid)
     {
+        // New method
+        // int numHorizontalLines = m_viewSize.y / m_gridCellSize.y - (m_viewSize.y % m_gridCellSize.y);
+        // int numVerticalLines = m_viewSize.x / m_gridCellSize.x - (m_viewSize.x % m_gridCellSize.x);
+
         float leftEdgeX = view.getCenter().x - (m_viewSize.x / 2);              // Left edge of viewable area
         float rightEdgeX = leftEdgeX + m_viewSize.x + m_gridCellSize.x;                     // Right edge of viewable area - width of a cell is added to ensure full coverage
-        float firstCellX = leftEdgeX - (static_cast<int>(leftEdgeX) % m_gridCellSize.x);    // X position of leftmost cell starting just outside of window
+        float firstVertLineX = leftEdgeX - (static_cast<int>(leftEdgeX) % m_gridCellSize.x);    // X position of leftmost cell starting just outside of window
 
-        float topEdgeY = view.getCenter().y - (m_viewSize.y / 2);               // Top of viewable area
+        // float topEdgeY = view.getCenter().y - (m_viewSize.y / 2);               // Top of viewable area
         float bottomEdgeY = topEdgeY + m_viewSize.y + m_gridCellSize.y;                     // Bottom of viewable area - height of cell added to ensure full coverage
-        float firstCellY = topEdgeY - (static_cast<int>(topEdgeY) % m_gridCellSize.y);      // Y position of top cell starting just outside of window
+
+        sf::VertexArray lines(sf::Lines);
+
+        // Draw vertical lines
+        for (float x = firstVertLineX; x < rightEdgeX; x += m_gridCellSize.x)
+        {
+            lines.append(sf::Vertex(sf::Vector2f(x, topEdgeY)));
+            lines.append(sf::Vertex(sf::Vector2f(x, bottomEdgeY)));
+        }
+
+        // Draw horizontal lines
+        for (float y = bottomEdgeY; y > 0; y -= m_gridCellSize.y)
+        {
+            lines.append(sf::Vertex(sf::Vector2f(leftEdgeX, y)));
+            lines.append(sf::Vertex(sf::Vector2f(rightEdgeX, y)));
+
+            for (int x = firstVertLineX; x < )
+        }
+
+
+
+        // Old method
 
         sf::VertexArray lines(sf::Lines);
 
