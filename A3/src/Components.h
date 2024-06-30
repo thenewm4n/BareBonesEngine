@@ -17,7 +17,6 @@ public:
     Vec2f velocity = { 0.f, 0.f };
     float angle = 0.f;
 
-public:
     CTransform() {}
     CTransform(const Vec2f& pos)
         : position(pos) {}
@@ -30,7 +29,6 @@ class CCollision : public Component
 public:
     float radius = 0.f;
 
-public:
     CCollision() {}
     CCollision(float rad)
         : radius(rad) {}
@@ -42,7 +40,6 @@ public:
     int framesDuration = 0;
     int frameCreated = 0;
 
-public:
     CLifespan() {}
     CLifespan(int duration, int frame)
         : framesDuration(duration), frameCreated(frame) {}
@@ -59,7 +56,6 @@ public:
     bool canJump = true;
     bool canShoot = true;
 
-public:
     CInput() {}
 };
 
@@ -68,7 +64,6 @@ class CState : public Component
 public:
     std::string state = "standing";
 
-public:
     CState() {}
     CState(const std::string& state)
         : state(state) {}
@@ -80,7 +75,6 @@ public:
     Animation animation;
     bool toRepeat = false;
 
-public:
     CAnimation() {}
     CAnimation(const Animation& animation, bool toRepeat)
         : animation(animation), toRepeat(toRepeat) {}
@@ -92,7 +86,6 @@ public:
     Vec2f size;
     Vec2f halfSize;
 
-public:
     CBoundingBox() {}
     CBoundingBox(const Vec2f& size)
         : size(size), halfSize(size / 2) {}
@@ -103,7 +96,6 @@ class CGravity : public Component
 public:
     float acceleration = 0;
 
-public:
     CGravity() {}
     CGravity(float accel)
         : acceleration(accel) {}

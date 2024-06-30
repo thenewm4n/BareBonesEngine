@@ -22,7 +22,7 @@ private:
     std::shared_ptr<Entity> m_player;
     PlayerConfig m_playerConfig;
     EntityManager m_entityManager;
-    sf::Vector2f m_viewSize{320.f, 180.f};
+    sf::Vector2f m_viewSize{384.f, 216.f};          // Was 320.f, 180.f on Mac
     const Vec2i m_gridCellSize{16, 16};
     sf::Text m_gridText;
     bool m_drawBoundingBoxes = false;

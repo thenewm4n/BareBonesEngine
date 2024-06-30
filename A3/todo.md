@@ -1,8 +1,5 @@
 # To complete
-- ScenePlatformer::sRender() - fix position of grid (lines up with top, not bottom)
-    - Grid coords change with view; should it be this way?
-- ScenePlatformer::gridToMidPixel
-- ScenePlatformer::sRender() - fix position of grid text
+- Fix ScenePlatformer::gridToMidPixel (used in ScenePlatformer::spawnPlayer())
 - Bullet animation: get bullet sprite
 - ScenePlatformer::loadLevel()
 - Implementation of sDoAction() for ScenePlatformer; including change state of player so that Animation changes.
@@ -21,8 +18,6 @@
 2. Can implement Animation::update() and Animation::hasEnded() at any time -> only effects animation, not gameplay
 3. Implement Scene_Play::loadLevel()
     - Once you correctly read in different type of entities, add them to EntityManager and they should automatically be drawn to screen (because rendering already done). Add the correct bounding boxes to Tile entities, and no bounding boxes to Dec entities.
-
-
     - Register keys in Scene_Play::init() at this point?
     - As part of this step, implement Scene_Play::gridToMidPixel(), which takes in as parameters a grid x,y position and an Entity, and returns the Vec2 position of the center of that entity. You must use the Animation size of the Entity to determine where its center point should be (this is the only role of the Entity in this function). Keep in mind this means the Entity must already have a CAnimation.
 4. Implement Scene_Play::spawnPlayer().

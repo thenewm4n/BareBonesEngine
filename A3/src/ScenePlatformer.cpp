@@ -54,6 +54,7 @@ void ScenePlatformer::loadLevel(const std::string& filename)
 
     // NOTE: all of code below is sample code which shows you how to set up and use entities with the new syntax -> should be removed
 
+    // Change PlayerConfig struct according to level.txt, then spawn player with this struct
     spawnPlayer();
 
     // some sample entities
@@ -341,23 +342,17 @@ void ScenePlatformer::sRender()
     // Draw grid for debugging
     if (m_drawGrid)
     {
-        // New method
-        // int numHorizontalLines = m_viewSize.y / m_gridCellSize.y - (m_viewSize.y % m_gridCellSize.y);
-        // int numVerticalLines = m_viewSize.x / m_gridCellSize.x - (m_viewSize.x % m_gridCellSize.x);
-
-        float leftEdgeX = view.getCenter().x - (m_viewSize.x / 2);              // Left edge of viewable area
-        float rightEdgeX = leftEdgeX + m_viewSize.x + m_gridCellSize.x;                     // Right edge of viewable area - width of a cell is added to ensure full coverage
-        float firstVertLineX = leftEdgeX - (static_cast<int>(leftEdgeX) % m_gridCellSize.x);    // X position of leftmost cell starting just outside of window
-
-        // float topEdgeY = view.getCenter().y - (m_viewSize.y / 2);               // Top of viewable area
-        float bottomEdgeY = topEdgeY + m_viewSize.y + m_gridCellSize.y;                     // Bottom of viewable area - height of cell added to ensure full coverage
+        float leftEdgeX = view.getCenter().x - (m_viewSize.x / 2);                                  // Left edge of viewable area
+        float rightEdgeX = leftEdgeX + m_viewSize.x + m_gridCellSize.x;                             // Right edge of viewable area - width of a cell is added to ensure full coverage
+        float firstVertLineX = leftEdgeX - (static_cast<int>(leftEdgeX) % m_gridCellSize.x);        // X position of leftmost cell starting just outside of window
+        float bottomEdgeY = m_viewSize.y;                                                           // Bottom of viewable area - height of cell added to ensure full coverage; top edge is 0
 
         sf::VertexArray lines(sf::Lines);
 
-        // Draw vertical lines
+        // Add verticle lines to vertex array
         for (float x = firstVertLineX; x < rightEdgeX; x += m_gridCellSize.x)
         {
-            lines.append(sf::Vertex(sf::Vector2f(x, topEdgeY)));
+            lines.append(sf::Vertex(sf::Vector2f(x, 0)));
             lines.append(sf::Vertex(sf::Vector2f(x, bottomEdgeY)));
         }
 
@@ -367,35 +362,14 @@ void ScenePlatformer::sRender()
             lines.append(sf::Vertex(sf::Vector2f(leftEdgeX, y)));
             lines.append(sf::Vertex(sf::Vector2f(rightEdgeX, y)));
 
-            for (int x = firstVertLineX; x < )
-        }
-
-
-
-        // Old method
-
-        sf::VertexArray lines(sf::Lines);
-
-        // Adds vertical lines to VertexArray
-        for (float x = firstCellX; x < rightEdgeX; x += m_gridCellSize.x)
-        {
-            lines.append(sf::Vertex(sf::Vector2f(x, topEdgeY)));
-            lines.append(sf::Vertex(sf::Vector2f(x, bottomEdgeY)));
-        }
-
-        // Adds horizontal line to VertexArray and draws coordinate text for each cell
-        for (float y = firstCellY; y < bottomEdgeY; y += m_gridCellSize.y)
-        {
-            lines.append(sf::Vertex(sf::Vector2f(leftEdgeX, y)));
-            lines.append(sf::Vertex(sf::Vector2f(rightEdgeX, y)));
-
-            // For each cell, adds coordinate text
-            for (float x = firstCellX; x < rightEdgeX; x += m_gridCellSize.x)
+            // Draw coordinate text for each cell
+            for (float x = firstVertLineX; x < rightEdgeX; x += m_gridCellSize.x)
             {
-                std::string xCellCoord = std::to_string(static_cast<int>(x) / m_gridCellSize.x);
-                std::string yCellCoord = std::to_string(static_cast<int>(y) / m_gridCellSize.y);
-                m_gridText.setString("(" + xCellCoord + ", " + yCellCoord + ")");
-                m_gridText.setPosition(x + 3, bottomEdgeY - y - m_gridCellSize.y + 2);      // OR m_gridText.setPosition(x + 3, y + 2); ?
+                int gridX = static_cast<int>(x) / m_gridCellSize.x;
+                int gridY = (m_viewSize.y - static_cast<int>(y)) / m_gridCellSize.y;
+
+                m_gridText.setString("(" + std::to_string(gridX) + ", " + std::to_string(gridY) + ")");
+                m_gridText.setPosition(x, y - m_gridCellSize.y);
                 window.draw(m_gridText);
             }
         }
@@ -412,9 +386,16 @@ void ScenePlatformer::spawnPlayer()
 
     // sample player entity which you can use to construct other entities
     m_player = m_entityManager.addEntity("player");
-    m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("Stand"), true);
-    m_player->addComponent<CTransform>(Vec2f(224.f, 352.f));
-    m_player->addComponent<CBoundingBox>(Vec2f(48.f, 48.f));
+    
+    // m_player->addComponent<CTransform>(Vec2f(m_gridCellSize.x, m_viewSize.y - m_gridCellSize.y));
+    m_player->addComponent<CTransform>(gridToMidPixel(2.f, 1.f, m_player));
+    
+    Animation standAnim = m_game->getAssets().getAnimation("Stand");
+    m_player->addComponent<CAnimation>(standAnim, true);
+    
+    const Vec2f& spriteSize = standAnim.getSize();
+    m_player->addComponent<CBoundingBox>(Vec2f(spriteSize.x, spriteSize.y));
+
     m_player->addComponent<CGravity>(0.1f);
 
     // TODO: add remaining components to player
@@ -433,5 +414,10 @@ Vec2f ScenePlatformer::gridToMidPixel(float gridPositionX, float gridPositionY, 
     // Grid width and height is stored in m_gridCellSize
     // Bottom left corner of animation should align with the bottom left of the grid cell
 
-    return Vec2f(0, 0);
+    const Vec2f& spriteSize = entity->getComponent<CAnimation>().animation.getSize();
+    
+    float x = (gridPositionX * m_gridCellSize.x) + (spriteSize.x / 2.f);
+    float y = m_viewSize.y - (gridPositionY * m_gridCellSize.y) - (spriteSize.y / 2.f);
+        
+    return Vec2f(x, y);
 }
