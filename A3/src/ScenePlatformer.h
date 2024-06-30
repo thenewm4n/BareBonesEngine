@@ -1,10 +1,10 @@
 #pragma once
 
-#include <map>
-#include <memory>
-
 #include "EntityManager.h"
 #include "Scene.h"
+
+#include <memory>
+
 
 class ScenePlatformer : public Scene
 {
@@ -18,18 +18,17 @@ public:
     ScenePlatformer(GameEngine* game, const std::string& levelPath);
 
 private:
+    std::string m_levelPath;
     std::shared_ptr<Entity> m_player;
     PlayerConfig m_playerConfig;
-    std::string m_levelPath;
     EntityManager m_entityManager;
-    bool m_drawBoundingBoxes = false;
-    bool m_drawGrid = false;
-    bool m_drawTextures = true;
     sf::Vector2f m_viewSize{320.f, 180.f};
     const Vec2i m_gridCellSize{16, 16};
     sf::Text m_gridText;
+    bool m_drawBoundingBoxes = false;
+    bool m_drawGrid = false;
+    bool m_drawTextures = true;
 
-private:
     void init(const std::string& levelPath);
     void loadLevel(const std::string& filename);
     void update() override;

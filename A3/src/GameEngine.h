@@ -19,15 +19,8 @@ public:
     bool isRunning();
     sf::RenderWindow& getWindow();
     sf::Vector2u getResolution();
-    float getAspectRatio();
+    float getAspectRatio();         // Only used to zoom in/out in ScenePlatformer
     const Assets& getAssets() const;
-
-protected:
-    void init(const std::string& assetsFilePath);
-    void update();
-    void sUserInput();
-
-    std::shared_ptr<Scene> getCurrentScene();
 
 protected:
     sf::RenderWindow m_window;
@@ -38,4 +31,11 @@ protected:
     SceneMap m_sceneMap;
     size_t m_simulationSpeed = 1;
     bool m_running = true;
+
+
+    void init(const std::string& assetsFilePath);
+    void update();
+    void sUserInput();
+
+    std::shared_ptr<Scene> getCurrentScene();
 };

@@ -1,10 +1,8 @@
-#include <iostream>
-
 #include "Scene.h"
 
-Scene::Scene()
-{
-}
+#include <iostream>
+
+Scene::Scene() {}
 
 Scene::Scene(GameEngine* gameEngine)
     : m_game(gameEngine)
@@ -16,10 +14,7 @@ Scene::Scene(GameEngine* gameEngine)
     }
 }
 
-void Scene::registerAction(int inputKey, const std::string& actionName)
-{
-    m_actionMap[inputKey] = actionName;
-}
+void Scene::registerAction(int inputKey, const std::string& actionName) { m_actionMap[inputKey] = actionName; }
 
 void Scene::simulate(const size_t frames)
 {
@@ -29,17 +24,8 @@ void Scene::simulate(const size_t frames)
 	}
 }
 
-size_t Scene::getCurrentFrame() const
-{
-    return m_currentFrame;
-}
+size_t Scene::getCurrentFrame() const { return m_currentFrame; }
 
-const ActionMap& Scene::getActionMap() const
-{
-    return m_actionMap;
-}
+const ActionMap& Scene::getActionMap() const { return m_actionMap; }
 
-bool Scene::hasEnded() const
-{
-    return m_hasEnded;
-}
+bool Scene::hasEnded() const { return m_hasEnded; }

@@ -14,6 +14,7 @@
 - ScenePlatformer::sRender()/sUserInput - fix colour change of pausing
     - Also, can still toggle textures etc when paused -> probably because sDoAction is still called when paused?
 - Brick texture glitches at regular intervals
+- Scene::setPaused() - is it necessary? Maybe, in order to stop sDoAction() when toggling textures etc while paused.
 
 # Recommended order of implementation
 1. Rendering system already done (maybe...) -> T (textures), C (bounding boxes) and G (grid) can be used to debug

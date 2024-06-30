@@ -9,7 +9,6 @@ public:
     T x = T();
     T y = T();
 
-public:
     Vec2();
     Vec2(T xIn, T yIn);
 
@@ -33,15 +32,11 @@ public:
 
 // Method implementations
 template <typename T>
-Vec2<T>::Vec2()
-{
-}
+Vec2<T>::Vec2() {}
 
 template <typename T>
 Vec2<T>::Vec2(T xIn, T yIn)
-    : x(xIn), y(yIn)
-{
-}
+    : x(xIn), y(yIn) {}
 
 template <typename T>
 Vec2<T> Vec2<T>::operator + (const Vec2<T>& other) const
@@ -124,8 +119,8 @@ void Vec2<T>::normalise()
 }
 
 
-// Note: this is a non-member function
-//  Allows multiplication with scalar on left
+// NOTE: this is a non-member function
+// Allows multiplication with scalar on left
 template <typename T>
 Vec2<T> operator * (float scalar, const Vec2<T>& vec)
 {

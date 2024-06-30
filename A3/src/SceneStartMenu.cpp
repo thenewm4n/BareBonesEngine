@@ -1,6 +1,6 @@
 #include "SceneStartMenu.h"
+
 #include "ScenePlatformer.h"
-#include <iostream>
 
 SceneStartMenu::SceneStartMenu(GameEngine* gameEngine)
     : Scene(gameEngine), m_title("Platformer"), m_menuStrings({ "Level 1", "Level 2", "Level 3" }), m_levelPaths({"level_1.txt"})
@@ -26,6 +26,39 @@ void SceneStartMenu::init()
 void SceneStartMenu::update()
 {
     sRender();
+}
+
+void SceneStartMenu::sDoAction(const Action& action)
+{
+    const std::string& actionName = action.getName();
+
+    // Implement scene-specific consequences for Actions
+    if (action.getType() == "START")
+    {
+        if (actionName == "UP")
+        {
+            if (m_selectedMenuIndex > 0)
+            {
+                m_selectedMenuIndex--;
+            }
+        }
+        else if (actionName == "DOWN")
+        {
+            if (m_selectedMenuIndex < m_menuStrings.size() - 1)
+            {
+                m_selectedMenuIndex++;
+            }
+        }
+        else if (actionName == "SELECT")
+        {
+            const std::string sceneName("LEVEL_%i", m_selectedMenuIndex);
+            m_game->changeScene(sceneName, std::make_shared<ScenePlatformer>(m_game, m_levelPaths[m_selectedMenuIndex]));
+        }
+        else if (actionName == "QUIT")
+        {
+            m_game->quit();
+        }
+    }
 }
 
 void SceneStartMenu::sRender()
@@ -81,37 +114,4 @@ void SceneStartMenu::sRender()
 void SceneStartMenu::endScene()
 {
     m_game->quit();
-}
-
-void SceneStartMenu::sDoAction(const Action& action)
-{
-    const std::string& actionName = action.getName();
-
-    // Implement scene-specific consequences for Actions
-    if (action.getType() == "START")
-    {
-        if (actionName == "UP")
-        {
-            if (m_selectedMenuIndex > 0)
-            {
-                m_selectedMenuIndex--;
-            }
-        }
-        else if (actionName == "DOWN")
-        {
-            if (m_selectedMenuIndex < m_menuStrings.size() - 1)
-            {
-                m_selectedMenuIndex++;
-            }
-        }
-        else if (actionName == "SELECT")
-        {
-            const std::string sceneName("LEVEL_%i", m_selectedMenuIndex);
-            m_game->changeScene(sceneName, std::make_shared<ScenePlatformer>(m_game, m_levelPaths[m_selectedMenuIndex]));
-        }
-        else if (actionName == "QUIT")
-        {
-            m_game->quit();
-        }
-    }
 }

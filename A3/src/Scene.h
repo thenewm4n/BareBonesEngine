@@ -1,11 +1,8 @@
 #pragma once
 
-#include <map>
-#include <memory>
-
-#include <SFML/Graphics.hpp>
-
 #include "Action.h"
+
+#include <map>
 
 using ActionMap = std::map<int, std::string>;
 
@@ -13,18 +10,6 @@ class GameEngine;
 
 class Scene
 {
-protected:
-    GameEngine* m_game = nullptr;
-    ActionMap m_actionMap;
-    bool m_paused = false;
-    bool m_hasEnded = false;
-    size_t m_currentFrame = 0;
-
-protected:
-    virtual void sRender() = 0;
-    virtual void endScene() = 0;
-    void setPaused(bool paused);        // Necessary in most scenes, hence in Scene base class
-
 public:
     Scene();
     Scene(GameEngine* gameEngine);
@@ -38,4 +23,16 @@ public:
     size_t getCurrentFrame() const;
     const ActionMap& getActionMap() const;
     bool hasEnded() const;
+
+protected:
+    GameEngine* m_game = nullptr;
+    ActionMap m_actionMap;
+    bool m_paused = false;
+    bool m_hasEnded = false;
+    size_t m_currentFrame = 0;
+
+    virtual void sRender() = 0;
+    virtual void endScene() = 0;
+
+    void setPaused(bool paused);        // Necessary in most scenes, hence in Scene base class
 };

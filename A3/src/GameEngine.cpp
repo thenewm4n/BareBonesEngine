@@ -1,11 +1,12 @@
+#include "GameEngine.h"
+
+#include "Action.h"
+#include "SceneStartMenu.h"
+
 #include <fstream>
 #include <iostream>
 #include <sstream>
 
-#include "Action.h"
-#include "GameEngine.h"
-#include "SceneStartMenu.h"
-#include "Vec2.h"  
 
 // Public methods
 

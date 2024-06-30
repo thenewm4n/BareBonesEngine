@@ -1,15 +1,11 @@
-#include <cmath>
-
 #include "Animation.h"
 
-Animation::Animation()
-{
-}
+#include <cmath>
+
+Animation::Animation() {}
 
 Animation::Animation(const std::string& animationName, const sf::Texture& tex)
-    : Animation(animationName, tex, 1, 1)
-{
-}
+    : Animation(animationName, tex, 1, 1) {}
 
 Animation::Animation(const std::string& animationName, const sf::Texture& tex, size_t frameCount, size_t frameDuration)
     : m_name(animationName), m_sprite(tex), m_frameCount(frameCount), m_frameDuration(frameDuration), m_currentAnimationFrame(0)
@@ -49,17 +45,8 @@ bool Animation::hasEnded() const
     return false;
 }
 
-const std::string& Animation::getName() const
-{
-    return m_name;
-}
+const std::string& Animation::getName() const { return m_name; }
 
-const Vec2f& Animation::getSize() const
-{
-    return m_size;
-}
+const Vec2f& Animation::getSize() const { return m_size; }
 
-sf::Sprite& Animation::getSprite()
-{
-    return m_sprite;
-}
+sf::Sprite& Animation::getSprite() { return m_sprite; }

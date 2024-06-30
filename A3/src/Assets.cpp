@@ -1,15 +1,13 @@
+#include "Assets.h"
+
+#include "Animation.h"
+
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <sstream>
 
-#include "Assets.h"
-#include "Animation.h"
-
-
-Assets::Assets()
-{
-}
+Assets::Assets() {}
 
 void Assets::loadFromFile(const std::string& assetsFilePath)
 {

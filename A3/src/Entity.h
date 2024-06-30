@@ -1,9 +1,9 @@
 #pragma once
 
+#include "Components.h"
+
 #include <string>
 #include <tuple>
-
-#include "Components.h"
 
 class EntityManager;
 
@@ -22,27 +22,7 @@ class Entity
 {
     friend class EntityManager;     // Allows EntityManager objects to access private Entity constructor
 
-private:
-    bool m_alive = true;
-    size_t m_id = 0;
-    std::string m_tag = "default";
-    ComponentTuple m_components;
-
-private:
-    Entity(const size_t id, const std::string& tag);
-
 public:
-    bool isAlive() const;
-    void destroy();
-    const std::string& getTag() const;
-    const size_t getId() const;
-
-    template <typename T>
-    bool hasComponent()
-    {
-        return getComponent<T>().has;
-    }
-
     template <typename T, typename... TArgs>        // TArgs is 1 or more arguments, in this case the arguments passed to the constructor
     T& addComponent(TArgs&&... args)       // rvalue references
     {
@@ -53,14 +33,33 @@ public:
     }
     
     template <typename T>
+    void removeComponent()
+    {
+        getComponent<T>() = T();
+    }
+
+    template <typename T>
     T& getComponent()
     {
         return std::get<T>(m_components);
     }
 
     template <typename T>
-    void removeComponent()
+    bool hasComponent()
     {
-        getComponent<T>() = T();
+        return getComponent<T>().has;
     }
+
+    void destroy();
+    bool isAlive() const;
+    const size_t getId() const;
+    const std::string& getTag() const;
+
+private:
+    ComponentTuple m_components;
+    bool m_alive = true;
+    size_t m_id = 0;
+    std::string m_tag = "default";
+
+    Entity(const size_t id, const std::string& tag);
 };

@@ -1,9 +1,9 @@
 #pragma once
 
-#include <vector>
-
 #include "GameEngine.h"
 #include "Scene.h"
+
+#include <vector>
 
 class SceneStartMenu : public Scene
 {
@@ -12,15 +12,14 @@ public:
 
 private:
     std::string m_title;
+    sf::Text m_menuText;
     std::vector<std::string> m_menuStrings;
     std::vector<std::string> m_levelPaths;
-    sf::Text m_menuText;
     uint8_t m_selectedMenuIndex = 0;
 
-private:
     void init();
     void update() override;
+    void sDoAction(const Action& action) override;
     void sRender() override;
     void endScene() override;
-    void sDoAction(const Action& action) override;
 };

@@ -1,12 +1,14 @@
-#include <iostream>
+#include "ScenePlatformer.h"
 
 #include "Action.h"
 #include "Assets.h"
 #include "Components.h"
 #include "GameEngine.h"
 #include "Physics.h"
-#include "ScenePlatformer.h"
 #include "SceneStartMenu.h"
+
+#include <iostream>
+
 
 ScenePlatformer::ScenePlatformer(GameEngine* game, const std::string& levelPath)
     : Scene(game), m_levelPath(levelPath)
@@ -38,23 +40,6 @@ void ScenePlatformer::init(const std::string& levelPath)
     m_game->getWindow().setView(view);
 
     loadLevel(levelPath);
-}
-
-void ScenePlatformer::update()
-{
-    if (m_paused)
-	{
-		return;
-	}
-
-    // Adds and removes entities while avoiding iterator invalidation
-    m_entityManager.update();
-
-    sMovement();
-    sLifespan();
-    sCollision();
-    sAnimation();
-    sRender();
 }
 
 void ScenePlatformer::loadLevel(const std::string& filename)
@@ -99,69 +84,26 @@ void ScenePlatformer::loadLevel(const std::string& filename)
             // This is correct
 }
 
+void ScenePlatformer::update()
+{
+    if (m_paused)
+	{
+		return;
+	}
+
+    // Adds and removes entities while avoiding iterator invalidation
+    m_entityManager.update();
+
+    sMovement();
+    sLifespan();
+    sCollision();
+    sAnimation();
+    sRender();
+}
+
 void ScenePlatformer::endScene()
 {
     m_game->changeScene("MENU", std::make_shared<SceneStartMenu>(m_game));
-}
-
-void ScenePlatformer::sMovement()
-{
-    // TODO: Implement player movemement/jumping based on its CInput component
-        // Use scales of -1/1 to look left/right
-    // TODO: Implement gravity's effect on player
-    // TODO: Implement max player speed in both X and Y directions
-
-    // Update player velocity according to input
-    Vec2f velocity(0, m_player->getComponent<CTransform>().velocity.y);
-    if (m_player->getComponent<CInput>().up)
-    {
-        // m_player.getComponent<CState>().state = "jumping";      // Used for changing player animation
-        velocity.y = -3;
-    }
-    m_player->getComponent<CTransform>().velocity = velocity;
-
-    // For each entity in scene, handle movement according to velocities
-    for (auto entity : m_entityManager.getEntities())   // Why isn't this auto&? Are they already references?
-    {
-        /*
-        auto& velocity = entity->getComponent<CTransform>().velocity;
-
-        if (entity->hasComponent<CGravity>())
-        {
-            velocity.y += entity->getComponent<CGravity>().acceleration;
-        }
-
-        // Should cap velocity in all directions to ensure no moving throughfloors
-        if (velocity.y > m_playerConfig.MAX_SPEED)
-        {
-            velocity.y = m_playerConfig.MAX_SPEED;
-        }
-        if (velocity.x > m_playerConfig.MAX_SPEED)
-        {
-            velocity.x = m_playerConfig.MAX_SPEED;
-        }
-        */
-
-        // Update Entity's position according to velocity
-        entity->getComponent<CTransform>().position += velocity;
-    }
-}
-
-void ScenePlatformer::sLifespan()
-{
-    // TODO: Check lifespan of entities that have them, and destroy if they go over
-}
-
-void ScenePlatformer::sCollision()
-{
-    // TODO: Implement Physics::getOverlap() to use inside this function
-
-    // TODO: Implement bullet/tile collisions
-        // Destroy tile if it has Brick animation
-    // TODO: Implement player/tile collisions and resolutions
-        // Update the CState component of player to store whether it's currently on ground or in air; this will be used by Animation system
-    // TODO: Check to see if player has fallen down hole i.e. y > height
-    // TODO: Don't let player walk off left side of map
 }
 
 void ScenePlatformer::sDoAction(const Action& action)
@@ -237,6 +179,67 @@ void ScenePlatformer::sDoAction(const Action& action)
         }
     }
 }
+
+void ScenePlatformer::sMovement()
+{
+    // TODO: Implement player movemement/jumping based on its CInput component
+        // Use scales of -1/1 to look left/right
+    // TODO: Implement gravity's effect on player
+    // TODO: Implement max player speed in both X and Y directions
+
+    // Update player velocity according to input
+    Vec2f velocity(0, m_player->getComponent<CTransform>().velocity.y);
+    if (m_player->getComponent<CInput>().up)
+    {
+        // m_player.getComponent<CState>().state = "jumping";      // Used for changing player animation
+        velocity.y = -3;
+    }
+    m_player->getComponent<CTransform>().velocity = velocity;
+
+    // For each entity in scene, handle movement according to velocities
+    for (auto entity : m_entityManager.getEntities())   // Why isn't this auto&? Are they already references?
+    {
+        /*
+        auto& velocity = entity->getComponent<CTransform>().velocity;
+
+        if (entity->hasComponent<CGravity>())
+        {
+            velocity.y += entity->getComponent<CGravity>().acceleration;
+        }
+
+        // Should cap velocity in all directions to ensure no moving throughfloors
+        if (velocity.y > m_playerConfig.MAX_SPEED)
+        {
+            velocity.y = m_playerConfig.MAX_SPEED;
+        }
+        if (velocity.x > m_playerConfig.MAX_SPEED)
+        {
+            velocity.x = m_playerConfig.MAX_SPEED;
+        }
+        */
+
+        // Update Entity's position according to velocity
+        entity->getComponent<CTransform>().position += velocity;
+    }
+}
+
+void ScenePlatformer::sLifespan()
+{
+    // TODO: Check lifespan of entities that have them, and destroy if they go over
+}
+
+void ScenePlatformer::sCollision()
+{
+    // TODO: Implement Physics::getOverlap() to use inside this function
+
+    // TODO: Implement bullet/tile collisions
+        // Destroy tile if it has Brick animation
+    // TODO: Implement player/tile collisions and resolutions
+        // Update the CState component of player to store whether it's currently on ground or in air; this will be used by Animation system
+    // TODO: Check to see if player has fallen down hole i.e. y > height
+    // TODO: Don't let player walk off left side of map
+}
+
 
 void ScenePlatformer::sAnimation()
 {
