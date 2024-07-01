@@ -1,5 +1,5 @@
 # To complete
-- Fix ScenePlatformer::gridToMidPixel (used in ScenePlatformer::spawnPlayer())
+- ScenePlatformer::sMovement()
 - Bullet animation: get bullet sprite
 - ScenePlatformer::loadLevel()
 - Implementation of sDoAction() for ScenePlatformer; including change state of player so that Animation changes.

@@ -189,13 +189,35 @@ void ScenePlatformer::sMovement()
     // TODO: Implement max player speed in both X and Y directions
 
     // Update player velocity according to input
-    Vec2f velocity(0, m_player->getComponent<CTransform>().velocity.y);
-    if (m_player->getComponent<CInput>().up)
+    // Vec2f velocity(0, m_player->getComponent<CTransform>().velocity.y);      I don't know what's going on here
+    auto& input = m_player->getComponent<CInput>();
+    auto& velocity = m_player->getComponent<CTransform>().velocity;
+    
+    if (input.up)
     {
-        // m_player.getComponent<CState>().state = "jumping";      // Used for changing player animation
+        //m_player.getComponent<CState>().state = "jumping";      // Used for changing player animation
         velocity.y = -3;
     }
-    m_player->getComponent<CTransform>().velocity = velocity;
+    else
+    {
+        velocity.y = 0;
+    }
+
+    if (input.right)
+    {
+        velocity.x = 3;
+    }
+    else if (input.left)
+    {
+        velocity.x = -3;
+    }
+    else
+    {
+        velocity.x = 0;
+    }
+    
+    // Maybe this is necessary for handling gravity?
+    // m_player->getComponent<CTransform>().velocity = velocity;
 
     // For each entity in scene, handle movement according to velocities
     for (auto entity : m_entityManager.getEntities())   // Why isn't this auto&? Are they already references?
@@ -219,8 +241,10 @@ void ScenePlatformer::sMovement()
         }
         */
 
+       auto& transform = entity->getComponent<CTransform>();
+
         // Update Entity's position according to velocity
-        entity->getComponent<CTransform>().position += velocity;
+        transform.position += transform.velocity;
     }
 }
 
@@ -387,11 +411,11 @@ void ScenePlatformer::spawnPlayer()
     // sample player entity which you can use to construct other entities
     m_player = m_entityManager.addEntity("player");
     
-    // m_player->addComponent<CTransform>(Vec2f(m_gridCellSize.x, m_viewSize.y - m_gridCellSize.y));
-    m_player->addComponent<CTransform>(gridToMidPixel(2.f, 1.f, m_player));
-    
     Animation standAnim = m_game->getAssets().getAnimation("Stand");
     m_player->addComponent<CAnimation>(standAnim, true);
+
+    // Adding CTransform must follow adding CAnimation because gridToMidPixel uses CAnimation
+    m_player->addComponent<CTransform>(gridToMidPixel(1.f, 1.f, m_player));
     
     const Vec2f& spriteSize = standAnim.getSize();
     m_player->addComponent<CBoundingBox>(Vec2f(spriteSize.x, spriteSize.y));
@@ -406,18 +430,19 @@ void ScenePlatformer::spawnBullet(std::shared_ptr<Entity> entity)
     // TODO: this should spawn a bullet at a given entity, going in direction entity is facing
 }
 
+// Used to position of entity so bottom left of sprite is at bottom left of the cell
 Vec2f ScenePlatformer::gridToMidPixel(float gridPositionX, float gridPositionY, std::shared_ptr<Entity> entity)
 {
-    // TODO: Takes in a grid position where the bottom left of the entity is, and an Entity object
-    // Returns Vec2 indicating the actual centre position of the entity (not a grid position)
-    // Must use Entity's animation size
-    // Grid width and height is stored in m_gridCellSize
-    // Bottom left corner of animation should align with the bottom left of the grid cell
+    if (!entity->hasComponent<CAnimation>())
+    {
+        std::cerr << "ScenePlatformer.cpp, Line 419: entity has no CAnimation." << std::endl;
+        return Vec2f(0.f, 0.f);
+    }
 
     const Vec2f& spriteSize = entity->getComponent<CAnimation>().animation.getSize();
     
     float x = (gridPositionX * m_gridCellSize.x) + (spriteSize.x / 2.f);
-    float y = m_viewSize.y - (gridPositionY * m_gridCellSize.y) - (spriteSize.y / 2.f);
+    float y = m_viewSize.y - (gridPositionY * m_gridCellSize.y) - spriteSize.y / 2.f;
         
     return Vec2f(x, y);
 }
