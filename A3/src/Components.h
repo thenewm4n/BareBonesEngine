@@ -94,7 +94,7 @@ public:
 class CGravity : public Component
 {
 public:
-    float acceleration = 0;
+    float acceleration = 9.8;
 
     CGravity() {}
     CGravity(float accel)

@@ -12,6 +12,7 @@ public:
     Animation(const std::string& animationName, const sf::Texture& tex, size_t frameCount, size_t frameDuration);
 
     void update();
+    void flipX(bool flip);
     bool hasEnded() const;
     const std::string& getName() const;
     const Vec2f& getSize() const;
@@ -25,5 +26,6 @@ private:
     uint8_t m_currentAnimationFrame = 0;
     size_t m_frameCount = 1;            // No. frames in the animation
     size_t m_frameDuration = 1;         // Number of game frames each animation frame persists
-    size_t m_gameFramesSinceStart; 
+    size_t m_gameFramesSinceStart;
+    bool m_flippedX = false;
 };

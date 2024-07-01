@@ -30,10 +30,22 @@ void Animation::update()
 
     // Set texture rectangle properly (see constructor for sample)
     sf::IntRect frameRect(std::floor(m_currentAnimationFrame * m_size.x), 0, m_size.x, m_size.y);
+
+    if (m_flippedX)
+    {
+        frameRect.left += frameRect.width;
+        frameRect.width *= -1;
+    }
+
     m_sprite.setTextureRect(frameRect);
 
     // Add the speed variable to the current frame (?)
     m_gameFramesSinceStart++;
+}
+
+void Animation::flipX(bool flip)
+{
+    m_flippedX = flip;
 }
 
 bool Animation::hasEnded() const

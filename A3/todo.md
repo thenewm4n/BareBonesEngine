@@ -1,5 +1,8 @@
 # To complete
-- ScenePlatformer::sMovement()
+- Fix player direction - probably due to creation of new Animation every loop in sAnimation().
+- Fix sAnimation() - probably due to creation of new Animation every loop in sAnimation().
+    - Or cycling too quickly through animation.
+- Change player speed in sMovement() according to PlayerConfig struct
 - Bullet animation: get bullet sprite
 - ScenePlatformer::loadLevel()
 - Implementation of sDoAction() for ScenePlatformer; including change state of player so that Animation changes.

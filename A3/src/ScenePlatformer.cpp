@@ -185,63 +185,71 @@ void ScenePlatformer::sMovement()
 {
     // TODO: Implement player movemement/jumping based on its CInput component
         // Use scales of -1/1 to look left/right
-    // TODO: Implement gravity's effect on player
     // TODO: Implement max player speed in both X and Y directions
 
-    // Update player velocity according to input
-    // Vec2f velocity(0, m_player->getComponent<CTransform>().velocity.y);      I don't know what's going on here
-    auto& input = m_player->getComponent<CInput>();
-    auto& velocity = m_player->getComponent<CTransform>().velocity;
-    
-    if (input.up)
+    // For each entity in scene, handle movement according to entity's velocity
+    for (auto entity : m_entityManager.getEntities())
     {
-        //m_player.getComponent<CState>().state = "jumping";      // Used for changing player animation
-        velocity.y = -3;
-    }
-    else
-    {
-        velocity.y = 0;
-    }
+        auto& transform = entity->getComponent<CTransform>();
 
-    if (input.right)
-    {
-        velocity.x = 3;
-    }
-    else if (input.left)
-    {
-        velocity.x = -3;
-    }
-    else
-    {
-        velocity.x = 0;
-    }
-    
-    // Maybe this is necessary for handling gravity?
-    // m_player->getComponent<CTransform>().velocity = velocity;
+        if (entity == m_player)
+        {
+            auto& input = m_player->getComponent<CInput>();
 
-    // For each entity in scene, handle movement according to velocities
-    for (auto entity : m_entityManager.getEntities())   // Why isn't this auto&? Are they already references?
-    {
-        /*
-        auto& velocity = entity->getComponent<CTransform>().velocity;
+            if (input.right)
+            {
+                // Set animation to right
+                m_player->getComponent<CAnimation>().animation.flipX(true);
+                transform.velocity.x = 2;
+            }
+            else if (input.left)
+            {
+                // Set animation to left
+                m_player->getComponent<CAnimation>().animation.flipX(false);
+                transform.velocity.x = -2;
+            }
+            else
+            {
+                transform.velocity.x = 0;
+            }
+
+            if (input.up && input.canJump)
+			{
+				transform.velocity.y = -3;
+				input.canJump = false;
+			}
+
+            // Set CState according to velocity, which changes animation
+            if (transform.velocity.y != 0)
+            {
+                m_player->getComponent<CState>().state = "inAir";
+            }
+            else if (transform.velocity.x != 0)
+            {
+                m_player->getComponent<CState>().state = "running";
+            }
+            else
+            {
+                m_player->getComponent<CState>().state = "standing";
+            }
+        }
 
         if (entity->hasComponent<CGravity>())
-        {
-            velocity.y += entity->getComponent<CGravity>().acceleration;
-        }
+		{
+	        // transform.velocity.y += entity->getComponent<CGravity>().acceleration;
+		}
 
-        // Should cap velocity in all directions to ensure no moving throughfloors
-        if (velocity.y > m_playerConfig.MAX_SPEED)
+        /*
+        // Should cap velocity in all directions to ensure no moving throughfloors     DOESN'T WORK
+        if (transform.velocity.y > m_playerConfig.MAX_SPEED)
         {
-            velocity.y = m_playerConfig.MAX_SPEED;
+            transform.velocity.y = m_playerConfig.MAX_SPEED;
         }
-        if (velocity.x > m_playerConfig.MAX_SPEED)
+        if (transform.velocity.x > m_playerConfig.MAX_SPEED)
         {
-            velocity.x = m_playerConfig.MAX_SPEED;
+           transform.velocity.x = m_playerConfig.MAX_SPEED;
         }
         */
-
-       auto& transform = entity->getComponent<CTransform>();
 
         // Update Entity's position according to velocity
         transform.position += transform.velocity;
@@ -263,6 +271,9 @@ void ScenePlatformer::sCollision()
         // Update the CState component of player to store whether it's currently on ground or in air; this will be used by Animation system
     // TODO: Check to see if player has fallen down hole i.e. y > height
     // TODO: Don't let player walk off left side of map
+
+
+    // If collision in y axis and coming from above, set y velocity to 0 and set player state to standing, and set CInput.canJump to true
 }
 
 
@@ -271,26 +282,29 @@ void ScenePlatformer::sAnimation()
     // Set player animation based on state
     for (auto& entity : m_entityManager.getEntities())
     {
-        // Change player Animation according to player CState
-        const auto& stateComponent = m_player->getComponent<CState>();
+        if (entity == m_player)
+		{
+            CState& stateComponent = m_player->getComponent<CState>();
 
-        if (stateComponent.state == "running")
-        {
-            m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("Run"), true);
-        }
-        else if (stateComponent.state == "standing")
-        {
-            m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("Stand"), true);
-        }
-        else if (stateComponent.state == "inAir")
-        {
-            m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("Air"), true);
-        }
-        else if (stateComponent.state == "shooting")
-        {
-            m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("Shoot"), false);
-        }
-
+            // If player has CState component, change animation according to state
+            if (stateComponent.state == "running")
+            {
+                m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("Run"), true);
+            }
+            else if (stateComponent.state == "standing")
+            {
+                m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("Stand"), true);
+            }
+            else if (stateComponent.state == "inAir")
+            {
+                m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("Air"), true);
+            }
+            else if (stateComponent.state == "shooting")
+            {
+                m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("Shoot"), false);
+            }
+		}
+      
         // If entity has Animation component, call update()
         if (entity->hasComponent<CAnimation>())
         {
@@ -421,7 +435,7 @@ void ScenePlatformer::spawnPlayer()
     m_player->addComponent<CBoundingBox>(Vec2f(spriteSize.x, spriteSize.y));
 
     m_player->addComponent<CGravity>(0.1f);
-
+    
     // TODO: add remaining components to player
 }
 
