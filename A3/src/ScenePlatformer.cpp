@@ -183,8 +183,6 @@ void ScenePlatformer::sDoAction(const Action& action)
 
 void ScenePlatformer::sMovement()
 {
-    // TODO: Implement player movemement/jumping based on its CInput component
-        // Use scales of -1/1 to look left/right
     // TODO: Implement max player speed in both X and Y directions
 
     // For each entity in scene, handle movement according to entity's velocity
@@ -195,17 +193,17 @@ void ScenePlatformer::sMovement()
         if (entity == m_player)
         {
             auto& input = m_player->getComponent<CInput>();
+            auto& state = m_player->getComponent<CState>();
 
-            if (input.right)
+            // Change velocity and animation direction according to input
+            if (input.right && !input.left)
             {
-                // Set animation to right
-                m_player->getComponent<CAnimation>().animation.flipX(true);
+                // state.isFacingRight = true;           // Used in sAnimation()   
                 transform.velocity.x = 2;
             }
-            else if (input.left)
+            else if (input.left && !input.right)
             {
-                // Set animation to left
-                m_player->getComponent<CAnimation>().animation.flipX(false);
+                //state.isFacingRight = false;
                 transform.velocity.x = -2;
             }
             else
@@ -213,24 +211,37 @@ void ScenePlatformer::sMovement()
                 transform.velocity.x = 0;
             }
 
+            // Jump if on ground and W pressed
             if (input.up && input.canJump)
 			{
 				transform.velocity.y = -3;
 				input.canJump = false;
 			}
 
-            // Set CState according to velocity, which changes animation
-            if (transform.velocity.y != 0)
+            // Set CState according to horizontal velocity -> changes animation set in sAnimation()
+            if (transform.velocity.x != 0)
             {
-                m_player->getComponent<CState>().state = "inAir";
-            }
-            else if (transform.velocity.x != 0)
-            {
-                m_player->getComponent<CState>().state = "running";
+                state.currentState = PlayerState::Running;
+
+                bool movingLeftMismatch = transform.velocity.x < 0 && transform.scale.x < 0 ? true : false;
+                bool movingRightMismatch = transform.velocity.x > 0 && transform.scale.x > 0 ? true : false;
+
+                // Change direction animation faces depending on velocity
+                if (movingLeftMismatch || movingRightMismatch)           // if moving right while animation looks left or moving left while animations looks right
+                {
+                    transform.scale.x *= -1;                    // flip animation in x direction
+                }
+
             }
             else
             {
-                m_player->getComponent<CState>().state = "standing";
+                state.currentState = PlayerState::Standing;     // No change to direction when velocity is 0
+            }
+            
+            // Falling animation overrides running or standing animations
+            if (transform.velocity.y != 0)
+            {
+                state.currentState = PlayerState::InAir;
             }
         }
 
@@ -285,38 +296,43 @@ void ScenePlatformer::sAnimation()
         if (entity == m_player)
 		{
             CState& stateComponent = m_player->getComponent<CState>();
+            CAnimation& animComponent = m_player->getComponent<CAnimation>();
 
-            // If player has CState component, change animation according to state
-            if (stateComponent.state == "running")
-            {
-                m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("Run"), true);
-            }
-            else if (stateComponent.state == "standing")
-            {
-                m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("Stand"), true);
-            }
-            else if (stateComponent.state == "inAir")
-            {
-                m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("Air"), true);
-            }
-            else if (stateComponent.state == "shooting")
-            {
-                m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("Shoot"), false);
+            // If state has changed, replace animation according to state
+            if (stateComponent.currentState != stateComponent.previousState)
+            { 
+                // Determine whether animation will be repeated or played once
+                bool toRepeat = stateComponent.currentState == PlayerState::Shooting ? false : true;
+
+                // Replace animation according to new state
+                const std::string& animationName = m_stateToAnimationMap[stateComponent.currentState];
+                animComponent = m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation(animationName), toRepeat);
+            
+                // Update previous state to current state
+                stateComponent.previousState = stateComponent.currentState;
             }
 		}
       
-        // If entity has Animation component, call update()
+        // If entity has Animation component, either update it, or remove if has ended
         if (entity->hasComponent<CAnimation>())
         {
-            CAnimation& animationComponent = entity->getComponent<CAnimation>();
+            CAnimation& animComponent = entity->getComponent<CAnimation>();
 
-            if (animationComponent.animation.hasEnded() && !animationComponent.toRepeat)
+            if (animComponent.animation.hasEnded() && !animComponent.toRepeat)
             {
-                entity->removeComponent<CAnimation>();
+                if (entity == m_player)
+                {
+                    const Animation& standingAnimation = m_game->getAssets().getAnimation(m_stateToAnimationMap[PlayerState::Standing]);
+                    entity->addComponent<CAnimation>(standingAnimation, true);
+                }
+                else
+                {
+                    entity->removeComponent<CAnimation>();
+                }
             }
             else
-            {
-                animationComponent.animation.update();
+            {   
+                animComponent.animation.update();       // Animation cycles by default
             }
         }
     }

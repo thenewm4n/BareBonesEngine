@@ -5,11 +5,13 @@
 
 Animation::Animation() {}
 
-Animation::Animation(const std::string& animationName, const sf::Texture& tex)
-    : Animation(animationName, tex, 1, 1) {}
-
-Animation::Animation(const std::string& animationName, const sf::Texture& tex, size_t frameCount, size_t frameDuration)
-    : m_name(animationName), m_sprite(tex), m_frameCount(frameCount), m_frameDuration(frameDuration), m_currentAnimationFrame(0)
+Animation::Animation(const std::string& animationName, const sf::Texture& tex, int frameCount, int frameDuration)
+    : m_name(animationName),
+    m_sprite(tex),
+    m_frameCount(frameCount),
+    m_frameDuration(frameDuration),
+    m_currentAnimationFrame(0),
+    m_gameLoopsSinceStart(0)
 {
     m_size = Vec2f(static_cast<float>(tex.getSize().x) / frameCount, static_cast<float>(tex.getSize().y));
     m_sprite.setOrigin(m_size.x / 2.f, m_size.y / 2.f);                                                                 // Origin set to centre of sprite
@@ -20,32 +22,25 @@ Animation::Animation(const std::string& animationName, const sf::Texture& tex, s
 void Animation::update()
 {
     // Calculate correct frame to display
-    m_currentAnimationFrame = (m_gameFramesSinceStart - (m_gameFramesSinceStart % m_frameDuration)) / m_frameDuration;
+    m_currentAnimationFrame = (m_gameLoopsSinceStart - (m_gameLoopsSinceStart % m_frameDuration)) / m_frameDuration;        // for standing animation, this results in 0 / 1
 
     // Reset animation frame to start (this should only happen if toRepeat == true, as checked in ScenePlatformer::sAnimation())
-    if (m_currentAnimationFrame > m_frameCount)
+    if (m_currentAnimationFrame > m_frameCount - 1)
     {
         m_currentAnimationFrame = 0;
+        m_gameLoopsSinceStart = 0;
+    }
+    else
+    {
+        // Add the speed variable to the current frame (?)
+        m_gameLoopsSinceStart++;
     }
 
     // Set texture rectangle properly (see constructor for sample)
     sf::IntRect frameRect(std::floor(m_currentAnimationFrame * m_size.x), 0, m_size.x, m_size.y);
 
-    if (m_flippedX)
-    {
-        frameRect.left += frameRect.width;
-        frameRect.width *= -1;
-    }
-
     m_sprite.setTextureRect(frameRect);
-
-    // Add the speed variable to the current frame (?)
-    m_gameFramesSinceStart++;
-}
-
-void Animation::flipX(bool flip)
-{
-    m_flippedX = flip;
+     
 }
 
 bool Animation::hasEnded() const
@@ -56,6 +51,11 @@ bool Animation::hasEnded() const
     }
 
     return false;
+}
+
+bool Animation::isFlipped() const
+{
+    return m_flippedX;
 }
 
 const std::string& Animation::getName() const { return m_name; }

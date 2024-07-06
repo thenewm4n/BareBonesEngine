@@ -2,6 +2,7 @@
 
 #include "Components.h"
 
+#include <iostream>
 #include <string>
 #include <tuple>
 
@@ -23,11 +24,11 @@ class Entity
     friend class EntityManager;     // Allows EntityManager objects to access private Entity constructor
 
 public:
-    template <typename T, typename... TArgs>        // TArgs is 1 or more arguments, in this case the arguments passed to the constructor
-    T& addComponent(TArgs&&... args)       // rvalue references
+    template <typename T, typename... TArgs>                // TArgs is 1 or more arguments, in this case the arguments passed to the constructor
+    T& addComponent(TArgs&&... args)                        // rvalue references
     {
         auto& component = getComponent<T>();
-        component = T(std::forward<TArgs>(args)...);       // Overwrites the current component
+        component = T(std::forward<TArgs>(args)...);        // Overwrites the current component
         component.has = true;
         return component;
     }

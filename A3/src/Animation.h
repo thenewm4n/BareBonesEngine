@@ -8,12 +8,13 @@ class Animation
 {
 public:
     Animation();
-    Animation(const std::string& animationName, const sf::Texture& tex);        // Calls the below constructor
-    Animation(const std::string& animationName, const sf::Texture& tex, size_t frameCount, size_t frameDuration);
+    Animation(const std::string& animationName, const sf::Texture& tex, int frameCount = 1, int frameDuration = 10);
 
     void update();
-    void flipX(bool flip);
+    void flipX(bool shouldBeFlipped);
+    
     bool hasEnded() const;
+    bool isFlipped() const;
     const std::string& getName() const;
     const Vec2f& getSize() const;
     sf::Sprite& getSprite();
@@ -21,11 +22,10 @@ public:
 private:
     std::string m_name = "NONE";
     sf::Sprite m_sprite;
-    Vec2f m_size = { 1, 1 };           // Size of each animation frame
-    // size_t m_currentFrame = 0;       // Current animation frame   I'M NOT SURE THIS IS WHAT IT'S MEANT TO BE
-    uint8_t m_currentAnimationFrame = 0;
-    size_t m_frameCount = 1;            // No. frames in the animation
-    size_t m_frameDuration = 1;         // Number of game frames each animation frame persists
-    size_t m_gameFramesSinceStart;
+    Vec2f m_size;            // Size of each animation frame
+    int m_currentAnimationFrame;
+    int m_frameCount;                // No. frames in the animation
+    int m_frameDuration;             // Number of game loops each animation frame persists
+    size_t m_gameLoopsSinceStart;
     bool m_flippedX = false;
 };

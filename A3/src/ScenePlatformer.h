@@ -14,10 +14,19 @@ class ScenePlatformer : public Scene
         std::string WEAPON;
     };
 
+
 public:
     ScenePlatformer(GameEngine* game, const std::string& levelPath);
 
 private:
+    std::unordered_map<PlayerState, std::string> m_stateToAnimationMap =
+    {
+        {PlayerState::Running, "Run"},
+        {PlayerState::Standing, "Stand"},
+        {PlayerState::InAir, "Air"},
+        {PlayerState::Shooting, "Shoot"}
+    };
+
     std::string m_levelPath;
     std::shared_ptr<Entity> m_player;
     PlayerConfig m_playerConfig;

@@ -1,8 +1,6 @@
 # To complete
-- Fix player direction - probably due to creation of new Animation every loop in sAnimation().
-- Fix sAnimation() - probably due to creation of new Animation every loop in sAnimation().
-    - Or cycling too quickly through animation.
 - Change player speed in sMovement() according to PlayerConfig struct
+- ScenePlatformer::sCollision()
 - Bullet animation: get bullet sprite
 - ScenePlatformer::loadLevel()
 - Implementation of sDoAction() for ScenePlatformer; including change state of player so that Animation changes.
@@ -15,6 +13,8 @@
     - Also, can still toggle textures etc when paused -> probably because sDoAction is still called when paused?
 - Brick texture glitches at regular intervals
 - Scene::setPaused() - is it necessary? Maybe, in order to stop sDoAction() when toggling textures etc while paused.
+- Run animation displays weirdly sometimes.
+    - Only when running in first half of view width of world.
 
 # Recommended order of implementation
 1. Rendering system already done (maybe...) -> T (textures), C (bounding boxes) and G (grid) can be used to debug

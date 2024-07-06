@@ -2,10 +2,19 @@
 
 #include "Animation.h"
 
+
 class Component
 {
 public:
     bool has = false;
+};
+
+enum class PlayerState
+{
+    Running,
+    Standing,
+    InAir,
+    Shooting
 };
 
 class CTransform : public Component
@@ -62,11 +71,13 @@ public:
 class CState : public Component
 {
 public:
-    std::string state = "standing";
+    PlayerState currentState = PlayerState::Standing;
+    PlayerState previousState;
+    bool isFacingRight = false;
 
     CState() {}
-    CState(const std::string& state)
-        : state(state) {}
+    CState(PlayerState state)
+        : currentState(state) {}
 };
 
 class CAnimation : public Component     // For textures and animations
