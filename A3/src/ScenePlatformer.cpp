@@ -275,41 +275,37 @@ void ScenePlatformer::sLifespan()
 
 void ScenePlatformer::sCollision()
 {
-    // TODO: Implement bullet/tile collisions
-        // Destroy tile if it has Brick animation
     // TODO: Implement player/tile collisions and resolutions
         // Update the CState component of player to store whether it's currently on ground or in air; this will be used by Animation system
+    // TODO: Implement bullet/tile collisions
+        // Destroy tile if it has Brick animation
+    // TODO: Check to see if player has fallen down hole i.e. y > height
+    // TODO: Don't let player walk off left side of map
     
-    for (auto entity1 : m_entityManager.getEntities())
+    // If collision in y axis and coming from above, resolve collision, and set y velocity to 0, and set CInput.canJump to true
+
+    for (auto a : m_entityManager.getEntities())
     {
-        if (!entity1->hasComponent<CBoundingBox>())
+        if (!a->hasComponent<CBody>())
         {
             continue;
         }
 
-        for (auto entity2 : m_entityManager.getEntities())
+        for (auto b : m_entityManager.getEntities())
         {
-            if (!entity2->hasComponent<CBoundingBox>() || entity1 == entity2)
+            if (!b->hasComponent<CBody>() || a == b)
             {
                 continue;
             }
 
             // If overlap in both x and y directions, resolve collision
-            Vec2f overlap = getOverlap(entity1, entity2);
+            Vec2f overlap = Physics::getOverlap(a, b);
             if (overlap.x > 0 && overlap.y > 0)
             {
-                // Resolve collision by seeing whether overlap is new in x direction or y direction
+                Physics::resolveCollision(a, b);
             }
         }
     }
-
-    bool isCollision = false;
-
-    // TODO: Check to see if player has fallen down hole i.e. y > height
-    // TODO: Don't let player walk off left side of map
-
-
-    // If collision in y axis and coming from above, resolve collisition, and set y velocity to 0, and set CInput.canJump to true
 }
 
 
@@ -402,14 +398,14 @@ void ScenePlatformer::sRender()
         }
 
         // Draw Entity bounding boxes
-        if (m_drawBoundingBoxes && entity->hasComponent<CBoundingBox>())
+        if (m_drawBoundingBoxes && entity->hasComponent<CBody>())
         {
-            auto& bBox = entity->getComponent<CBoundingBox>();
+            auto& bBox = entity->getComponent<CBody>().bBox;
             auto& transform = entity->getComponent<CTransform>();
             
             sf::RectangleShape rectangle;
             rectangle.setSize(sf::Vector2f(bBox.size.x - 1, bBox.size.y - 1));  // Only takes sf::Vector2f
-            rectangle.setOrigin(bBox.halfSize.x, bBox.halfSize.y);
+            rectangle.setOrigin(bBox.size.x / 2.f, bBox.size.y / 2.f);
             rectangle.setPosition(transform.position.x, transform.position.y);      
             rectangle.setFillColor(sf::Color(0, 0, 0, 0));                  // Sets alpha of fill colour to 0 i.e. transparent
             rectangle.setOutlineColor(sf::Color(255, 255, 255, 255));       // Sets alpha of outline to 255 i.e. opaque
@@ -473,7 +469,7 @@ void ScenePlatformer::spawnPlayer()
     m_player->addComponent<CTransform>(gridToMidPixel(1.f, 1.f, m_player));
     
     const Vec2f& spriteSize = standAnim.getSize();
-    m_player->addComponent<CBoundingBox>(Vec2f(spriteSize.x, spriteSize.y));
+    m_player->addComponent<CBody>(CBoundingBox(Vec2f(spriteSize.x, spriteSize.y)), 1.f);
 
     m_player->addComponent<CGravity>(0.1f);
     

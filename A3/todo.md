@@ -1,6 +1,6 @@
 # To complete
-- Continue with ScenePlatformer::sCollision() -> currently determining the direction of new collision.
 - ScenePlatformer::loadLevel()
+    - Add a block to test collisions
     - Populate PlayerConfig struct -> change player speed in sMovement() according to PlayerConfig struct
     - Uncomment speed cap in sMovement().
 - ScenePlatformer::spawnPlayer()
@@ -42,3 +42,4 @@
 # Improvements
 - SceneStartMenu: make initialisation of title, menu strings & level paths dynamic according to e.g. config file, levels file.
 - Decouple logic from framerate using delta time.
+- Use mass in collision resolution.

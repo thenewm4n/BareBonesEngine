@@ -2,6 +2,7 @@
 
 #include "Animation.h"
 
+#include <iostream>
 
 class Component
 {
@@ -31,6 +32,33 @@ public:
         : position(pos) {}
     CTransform(const Vec2f& pos, const Vec2f& vel, float ang)
         : position(pos), previousPosition(pos), velocity(vel), angle(ang) {}
+};
+
+class CBoundingBox : public Component
+{
+public:
+    Vec2f size;
+
+    CBoundingBox() {}
+    CBoundingBox(const Vec2f& size)
+        : size(size) {}
+};
+
+class CBody : public Component
+{
+public:
+    CBoundingBox bBox;
+    float mass;         // 0 < mass <= 1
+
+    CBody()
+        : mass(1.f) {}
+    
+    CBody(CBoundingBox box, float mass = 1.f)
+        : bBox(box)
+    {
+        if (mass < 0.001f) { std::cout << "Mass is negative or zero." << std::endl; }
+        if (mass > 1.f) { std::cout << "Mass is greater than 1." << std::endl; }
+    }
 };
 
 class CCollision : public Component
@@ -89,16 +117,6 @@ public:
     CAnimation() {}
     CAnimation(const Animation& animation, bool toRepeat)
         : animation(animation), toRepeat(toRepeat) {}
-};
-
-class CBoundingBox : public Component
-{
-public:
-    Vec2f size;
-
-    CBoundingBox() {}
-    CBoundingBox(const Vec2f& size)
-        : size(size) {}
 };
 
 class CGravity : public Component
