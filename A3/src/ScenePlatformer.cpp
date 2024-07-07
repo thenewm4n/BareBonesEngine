@@ -11,7 +11,8 @@
 
 
 ScenePlatformer::ScenePlatformer(GameEngine* game, const std::string& levelPath)
-    : Scene(game), m_levelPath(levelPath)
+    : Scene(game),
+    m_levelPath(levelPath)
 {
     init(m_levelPath);
 }
@@ -274,17 +275,41 @@ void ScenePlatformer::sLifespan()
 
 void ScenePlatformer::sCollision()
 {
-    // TODO: Implement Physics::getOverlap() to use inside this function
-
     // TODO: Implement bullet/tile collisions
         // Destroy tile if it has Brick animation
     // TODO: Implement player/tile collisions and resolutions
         // Update the CState component of player to store whether it's currently on ground or in air; this will be used by Animation system
+    
+    for (auto entity1 : m_entityManager.getEntities())
+    {
+        if (!entity1->hasComponent<CBoundingBox>())
+        {
+            continue;
+        }
+
+        for (auto entity2 : m_entityManager.getEntities())
+        {
+            if (!entity2->hasComponent<CBoundingBox>() || entity1 == entity2)
+            {
+                continue;
+            }
+
+            // If overlap in both x and y directions, resolve collision
+            Vec2f overlap = getOverlap(entity1, entity2);
+            if (overlap.x > 0 && overlap.y > 0)
+            {
+                // Resolve collision by seeing whether overlap is new in x direction or y direction
+            }
+        }
+    }
+
+    bool isCollision = false;
+
     // TODO: Check to see if player has fallen down hole i.e. y > height
     // TODO: Don't let player walk off left side of map
 
 
-    // If collision in y axis and coming from above, set y velocity to 0 and set player state to standing, and set CInput.canJump to true
+    // If collision in y axis and coming from above, resolve collisition, and set y velocity to 0, and set CInput.canJump to true
 }
 
 

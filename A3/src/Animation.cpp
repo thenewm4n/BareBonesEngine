@@ -1,7 +1,6 @@
 #include "Animation.h"
 
 #include <cmath>
-#include <iostream>
 
 Animation::Animation() {}
 

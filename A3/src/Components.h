@@ -95,11 +95,10 @@ class CBoundingBox : public Component
 {
 public:
     Vec2f size;
-    Vec2f halfSize;
 
     CBoundingBox() {}
     CBoundingBox(const Vec2f& size)
-        : size(size), halfSize(size / 2) {}
+        : size(size) {}
 };
 
 class CGravity : public Component
