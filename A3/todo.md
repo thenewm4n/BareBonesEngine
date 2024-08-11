@@ -1,13 +1,20 @@
+# Next:
+- resolveCollision(), line 88 - !!! the y positions of player and object need to be windowSize.y - position.y
+
+
 # To complete
-- ScenePlatformer::loadLevel()
-    - Add a block to test collisions
-    - Populate PlayerConfig struct -> change player speed in sMovement() according to PlayerConfig struct
-    - Uncomment speed cap in sMovement().
+- ScenePlatformer::sMovement() (??? remember that player Y speed is positive in level_1.txt, so must be negated in code)
+    - Implement max speed cap
+    - Implement collision resolution
+    - Then, uncomment gravity in sMovement()
 - ScenePlatformer::spawnPlayer()
     - Are there more components to add to player?
-- Implementation of sDoAction() for ScenePlatformer; including change state of player so that Animation changes.
+- ScenePlatformer::sDoAction(): including change state of player so that Animation changes.
+- ScenePlatformer::sCollision()
+	- Bullet tile collisions.
+    - Detect if fallen down hole.
+    - Detect if off screen to left.
 - Bullet animation: get bullet sprite
-- ScenePlatformer::sMovement(): remember that player Y speed is positive in level_1.txt, so must be negated in code
 - Physics.h
 - Text for SceneStartMenu - levels, controls legend at bottom
 - ScenePlatformer::sRender()/sUserInput - fix colour change of pausing

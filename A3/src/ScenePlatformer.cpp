@@ -36,7 +36,7 @@ void ScenePlatformer::init(const std::string& levelPath)
 
     m_gridText.setFont(m_game->getAssets().getFont("Tech"));
     m_gridText.setCharacterSize(50);
-    m_gridText.setScale(0.05, 0.05);
+    m_gridText.setScale(0.05f, 0.05f);
 
     sf::View view(sf::FloatRect(0, 0, m_viewSize.x, m_viewSize.y));
     m_game->getWindow().setView(view);
@@ -51,7 +51,7 @@ void ScenePlatformer::loadLevel(const std::string& filename)
 
     // Can be Player, Block, or Prop
     std::ifstream levelFile(filename);
-    if (!levelFile.is_open())           // What is going on here?
+    if (!levelFile.is_open())
     {
         std::cerr << "ScenePlatformer.cpp, Line 60: Error opening level file." << std::endl;
         exit(-1);
@@ -73,7 +73,7 @@ void ScenePlatformer::loadLevel(const std::string& filename)
                 lineStream >> m_playerConfig.X >> m_playerConfig.Y >> m_playerConfig.BB_WIDTH
                 >> m_playerConfig.BB_HEIGHT >> m_playerConfig.X_SPEED >> m_playerConfig.JUMP_SPEED
                 >> m_playerConfig.MAX_SPEED >> m_playerConfig.GRAVITY >> m_playerConfig.WEAPON;
-                
+
                 // Spawn player according to PlayerConfig values
                 spawnPlayer();
             }
@@ -89,7 +89,6 @@ void ScenePlatformer::loadLevel(const std::string& filename)
                 {
                     entity = m_entityManager.addEntity("Solid");
                     entity->addComponent<CBody>(m_game->getAssets().getAnimation(animationName).getSize());
-                    
                 }
                 else    // if Prop
                 {
@@ -219,12 +218,12 @@ void ScenePlatformer::sMovement()
             if (input.right && !input.left)
             {
                 // state.isFacingRight = true;           // Used in sAnimation()   
-                transform.velocity.x = 2;
+                transform.velocity.x = m_playerConfig.X_SPEED;
             }
             else if (input.left && !input.right)
             {
                 //state.isFacingRight = false;
-                transform.velocity.x = -2;
+                transform.velocity.x = -m_playerConfig.X_SPEED;
             }
             else
             {
@@ -234,7 +233,7 @@ void ScenePlatformer::sMovement()
             // Jump if on ground and W pressed
             if (input.up && input.canJump)
 			{
-				transform.velocity.y = -3;
+				transform.velocity.y = -m_playerConfig.JUMP_SPEED;
 				input.canJump = false;
 			}
 
@@ -300,17 +299,19 @@ void ScenePlatformer::sCollision()
         // Destroy tile if it has Brick animation
     // TODO: Check to see if player has fallen down hole i.e. y > height
     // TODO: Don't let player walk off left side of map
-    
+
     // If collision in y axis and coming from above, resolve collision, and set y velocity to 0, and set CInput.canJump to true
 
-    for (auto a : m_entityManager.getEntities())
+    EntityVector& entities = m_entityManager.getEntities();
+
+    for (auto a : entities)
     {
         if (!a->hasComponent<CBody>())
         {
             continue;
         }
 
-        for (auto b : m_entityManager.getEntities())
+        for (auto b : entities)
         {
             if (!b->hasComponent<CBody>() || a == b)
             {
@@ -326,7 +327,6 @@ void ScenePlatformer::sCollision()
         }
     }
 }
-
 
 void ScenePlatformer::sAnimation()
 {
@@ -445,7 +445,7 @@ void ScenePlatformer::sRender()
             for (float x = firstVertLineX; x < rightEdgeX; x += m_gridCellSize.x)
             {
                 int gridX = static_cast<int>(x) / m_gridCellSize.x;
-                int gridY = (m_viewSize.y - static_cast<int>(y)) / m_gridCellSize.y;
+                int gridY = (static_cast<int>(m_viewSize.y) - static_cast<int>(y)) / m_gridCellSize.y;
 
                 m_gridText.setString("(" + std::to_string(gridX) + ", " + std::to_string(gridY) + ")");
                 m_gridText.setPosition(x, y - m_gridCellSize.y);

@@ -10,10 +10,9 @@ class ScenePlatformer : public Scene
 {
     struct PlayerConfig
     {
-        float X, Y, BB_WIDTH, BB_HEIGHT, X_SPEED, MAX_SPEED, JUMP_SPEED, GRAVITY;
-        std::string WEAPON;
+        float X = 0.0f, Y = 0.0f, BB_WIDTH = 1.0f, BB_HEIGHT = 1.0f, X_SPEED = 0.0f, JUMP_SPEED = 0.0f, MAX_SPEED = 10.0f, GRAVITY = 2.0f;
+        std::string WEAPON = "NONE";
     };
-
 
 public:
     ScenePlatformer(GameEngine* game, const std::string& levelPath);
@@ -30,7 +29,7 @@ private:
     std::shared_ptr<Entity> m_player;
     PlayerConfig m_playerConfig;
     EntityManager m_entityManager;
-    sf::Vector2f m_viewSize{320.f, 180.f};          // Was 320.f, 180.f on Mac, 384.f, 216.f on PC
+    sf::Vector2f m_viewSize{384.f, 216.f};          // Was 320.f, 180.f on Mac, 384.f, 216.f on PC
     const Vec2i m_gridCellSize{16, 16};
     sf::Text m_gridText;
     bool m_drawBoundingBoxes = false;

@@ -65,7 +65,7 @@ public:
         : mass(1.f) {}
     
     CBody(Vec2f size, float mass = 1.f)
-        : bBox(size)
+        : bBox(size), mass(mass)
     {
         if (mass < 0.001f) { std::cout << "Mass is negative or zero." << std::endl; }
         if (mass > 1.f) { std::cout << "Mass is greater than 1." << std::endl; }
@@ -109,13 +109,14 @@ public:
 class CState : public Component
 {
 public:
-    PlayerState currentState = PlayerState::Standing;
+    PlayerState currentState;
     PlayerState previousState;
     bool isFacingRight = false;
 
-    CState() {}
+    CState()
+        : currentState(PlayerState::Standing), previousState(PlayerState::Standing) {}
     CState(PlayerState state)
-        : currentState(state) {}
+        : currentState(state), previousState(PlayerState::Standing) {}
 };
 
 class CAnimation : public Component     // For textures and animations
@@ -132,7 +133,7 @@ public:
 class CGravity : public Component
 {
 public:
-    float acceleration = 9.8;
+    float acceleration = 9.8f;
 
     CGravity() {}
     CGravity(float accel)

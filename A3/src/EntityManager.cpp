@@ -35,11 +35,11 @@ std::shared_ptr<Entity> EntityManager::addEntity(const std::string& tag)
     return entity;   
 }
 
-const EntityVector& EntityManager::getEntities() { return m_entities; }
+EntityVector& EntityManager::getEntities() { return m_entities; }
 
-const EntityVector& EntityManager::getEntities(const std::string& tag) { return m_entityMap[tag]; }
+EntityVector& EntityManager::getEntities(const std::string& tag) { return m_entityMap[tag]; }
 
-const std::map<std::string, EntityVector>& EntityManager::getEntityMap() { return m_entityMap; }
+const std::unordered_map<std::string, EntityVector>& EntityManager::getEntityMap() { return m_entityMap; }
 
 
 void EntityManager::removeDeadEntities(EntityVector& vector)
