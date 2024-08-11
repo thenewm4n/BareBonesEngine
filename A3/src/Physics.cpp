@@ -83,6 +83,8 @@ namespace
 
     void movePlayer(std::shared_ptr<Entity> player, std::shared_ptr<Entity> object, bool isXDirection)
     {
+        // !!! the y positions of player and object need to be windowSize.y - position.y
+
         float& posPlayer = isXDirection ? player->getComponent<CTransform>().position.x : player->getComponent<CTransform>().position.y;
         float& posObject = isXDirection ? object->getComponent<CTransform>().position.x : object->getComponent<CTransform>().position.y;
         float overlap = isXDirection ? Physics::getOverlap(player, object).x : Physics::getOverlap(player, object).y;
