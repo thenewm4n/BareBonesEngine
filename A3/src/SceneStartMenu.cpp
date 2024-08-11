@@ -3,7 +3,7 @@
 #include "ScenePlatformer.h"
 
 SceneStartMenu::SceneStartMenu(GameEngine* gameEngine)
-    : Scene(gameEngine), m_title("Platformer"), m_menuStrings({ "Level 1", "Level 2", "Level 3" }), m_levelPaths({"level_1.txt"})
+    : Scene(gameEngine), m_title("Platformer"), m_menuStrings({ "Level 1", "Level 2", "Level 3" }), m_levelPaths({"bin/level_1.txt"})
 {
     init();
 }

@@ -7,14 +7,15 @@
 #include "Physics.h"
 #include "SceneStartMenu.h"
 
+#include <fstream>
 #include <iostream>
+#include <sstream>
 
 
 ScenePlatformer::ScenePlatformer(GameEngine* game, const std::string& levelPath)
-    : Scene(game),
-    m_levelPath(levelPath)
+    : Scene(game)
 {
-    init(m_levelPath);
+    init(levelPath);
 }
 
 void ScenePlatformer::init(const std::string& levelPath)
@@ -48,42 +49,60 @@ void ScenePlatformer::loadLevel(const std::string& filename)
     // Overwrites previous EntityManager
     m_entityManager = EntityManager();
 
-    // TODO: read in level file and add appropriate entities to entity manager -> will automatically be drawn to screen
-        // Add correct bounding boxes to Tile entities, no bounding boxes to Dec entities
-    // Use playerConfig struct m_playerConfig to store player properties
-    // This struct is defined at top of ScenePlatformer.h
-
-    // NOTE: all of code below is sample code which shows you how to set up and use entities with the new syntax -> should be removed
-
-    // Change PlayerConfig struct according to level.txt, then spawn player with this struct
-    spawnPlayer();
-
-    // some sample entities
-    auto brick = m_entityManager.addEntity("tile");
-    // IMPORTANT: always add CAnimatio component first so gridToMidPixel can compute correctly
-    brick->addComponent<CAnimation>(m_game->getAssets().getAnimation("Brick"), true);
-    // brick->addComponent<CTransform>(Vec2f(96.f, 480.f));
-    brick->addComponent<CTransform>(Vec2f(0.f, 0.f));
-    // NOTE: final code should position entity with grid x,y position read from file:
-    // brick->addComponent<CTransform>(gridToMidPixel(gridX, gridY, brick));
-
-    if (brick->getComponent<CAnimation>().animation.getName() == "Brick")
+    // Can be Player, Block, or Prop
+    std::ifstream levelFile(filename);
+    if (!levelFile.is_open())           // What is going on here?
     {
-        std::cout << "This could be good way of identifying if a tile is a brick" << std::endl;
+        std::cerr << "ScenePlatformer.cpp, Line 60: Error opening level file." << std::endl;
+        exit(-1);
     }
 
-    auto questionMarkBlock = m_entityManager.addEntity("tile");
-    questionMarkBlock->addComponent<CAnimation>(m_game->getAssets().getAnimation("QuestionMark"), true);
-    questionMarkBlock->addComponent<CTransform>(Vec2f(24.f, 24.f));
+    std::string line;
+    std::string token;
 
-    // NOTE - THIS IS IMPORTANT, READ THIS SAMPLE
-        // Components are now returned as references, not pointers.
-        // If you do not specify a reference variable type, it will only copy.
-        //The follow is an example:
-            // auto transform1 = entity->getComponent<CTransform>()
-            // transform one is a copy
-            // auto& transform2 = entity->getComponent<CTransform>()
-            // This is correct
+    while (std::getline(levelFile, line))
+    {
+        // Enables reading of strings separated by whitespace
+        std::istringstream lineStream(line);
+
+        if (lineStream >> token)
+        {
+            if (token == "Player")
+            {
+                // Read values into PlayerConfig struct
+                lineStream >> m_playerConfig.X >> m_playerConfig.Y >> m_playerConfig.BB_WIDTH
+                >> m_playerConfig.BB_HEIGHT >> m_playerConfig.X_SPEED >> m_playerConfig.JUMP_SPEED
+                >> m_playerConfig.MAX_SPEED >> m_playerConfig.GRAVITY >> m_playerConfig.WEAPON;
+                
+                // Spawn player according to PlayerConfig values
+                spawnPlayer();
+            }
+            else
+            {
+                std::string animationName;
+                Vec2f position;
+                std::shared_ptr<Entity> entity;
+
+                lineStream >> animationName >> position.x >> position.y;
+
+                if (token == "Solid")
+                {
+                    entity = m_entityManager.addEntity("Solid");
+                    entity->addComponent<CBody>(m_game->getAssets().getAnimation(animationName).getSize());
+                    
+                }
+                else    // if Prop
+                {
+                    entity = m_entityManager.addEntity("Prop");
+                }
+
+                entity->addComponent<CAnimation>(m_game->getAssets().getAnimation(animationName), true);    // IMPORTANT: add CAnimation first so gridToMidPixel can compute correctly
+                entity->addComponent<CTransform>(gridToMidPixel(position.x, position.y, entity));
+            }
+        }
+    }
+
+    levelFile.close();
 }
 
 void ScenePlatformer::update()
@@ -384,35 +403,20 @@ void ScenePlatformer::sRender()
     window.setView(view);
 
     // Drawing of textures/animations and bounding boxes
-    for (auto entity : m_entityManager.getEntities())
+    EntityVector& entities = m_entityManager.getEntities();
+    for (auto entity : entities)    // Entity shared ptrs
     {
-        // Draw Entity textures/animations
-        if (m_drawTextures && entity->hasComponent<CAnimation>())
-        {
-            auto& transform = entity->getComponent<CTransform>();
-            auto& animationSprite = entity->getComponent<CAnimation>().animation.getSprite();
-            animationSprite.setPosition(transform.position.x, transform.position.y);
-            animationSprite.setScale(transform.scale.x, transform.scale.y);
-            animationSprite.setRotation(transform.angle);
-            window.draw(animationSprite);
-        }
-
-        // Draw Entity bounding boxes
-        if (m_drawBoundingBoxes && entity->hasComponent<CBody>())
-        {
-            auto& bBox = entity->getComponent<CBody>().bBox;
-            auto& transform = entity->getComponent<CTransform>();
-            
-            sf::RectangleShape rectangle;
-            rectangle.setSize(sf::Vector2f(bBox.size.x - 1, bBox.size.y - 1));  // Only takes sf::Vector2f
-            rectangle.setOrigin(bBox.size.x / 2.f, bBox.size.y / 2.f);
-            rectangle.setPosition(transform.position.x, transform.position.y);      
-            rectangle.setFillColor(sf::Color(0, 0, 0, 0));                  // Sets alpha of fill colour to 0 i.e. transparent
-            rectangle.setOutlineColor(sf::Color(255, 255, 255, 255));       // Sets alpha of outline to 255 i.e. opaque
-            rectangle.setOutlineThickness(1);
-            window.draw(rectangle);
-        }
+        renderEntity(entity);
     }
+
+    // Find and re-render player last, if it exists
+    auto playerIterator = std::find_if(entities.begin(), entities.end(), [](std::shared_ptr<Entity> e) {
+        return e->getTag() == "Player"; 
+    });
+    if (playerIterator != entities.end())
+    {
+        renderEntity(*playerIterator);
+    } 
 
     // Draw grid for debugging
     if (m_drawGrid)
@@ -460,7 +464,7 @@ void ScenePlatformer::spawnPlayer()
     // Read player config from level file and spawn player (this is where player should restart after death)
 
     // sample player entity which you can use to construct other entities
-    m_player = m_entityManager.addEntity("player");
+    m_player = m_entityManager.addEntity("Player");
     
     Animation standAnim = m_game->getAssets().getAnimation("Stand");
     m_player->addComponent<CAnimation>(standAnim, true);
@@ -469,7 +473,7 @@ void ScenePlatformer::spawnPlayer()
     m_player->addComponent<CTransform>(gridToMidPixel(1.f, 1.f, m_player));
     
     const Vec2f& spriteSize = standAnim.getSize();
-    m_player->addComponent<CBody>(CBoundingBox(Vec2f(spriteSize.x, spriteSize.y)), 1.f);
+    m_player->addComponent<CBody>(Vec2f(spriteSize.x, spriteSize.y), 1.f);
 
     m_player->addComponent<CGravity>(0.1f);
     
@@ -486,7 +490,7 @@ Vec2f ScenePlatformer::gridToMidPixel(float gridPositionX, float gridPositionY, 
 {
     if (!entity->hasComponent<CAnimation>())
     {
-        std::cerr << "ScenePlatformer.cpp, Line 419: entity has no CAnimation." << std::endl;
+        std::cerr << "ScenePlatformer.cpp: entity has no CAnimation." << std::endl;
         return Vec2f(0.f, 0.f);
     }
 
@@ -496,4 +500,34 @@ Vec2f ScenePlatformer::gridToMidPixel(float gridPositionX, float gridPositionY, 
     float y = m_viewSize.y - (gridPositionY * m_gridCellSize.y) - spriteSize.y / 2.f;
         
     return Vec2f(x, y);
+}
+
+void ScenePlatformer::renderEntity(std::shared_ptr<Entity> e)
+{
+    // Draw Entity textures/animations
+    if (m_drawTextures && e->hasComponent<CAnimation>())
+    {
+        auto& transform = e->getComponent<CTransform>();
+        auto& animationSprite = e->getComponent<CAnimation>().animation.getSprite();
+        animationSprite.setPosition(transform.position.x, transform.position.y);
+        animationSprite.setScale(transform.scale.x, transform.scale.y);
+        animationSprite.setRotation(transform.angle);
+        m_game->getWindow().draw(animationSprite);
+    }
+
+    // Draw Entity bounding boxes
+    if (m_drawBoundingBoxes && e->hasComponent<CBody>())
+    {
+        auto& bBox = e->getComponent<CBody>().bBox;
+        auto& transform = e->getComponent<CTransform>();
+        
+        sf::RectangleShape rectangle;
+        rectangle.setSize(sf::Vector2f(bBox.size.x - 1, bBox.size.y - 1));  // Only takes sf::Vector2f
+        rectangle.setOrigin(bBox.size.x / 2.f, bBox.size.y / 2.f);
+        rectangle.setPosition(transform.position.x, transform.position.y);      
+        rectangle.setFillColor(sf::Color(0, 0, 0, 0));                  // Sets alpha of fill colour to 0 i.e. transparent
+        rectangle.setOutlineColor(sf::Color(255, 255, 255, 255));       // Sets alpha of outline to 255 i.e. opaque
+        rectangle.setOutlineThickness(1);
+        m_game->getWindow().draw(rectangle);
+    }
 }

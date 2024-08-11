@@ -44,31 +44,41 @@ public:
         : size(size) {}
 };
 
+class CBoundingCircle : public Component
+{
+public:
+    float radius = 0.f;
+
+    CBoundingCircle() {}
+    CBoundingCircle(float rad)
+        : radius(rad) {}
+};
+
 class CBody : public Component
 {
 public:
     CBoundingBox bBox;
+    // CBoundingCircle bCircle;
     float mass;         // 0 < mass <= 1
 
     CBody()
         : mass(1.f) {}
     
-    CBody(CBoundingBox box, float mass = 1.f)
-        : bBox(box)
+    CBody(Vec2f size, float mass = 1.f)
+        : bBox(size)
     {
         if (mass < 0.001f) { std::cout << "Mass is negative or zero." << std::endl; }
         if (mass > 1.f) { std::cout << "Mass is greater than 1." << std::endl; }
     }
-};
-
-class CCollision : public Component
-{
-public:
-    float radius = 0.f;
-
-    CCollision() {}
-    CCollision(float rad)
-        : radius(rad) {}
+    
+    /*
+    CBody(float radius, float mass = 1.f)
+        : bCircle(radius)
+    {
+        if (mass < 0.001f) { std::cout << "Mass is negative or zero." << std::endl; }
+        if (mass > 1.f) { std::cout << "Mass is greater than 1." << std::endl; }
+    }
+    */
 };
 
 class CLifespan : public Component

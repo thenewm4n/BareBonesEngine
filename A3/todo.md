@@ -13,8 +13,7 @@
 - ScenePlatformer::sRender()/sUserInput - fix colour change of pausing
     - Also, can still toggle textures etc when paused -> probably because sDoAction is still called when paused?
 - Scene::setPaused() - is it necessary? Maybe, in order to stop sDoAction() when toggling textures etc while paused.
-- Run animation displays weirdly sometimes.
-    - Only when running in first half of view width of world.
+- Fix jittery camera when moving.
 
 # Recommended order of implementation
 1. Implement Scene_Play::loadLevel()

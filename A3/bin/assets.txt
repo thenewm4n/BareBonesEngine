@@ -20,9 +20,9 @@ Animation Air TexAir 1 1
 Animation Shoot TexShoot 1 1
 Animation Explosion TexExplosion 8 20
 Animation Coin TexCoin 4 5
-Animation QuestionMark TexQMark 5 8
+Animation QMark TexQMark 5 8
 Animation Brick TexBrick 1 1
-Animation QuestionMarkDead TexQMarkDead 1 1
+Animation QMarkDead TexQMarkDead 1 1
 Animation Pipe TexPipe 1 1
 Animation Cloud TexCloud 1 1
 Animation Bush TexBush 1 1

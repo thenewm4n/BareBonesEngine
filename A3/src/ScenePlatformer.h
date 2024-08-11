@@ -27,7 +27,6 @@ private:
         {PlayerState::Shooting, "Shoot"}
     };
 
-    std::string m_levelPath;
     std::shared_ptr<Entity> m_player;
     PlayerConfig m_playerConfig;
     EntityManager m_entityManager;
@@ -54,4 +53,5 @@ private:
     void spawnBullet(std::shared_ptr<Entity> entity);
     
     Vec2f gridToMidPixel(float gridPositionX, float gridPositionY, std::shared_ptr<Entity> entity);
+    void renderEntity(std::shared_ptr<Entity> e);
 };
