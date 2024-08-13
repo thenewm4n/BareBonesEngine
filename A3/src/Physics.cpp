@@ -13,8 +13,8 @@ namespace
             const auto& transformA = a->getComponent<CTransform>();
             const auto& transformB = b->getComponent<CTransform>();
 
-            const Vec2f& positionA = usePrevious ? aTransform.previousPosition : aTransform.position;
-            const Vec2f& positionB = usePrevious ? bTransform.previousPosition : bTransform.position;
+            const Vec2f& positionA = usePrevious ? transformA.previousPosition : transformA.position;
+            const Vec2f& positionB = usePrevious ? transformB.previousPosition : transformB.position;
             
             const Vec2f halfSizeA = a->getComponent<CBody>().bBox.size / 2.f;
             const Vec2f halfSizeB = b->getComponent<CBody>().bBox.size / 2.f;
@@ -30,6 +30,7 @@ namespace
             return overlap;
         }
 
+        std::cerr << "Physics.cpp: one or both entities lack a CBody or CTransform." << std::endl;
         return Vec2f(0.f, 0.f);
     }
 
@@ -134,12 +135,17 @@ namespace Physics
 
     void resolveCollision(std::shared_ptr<Entity> player, std::shared_ptr<Entity> object)
     {
-        Vec2f previousOverlap = Physics::getPreviousOverlap(a, b);
-        
         // This function is only called there's overlap in both x and y directions;
         // if previous x overlap is negative, x overlap is new
-        bool isXDirection = previousOverlap.x < 0;
 
-        moveEntity(a, b, isXDirection);
+        const Vec2f currentOverlap = Physics::getOverlap(player, object);
+        const Vec2f previousOverlap = Physics::getPreviousOverlap(player, object);
+        std::cout << "Current overlap: " << currentOverlap.x << " " << currentOverlap.y << std::endl;
+        std::cout << "Previous overlap: " << previousOverlap.x << " " << previousOverlap.y << std::endl;
+
+        bool isXDirection = previousOverlap.x < 0;
+        std::cout << "Collision is in X direction: " << isXDirection << std::endl;
+
+        movePlayer(player, object, isXDirection);
     }
 }

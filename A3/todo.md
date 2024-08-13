@@ -1,4 +1,6 @@
 # Next:
+- Collision is not being detected as being in X direction -> I think previousOverlap is wrong
+    - Previous and current Y overlap should be identical!
 - resolveCollision(), line 88 - !!! the y positions of player and object need to be windowSize.y - position.y
 
 
