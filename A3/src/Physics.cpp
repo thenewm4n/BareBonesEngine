@@ -10,11 +10,13 @@ namespace
     {
         if (a->hasComponent<CBody>() && b->hasComponent<CBody>() && a->hasComponent<CTransform>() && b->hasComponent<CTransform>())
         {
-            const auto& transformA = a->getComponent<CTransform>();
-            const auto& transformB = b->getComponent<CTransform>();
+            std::cout << "A current position: " << a->getComponent<CTransform>().position.x << " " << a->getComponent<CTransform>().position.y << std::endl;
+            std::cout << "A previous position: " << a->getComponent<CTransform>().previousPosition.x << " " << a->getComponent<CTransform>().previousPosition.y << std::endl;
+            std::cout << "B current position: " << b->getComponent<CTransform>().position.x << " " << b->getComponent<CTransform>().position.y << std::endl;
+            std::cout << "B previous position: " << b->getComponent<CTransform>().previousPosition.x << " " << b->getComponent<CTransform>().previousPosition.y << std::endl;
 
-            const Vec2f& positionA = usePrevious ? transformA.previousPosition : transformA.position;
-            const Vec2f& positionB = usePrevious ? transformB.previousPosition : transformB.position;
+            const Vec2f positionA = usePrevious ? a->getComponent<CTransform>().previousPosition : a->getComponent<CTransform>().position;
+            const Vec2f positionB = usePrevious ? b->getComponent<CTransform>().previousPosition : b->getComponent<CTransform>().position;
             
             const Vec2f halfSizeA = a->getComponent<CBody>().bBox.size / 2.f;
             const Vec2f halfSizeB = b->getComponent<CBody>().bBox.size / 2.f;

@@ -1,7 +1,9 @@
 # Next:
-- Collision is not being detected as being in X direction -> I think previousOverlap is wrong
+- Does entity->addComponent() have a point?! Does the ComponentTuple m_components instantiate all the components automatically?
+- previousOverlap is wrong
     - Previous and current Y overlap should be identical!
 - resolveCollision(), line 88 - !!! the y positions of player and object need to be windowSize.y - position.y
+- I think the collision resolution is always in the y direction, pushing player down
 
 
 # To complete
@@ -9,8 +11,6 @@
     - Implement max speed cap
     - Implement collision resolution
     - Then, uncomment gravity in sMovement()
-- ScenePlatformer::spawnPlayer()
-    - Are there more components to add to player?
 - ScenePlatformer::sDoAction(): including change state of player so that Animation changes.
 - ScenePlatformer::sCollision()
 	- Bullet tile collisions.

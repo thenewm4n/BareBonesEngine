@@ -45,6 +45,12 @@ public:
     }
 
     template <typename T>
+    const T& getComponent() const
+    {
+        return std::get<T>(m_components);
+    }
+
+    template <typename T>
     bool hasComponent()
     {
         return getComponent<T>().has;

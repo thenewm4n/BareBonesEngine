@@ -217,12 +217,10 @@ void ScenePlatformer::sMovement()
             // Change velocity and animation direction according to input
             if (input.right && !input.left)
             {
-                // state.isFacingRight = true;           // Used in sAnimation()   
                 transform.velocity.x = m_playerConfig.X_SPEED;
             }
             else if (input.left && !input.right)
             {
-                //state.isFacingRight = false;
                 transform.velocity.x = -m_playerConfig.X_SPEED;
             }
             else
@@ -282,6 +280,7 @@ void ScenePlatformer::sMovement()
         */
 
         // Update Entity's position according to velocity
+        transform.previousPosition = transform.position;
         transform.position += transform.velocity;
     }
 }
@@ -461,23 +460,15 @@ void ScenePlatformer::sRender()
 
 void ScenePlatformer::spawnPlayer()
 {
-    // Read player config from level file and spawn player (this is where player should restart after death)
-
-    // sample player entity which you can use to construct other entities
+    // Add Player entity and add components according to playerConfig struct
     m_player = m_entityManager.addEntity("Player");
     
-    Animation standAnim = m_game->getAssets().getAnimation("Stand");
-    m_player->addComponent<CAnimation>(standAnim, true);
-
-    // Adding CTransform must follow adding CAnimation because gridToMidPixel uses CAnimation
-    m_player->addComponent<CTransform>(gridToMidPixel(1.f, 1.f, m_player));
-    
-    const Vec2f& spriteSize = standAnim.getSize();
-    m_player->addComponent<CBody>(Vec2f(spriteSize.x, spriteSize.y), 1.f);
-
-    m_player->addComponent<CGravity>(0.1f);
-    
-    // TODO: add remaining components to player
+    m_player->addComponent<CInput>();   // This isn't necessary due to the ComponentTuple...
+    m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("Stand"), true);
+    m_player->addComponent<CTransform>(gridToMidPixel(m_playerConfig.X, m_playerConfig.Y, m_player));       // Adding CTransform must follow adding CAnimation because gridToMidPixel uses CAnimation
+    m_player->addComponent<CBody>(Vec2f(m_playerConfig.BB_WIDTH, m_playerConfig.BB_HEIGHT), 1.f);
+    m_player->addComponent<CGravity>(m_playerConfig.GRAVITY);
+    m_player->addComponent<CState>();
 }
 
 void ScenePlatformer::spawnBullet(std::shared_ptr<Entity> entity)
