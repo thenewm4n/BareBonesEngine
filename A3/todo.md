@@ -1,16 +1,23 @@
 # Next:
-- Does entity->addComponent() have a point?! Does the ComponentTuple m_components instantiate all the components automatically?
-- previousOverlap is wrong
-    - Previous and current Y overlap should be identical!
+- What is wrong with Animation constructors? What can I use as m_sprite default parameter?
+- Collision resolution is always in y direction
+    - previousOverlap is wrong
+        - Previous and current Y overlap should be identical!
 - resolveCollision(), line 88 - !!! the y positions of player and object need to be windowSize.y - position.y
-- I think the collision resolution is always in the y direction, pushing player down
+
 
 
 # To complete
+- Clean up Animation.h and Animation.cpp
+- Where are animations flipped if change in direction?
 - ScenePlatformer::sMovement() (??? remember that player Y speed is positive in level_1.txt, so must be negated in code)
-    - Implement max speed cap
     - Implement collision resolution
     - Then, uncomment gravity in sMovement()
+    - After jumping...
+        - Maybe velocity.y isn't reset to 0, and remains positive?
+            - I think canJump isn't reset to true -> cannot jump again
+            - Falling animation remains.
+        - (!!!) Upon landing (i.e. player collides with tile from above), velocity.y should be set to 0
 - ScenePlatformer::sDoAction(): including change state of player so that Animation changes.
 - ScenePlatformer::sCollision()
 	- Bullet tile collisions.

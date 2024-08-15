@@ -35,7 +35,7 @@ public:
     template <typename T>
     void removeComponent()
     {
-        getComponent<T>() = T();
+		getComponent<T>() = T();                            // component.has set to false
     }
 
     template <typename T>

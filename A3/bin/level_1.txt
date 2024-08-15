@@ -1,4 +1,4 @@
-Player 2 1 24 24 2.5 3 5 0.5 Bullet 
+Player 2 1 24 24 2.5 5 5 0.3 Bullet 
 Solid Ground 0 0
 Solid Ground 1 0
 Solid Ground 2 0

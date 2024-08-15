@@ -20,7 +20,6 @@ ScenePlatformer::ScenePlatformer(GameEngine* game, const std::string& levelPath)
 
 void ScenePlatformer::init(const std::string& levelPath)
 {
-
     registerAction(sf::Keyboard::P, "PAUSE");
     registerAction(sf::Keyboard::Escape, "QUIT");
     registerAction(sf::Keyboard::T, "TOGGLE_TEXTURES");
@@ -132,6 +131,32 @@ void ScenePlatformer::sDoAction(const Action& action)
 
     if (action.getType() == "START")
     {
+        if (m_player->hasComponent<CInput>())
+        {
+            // Handle player input and return early to decrease latency
+            if (actionName == "UP")
+            {
+                m_player->getComponent<CInput>().up = true;
+                return;
+            }
+            else if (actionName == "DOWN")
+            {
+                m_player->getComponent<CInput>().down = true;
+                return;
+            }
+            else if (actionName == "LEFT")
+            {
+                m_player->getComponent<CInput>().left = true;
+                return;
+            }
+            else if (actionName == "RIGHT")
+            {
+                m_player->getComponent<CInput>().right = true;
+                return;
+            }
+        }
+
+        // Toggle toggle actions
         if (actionName == "TOGGLE_TEXTURES")
         {
             m_drawTextures = !m_drawTextures;
@@ -152,22 +177,7 @@ void ScenePlatformer::sDoAction(const Action& action)
         {
             endScene();
         }
-        else if (actionName == "UP")
-        {
-            m_player->getComponent<CInput>().up = true;
-        }
-        else if (actionName == "DOWN")
-        {
-            m_player->getComponent<CInput>().down = true;
-        }
-        else if (actionName == "LEFT")
-        {
-            m_player->getComponent<CInput>().left = true;
-        }
-        else if (actionName == "RIGHT")
-        {
-            m_player->getComponent<CInput>().right = true;
-        }
+        // Handle view manipulation actions
         else if (actionName == "ZOOM_IN")
         {
             m_viewSize.y -= 20;
@@ -181,21 +191,24 @@ void ScenePlatformer::sDoAction(const Action& action)
     }
     else if (action.getType() == "END")
     {
-        if (actionName == "UP")
+        if (m_player->hasComponent<CInput>())
         {
-            m_player->getComponent<CInput>().up = false;
-        }
-        else if (actionName == "DOWN")
-        {
-            m_player->getComponent<CInput>().down = false;
-        }
-        else if (actionName == "LEFT")
-        {
-            m_player->getComponent<CInput>().left = false;
-        }
-        else if (actionName == "RIGHT")
-        {
-            m_player->getComponent<CInput>().right = false;
+            if (actionName == "UP")
+            {
+                m_player->getComponent<CInput>().up = false;
+            }
+            else if (actionName == "DOWN")
+            {
+                m_player->getComponent<CInput>().down = false;
+            }
+            else if (actionName == "LEFT")
+            {
+                m_player->getComponent<CInput>().left = false;
+            }
+            else if (actionName == "RIGHT")
+            {
+                m_player->getComponent<CInput>().right = false;
+            }
         }
     }
 }
@@ -262,22 +275,15 @@ void ScenePlatformer::sMovement()
             }
         }
 
+		// Apply gravity if Entity has CGravity
         if (entity->hasComponent<CGravity>())
 		{
-	        // transform.velocity.y += entity->getComponent<CGravity>().acceleration;
+	        transform.velocity.y += entity->getComponent<CGravity>().acceleration;
 		}
 
-        /*
-        // Should cap velocity in all directions to ensure no moving throughfloors     DOESN'T WORK
-        if (transform.velocity.y > m_playerConfig.MAX_SPEED)
-        {
-            transform.velocity.y = m_playerConfig.MAX_SPEED;
-        }
-        if (transform.velocity.x > m_playerConfig.MAX_SPEED)
-        {
-           transform.velocity.x = m_playerConfig.MAX_SPEED;
-        }
-        */
+        // Cap velocity in both directions; necessary in y direction to ensure no moving through floor
+        transform.velocity.x = std::min(transform.velocity.x, m_playerConfig.MAX_SPEED);
+        transform.velocity.y = std::min(transform.velocity.y, m_playerConfig.MAX_SPEED);
 
         // Update Entity's position according to velocity
         transform.previousPosition = transform.position;
@@ -303,14 +309,14 @@ void ScenePlatformer::sCollision()
 
     EntityVector& entities = m_entityManager.getEntities();
 
-    for (auto a : entities)
+    for (std::shared_ptr<Entity> a : entities)
     {
         if (!a->hasComponent<CBody>())
         {
             continue;
         }
 
-        for (auto b : entities)
+        for (std::shared_ptr<Entity> b : entities)
         {
             if (!b->hasComponent<CBody>() || a == b)
             {
@@ -412,6 +418,7 @@ void ScenePlatformer::sRender()
     auto playerIterator = std::find_if(entities.begin(), entities.end(), [](std::shared_ptr<Entity> e) {
         return e->getTag() == "Player"; 
     });
+
     if (playerIterator != entities.end())
     {
         renderEntity(*playerIterator);
@@ -463,7 +470,7 @@ void ScenePlatformer::spawnPlayer()
     // Add Player entity and add components according to playerConfig struct
     m_player = m_entityManager.addEntity("Player");
     
-    m_player->addComponent<CInput>();   // This isn't necessary due to the ComponentTuple...
+    m_player->addComponent<CInput>();
     m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("Stand"), true);
     m_player->addComponent<CTransform>(gridToMidPixel(m_playerConfig.X, m_playerConfig.Y, m_player));       // Adding CTransform must follow adding CAnimation because gridToMidPixel uses CAnimation
     m_player->addComponent<CBody>(Vec2f(m_playerConfig.BB_WIDTH, m_playerConfig.BB_HEIGHT), 1.f);
