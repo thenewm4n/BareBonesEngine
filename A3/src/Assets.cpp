@@ -36,7 +36,7 @@ void Assets::loadFromFile(const std::string& assetsFilePath)
 
                 lineStream >> animationName >> textureName >> framesInAnimation >> frameDuration;
 
-                m_animationMap[animationName] = Animation(animationName, m_textureMap[textureName], framesInAnimation, frameDuration);
+                m_animationMap[animationName] = Animation(m_textureMap[textureName], animationName, framesInAnimation, frameDuration);
             }
             else if (firstElement == "Font")
             {

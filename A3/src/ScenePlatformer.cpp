@@ -215,8 +215,6 @@ void ScenePlatformer::sDoAction(const Action& action)
 
 void ScenePlatformer::sMovement()
 {
-    // TODO: Implement max player speed in both X and Y directions
-
     // For each entity in scene, handle movement according to entity's velocity
     for (auto entity : m_entityManager.getEntities())
     {
@@ -253,15 +251,12 @@ void ScenePlatformer::sMovement()
             {
                 state.currentState = PlayerState::Running;
 
-                bool movingLeftMismatch = transform.velocity.x < 0 && transform.scale.x < 0 ? true : false;
-                bool movingRightMismatch = transform.velocity.x > 0 && transform.scale.x > 0 ? true : false;
-
-                // Change direction animation faces depending on velocity
-                if (movingLeftMismatch || movingRightMismatch)           // if moving right while animation looks left or moving left while animations looks right
+                 // Flip animation in X direction if mismatch between velocity and orientation of animation in X
+                if ((transform.velocity.x < 0 && transform.scale.x < 0) ||
+                    (transform.velocity.x > 0 && transform.scale.x > 0))
                 {
-                    transform.scale.x *= -1;                    // flip animation in x direction
+                    transform.scale.x *= -1;
                 }
-
             }
             else
             {

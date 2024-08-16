@@ -1,15 +1,11 @@
 # Next:
-- What is wrong with Animation constructors? What can I use as m_sprite default parameter?
 - Collision resolution is always in y direction
     - previousOverlap is wrong
         - Previous and current Y overlap should be identical!
 - resolveCollision(), line 88 - !!! the y positions of player and object need to be windowSize.y - position.y
 
 
-
 # To complete
-- Clean up Animation.h and Animation.cpp
-- Where are animations flipped if change in direction?
 - ScenePlatformer::sMovement() (??? remember that player Y speed is positive in level_1.txt, so must be negated in code)
     - Implement collision resolution
     - Then, uncomment gravity in sMovement()

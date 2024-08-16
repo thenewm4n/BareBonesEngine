@@ -4,7 +4,7 @@
 
 Animation::Animation() : m_name("NONE"), m_size(Vec2f(1.f, 1.f)), m_frameCount(1), m_frameDuration(1) {}
 
-Animation::Animation(const std::string& animationName = "NONE", const sf::Texture& tex, int frameCount = 1, int frameDuration = 1)
+Animation::Animation(const sf::Texture& tex, const std::string& animationName, int frameCount, int frameDuration)
     : m_name(animationName),
     m_sprite(tex),
     m_frameCount(frameCount),
@@ -49,11 +49,6 @@ bool Animation::hasEnded() const
     }
 
     return false;
-}
-
-bool Animation::isFlipped() const
-{
-    return m_flippedX;
 }
 
 const std::string& Animation::getName() const { return m_name; }
