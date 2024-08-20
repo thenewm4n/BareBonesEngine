@@ -1,11 +1,13 @@
 # Next:
+- MAYBE THIS IS THE MAIN PROBLEM! -> resolveCollision(), line 88 - !!! the y positions of player and object need to be windowSize.y - position.y
 - Collision resolution is always in y direction
-    - previousOverlap is wrong
+    - is previousOverlap is wrong? Collision in X direction is detected correctly....
         - Previous and current Y overlap should be identical!
-- resolveCollision(), line 88 - !!! the y positions of player and object need to be windowSize.y - position.y
 
 
 # To complete
+- Physics.cpp (& Physics.h?)
+    - If collision from below, set y velocity to 0
 - ScenePlatformer::sMovement() (??? remember that player Y speed is positive in level_1.txt, so must be negated in code)
     - Implement collision resolution
     - Then, uncomment gravity in sMovement()
@@ -20,7 +22,6 @@
     - Detect if fallen down hole.
     - Detect if off screen to left.
 - Bullet animation: get bullet sprite
-- Physics.h
 - Text for SceneStartMenu - levels, controls legend at bottom
 - ScenePlatformer::sRender()/sUserInput - fix colour change of pausing
     - Also, can still toggle textures etc when paused -> probably because sDoAction is still called when paused?

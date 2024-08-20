@@ -144,11 +144,22 @@ namespace Physics
 
         const Vec2f currentOverlap = Physics::getOverlap(player, object);
         const Vec2f previousOverlap = Physics::getPreviousOverlap(player, object);
-        std::cout << "Current overlap: " << currentOverlap.x << " " << currentOverlap.y << std::endl;
-        std::cout << "Previous overlap: " << previousOverlap.x << " " << previousOverlap.y << std::endl;
 
         bool isXDirection = previousOverlap.x < 0;
-        std::cout << "Collision is in X direction: " << isXDirection << std::endl;
+        if (isXDirection)
+        {
+            std::cout << "Collision is in X direction" << std::endl;
+        }
+
+        // If player's previous position was less (i.e. closer to top of screen), collision from above
+        bool isFromAbove = player->getComponent<CTransform>().previousPosition.y < object->getComponent<CTransform>().previousPosition.y;
+        
+        // If collision is in y direction and is from above, reset player y velocity (sets player animation to standing) and allow jumping
+        if (!isXDirection && isFromAbove)
+        {
+            player->getComponent<CTransform>().velocity.y = 0.f;
+            player->getComponent<CInput>().canJump = true;
+        }
 
         movePlayer(player, object, isXDirection);
     }

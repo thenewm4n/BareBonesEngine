@@ -125,6 +125,20 @@ public:
         : currentState(PlayerState::Standing) {}
     CState(PlayerState state)
         : currentState(state) {}
+
+    std::string toString(bool usePrevious)
+    {
+        PlayerState state = usePrevious ? previousState : currentState;
+
+        switch (state)
+        {
+            case PlayerState::Running: return "Running";
+            case PlayerState::Standing: return "Standing";
+            case PlayerState::InAir: return "InAir";
+            case PlayerState::Shooting: return "Shooting";
+            default: return "Unknown";
+        }
+    }
 };
 
 class CAnimation : public Component     // For textures and animations
