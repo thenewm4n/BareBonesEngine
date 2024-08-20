@@ -268,12 +268,7 @@ void ScenePlatformer::sMovement()
             {
                 state.currentState = PlayerState::InAir;
             }
-
-            std::cout << "Current player state: " << state.toString(false) << std::endl;
-            std::cout << "Current player velocity: " << transform.velocity.x << ' ' << transform.velocity.y << std::endl;
         }
-
-        
 
 		// Apply gravity if Entity has CGravity
         if (entity->hasComponent<CGravity>())
