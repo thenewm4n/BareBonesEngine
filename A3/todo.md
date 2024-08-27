@@ -1,11 +1,14 @@
 # Next:
-- MAYBE THIS IS THE MAIN PROBLEM! -> resolveCollision(), line 88 - !!! the y positions of player and object need to be windowSize.y - position.y
+- The Problem: Even when the collision is in the X direction, it gets resolved in the y direction (hence why pushed below ground, because centre of player is below half of pipe)
+    - Maybe the resolution in X direction isn't enough to push the player out of the object, and then there is a y collision...
+    - Maybe look at Physics.cpp, line 110?
 - Collision resolution is always in y direction
-    - is previousOverlap is wrong? Collision in X direction is detected correctly....
-        - Previous and current Y overlap should be identical!
+    - Is previousOverlap wrong? Collision in X direction is detected correctly....
+        - Are previous and current y overlap identical?
 
 
 # To complete
+- Change ?sRender()/sMovement() in ScenePlatformer.cpp to make windowHeight - position.y to be the position of the entity?
 - Physics.cpp (& Physics.h?)
     - If collision from below, set y velocity to 0
 - ScenePlatformer::sMovement() (??? remember that player Y speed is positive in level_1.txt, so must be negated in code)

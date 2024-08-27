@@ -94,11 +94,26 @@ namespace
         float& posObject = isXDirection ? object->getComponent<CTransform>().position.x : object->getComponent<CTransform>().position.y;
         float overlap = isXDirection ? Physics::getOverlap(player, object).x : Physics::getOverlap(player, object).y;
 
+        if (isXDirection)
+        {
+            std::cout << "!X COLLISION!" << std::endl;
+            std::cout << "Actual player position: " << player->getComponent<CTransform>().position.x << ' ' << player->getComponent<CTransform>().position.y << std::endl;
+            std::cout << "Actual object position: " << object->getComponent<CTransform>().position.x << ' ' << object->getComponent<CTransform>().position.y << std::endl;
+            std::cout << "Calculated player position: " << posPlayer << std::endl;
+            std::cout << "Calculated object position: " << posObject << std::endl;
+        }
+
         // Calculate direction
         int direction = posPlayer > posObject ? 1 : -1;
 
         // Move the player in correct direction
         posPlayer += direction * overlap;
+
+        if (isXDirection)
+        {
+            std::cout << "New actual player position: " << player->getComponent<CTransform>().position.x << ' ' << player->getComponent<CTransform>().position.y << std::endl;
+            std::cout << "New calculated player position X: " << posPlayer << std::endl;
+        }
     }
 }
 
@@ -146,19 +161,29 @@ namespace Physics
         const Vec2f previousOverlap = Physics::getPreviousOverlap(player, object);
 
         bool isXDirection = previousOverlap.x < 0;
-        if (isXDirection)
+
+        // If collision in y direction, set velocity to 0 and handle according to direction
+        if (!isXDirection)
+        {
+            // Whether collision from above or below, set y velocity to 0
+            player->getComponent<CTransform>().velocity.y = 0.f;
+
+            // If player's previous position was less (i.e. closer to top of screen), collision from above
+            bool isFromAbove = player->getComponent<CTransform>().previousPosition.y < object->getComponent<CTransform>().previousPosition.y;
+            
+            // If collision is in y direction and is from above, reset player y velocity (sets player animation to standing) and allow jumping
+            if (isFromAbove)
+            {
+                player->getComponent<CInput>().canJump = true;
+            }
+            else
+            {
+                // TODO: Handle question mark collision here?
+            }
+        }
+        else
         {
             std::cout << "Collision is in X direction" << std::endl;
-        }
-
-        // If player's previous position was less (i.e. closer to top of screen), collision from above
-        bool isFromAbove = player->getComponent<CTransform>().previousPosition.y < object->getComponent<CTransform>().previousPosition.y;
-        
-        // If collision is in y direction and is from above, reset player y velocity (sets player animation to standing) and allow jumping
-        if (!isXDirection && isFromAbove)
-        {
-            player->getComponent<CTransform>().velocity.y = 0.f;
-            player->getComponent<CInput>().canJump = true;
         }
 
         movePlayer(player, object, isXDirection);
