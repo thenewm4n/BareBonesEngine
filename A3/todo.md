@@ -1,11 +1,5 @@
 # Next:
-- The Problem: Even when the collision is in the X direction, it gets resolved in the y direction (hence why pushed below ground, because centre of player is below half of pipe)
-    - Maybe the resolution in X direction isn't enough to push the player out of the object, and then there is a y collision...
-    - Maybe look at Physics.cpp, line 110?
-- Collision resolution is always in y direction
-    - Is previousOverlap wrong? Collision in X direction is detected correctly....
-        - Are previous and current y overlap identical?
-
+- Physics.cpp, line 194: in an x collision the loop after an x collision, the previous x overlap is positive -> registers as y collision
 
 # To complete
 - Change ?sRender()/sMovement() in ScenePlatformer.cpp to make windowHeight - position.y to be the position of the entity?

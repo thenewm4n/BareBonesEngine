@@ -10,13 +10,6 @@ namespace
     {
         if (a->hasComponent<CBody>() && b->hasComponent<CBody>() && a->hasComponent<CTransform>() && b->hasComponent<CTransform>())
         {
-            /*
-            std::cout << "A current position: " << a->getComponent<CTransform>().position.x << " " << a->getComponent<CTransform>().position.y << std::endl;
-            std::cout << "A previous position: " << a->getComponent<CTransform>().previousPosition.x << " " << a->getComponent<CTransform>().previousPosition.y << std::endl;
-            std::cout << "B current position: " << b->getComponent<CTransform>().position.x << " " << b->getComponent<CTransform>().position.y << std::endl;
-            std::cout << "B previous position: " << b->getComponent<CTransform>().previousPosition.x << " " << b->getComponent<CTransform>().previousPosition.y << std::endl;
-            */
-
             const Vec2f positionA = usePrevious ? a->getComponent<CTransform>().previousPosition : a->getComponent<CTransform>().position;
             const Vec2f positionB = usePrevious ? b->getComponent<CTransform>().previousPosition : b->getComponent<CTransform>().position;
             
@@ -86,6 +79,7 @@ namespace
     }
     */
 
+    /* ORIGINAL
     void movePlayer(std::shared_ptr<Entity> player, std::shared_ptr<Entity> object, bool isXDirection)
     {
         // !!! the y positions of player and object need to be windowSize.y - position.y
@@ -97,6 +91,7 @@ namespace
         if (isXDirection)
         {
             std::cout << "!X COLLISION!" << std::endl;
+			std::cout << "Overlap: " << overlap << std::endl;
             std::cout << "Actual player position: " << player->getComponent<CTransform>().position.x << ' ' << player->getComponent<CTransform>().position.y << std::endl;
             std::cout << "Actual object position: " << object->getComponent<CTransform>().position.x << ' ' << object->getComponent<CTransform>().position.y << std::endl;
             std::cout << "Calculated player position: " << posPlayer << std::endl;
@@ -106,6 +101,11 @@ namespace
         // Calculate direction
         int direction = posPlayer > posObject ? 1 : -1;
 
+		if (isXDirection)
+		{
+			std::cout << "Direction: " << direction << std::endl;
+		}
+
         // Move the player in correct direction
         posPlayer += direction * overlap;
 
@@ -113,6 +113,37 @@ namespace
         {
             std::cout << "New actual player position: " << player->getComponent<CTransform>().position.x << ' ' << player->getComponent<CTransform>().position.y << std::endl;
             std::cout << "New calculated player position X: " << posPlayer << std::endl;
+
+			std::cout << "New overlap: " << Physics::getOverlap(player, object).x << std::endl;
+        }
+    }
+    */
+
+    void movePlayer(std::shared_ptr<Entity> player, std::shared_ptr<Entity> object, bool isXDirection)
+    {
+		float& posPlayer = isXDirection ? player->getComponent<CTransform>().position.x : player->getComponent<CTransform>().position.y;
+		float& posObject = isXDirection ? object->getComponent<CTransform>().position.x : object->getComponent<CTransform>().position.y;
+		float overlap = isXDirection ? Physics::getOverlap(player, object).x : Physics::getOverlap(player, object).y;
+        
+
+        if (isXDirection)
+        {
+            // Debug output to verify overlap and positions
+            std::cout << "Initial posPlayer: " << posPlayer << std::endl;
+            std::cout << "Initial posObject: " << posObject << std::endl;
+            std::cout << "Overlap: " << overlap << std::endl;
+        }
+        
+		// Determine whether to push positive (down and right) or negative (up and left)
+		int direction = posPlayer > posObject ? 1 : -1;
+
+        posPlayer += direction * overlap;
+
+        if (isXDirection)
+        {
+            // Debug output to verify new position
+            std::cout << "New posPlayer: " << posPlayer << std::endl;
+			std::cout << "New overlap: " << Physics::getOverlap(player, object).x << std::endl;
         }
     }
 }
@@ -158,9 +189,11 @@ namespace Physics
         // if previous x overlap is negative, x overlap is new
 
         const Vec2f currentOverlap = Physics::getOverlap(player, object);
-        const Vec2f previousOverlap = Physics::getPreviousOverlap(player, object);
+        const Vec2f previousOverlap = Physics::getPreviousOverlap(player, object); 
 
-        bool isXDirection = previousOverlap.x < 0;
+        bool isXDirection = previousOverlap.x < 0;       // !!! This is where the problem is: because a collision the loop after a collision, the previous overlap is positive
+        
+		movePlayer(player, object, isXDirection);
 
         // If collision in y direction, set velocity to 0 and handle according to direction
         if (!isXDirection)
@@ -170,7 +203,7 @@ namespace Physics
 
             // If player's previous position was less (i.e. closer to top of screen), collision from above
             bool isFromAbove = player->getComponent<CTransform>().previousPosition.y < object->getComponent<CTransform>().previousPosition.y;
-            
+
             // If collision is in y direction and is from above, reset player y velocity (sets player animation to standing) and allow jumping
             if (isFromAbove)
             {
@@ -181,11 +214,5 @@ namespace Physics
                 // TODO: Handle question mark collision here?
             }
         }
-        else
-        {
-            std::cout << "Collision is in X direction" << std::endl;
-        }
-
-        movePlayer(player, object, isXDirection);
     }
 }

@@ -319,10 +319,13 @@ void ScenePlatformer::sCollision()
             }
 
             // If overlap in both x and y directions, resolve collision
-            Vec2f overlap = Physics::getOverlap(a, b);
-            if (overlap.x > 0 && overlap.y > 0)
+            if (a == m_player)
             {
-                Physics::resolveCollision(a, b);
+                Vec2f overlap = Physics::getOverlap(a, b);
+                if (overlap.x > 0 && overlap.y > 0)
+                {
+                    Physics::resolveCollision(a, b);
+                }
             }
         }
     }
