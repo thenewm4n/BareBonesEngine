@@ -1,18 +1,8 @@
 # Next:
-- Physics.cpp, line 194: in an x collision the loop after an x collision, the previous x overlap is positive -> registers as y collision
+- Zooming in ?sRender().
 
 # To complete
-- Change ?sRender()/sMovement() in ScenePlatformer.cpp to make windowHeight - position.y to be the position of the entity?
-- Physics.cpp (& Physics.h?)
-    - If collision from below, set y velocity to 0
-- ScenePlatformer::sMovement() (??? remember that player Y speed is positive in level_1.txt, so must be negated in code)
-    - Implement collision resolution
-    - Then, uncomment gravity in sMovement()
-    - After jumping...
-        - Maybe velocity.y isn't reset to 0, and remains positive?
-            - I think canJump isn't reset to true -> cannot jump again
-            - Falling animation remains.
-        - (!!!) Upon landing (i.e. player collides with tile from above), velocity.y should be set to 0
+- Fix window size/position.
 - ScenePlatformer::sDoAction(): including change state of player so that Animation changes.
 - ScenePlatformer::sCollision()
 	- Bullet tile collisions.

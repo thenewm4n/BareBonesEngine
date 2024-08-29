@@ -37,7 +37,7 @@ void ScenePlatformer::init(const std::string& levelPath)
     m_gridText.setCharacterSize(50);
     m_gridText.setScale(0.05f, 0.05f);
 
-    sf::View view(sf::FloatRect(0, 0, m_viewSize.x, m_viewSize.y));
+	sf::View view(sf::FloatRect(0, -m_viewSize.y, m_viewSize.x, m_viewSize.y));     // Top left corner of view is at (0, 0); view extends in negative y direction (upwards)
     m_game->getWindow().setView(view);
 
     loadLevel(levelPath);
@@ -95,7 +95,7 @@ void ScenePlatformer::loadLevel(const std::string& filename)
                 }
 
                 entity->addComponent<CAnimation>(m_game->getAssets().getAnimation(animationName), true);    // IMPORTANT: add CAnimation first so gridToMidPixel can compute correctly
-                entity->addComponent<CTransform>(gridToMidPixel(position.x, position.y, entity));
+                entity->addComponent<CTransform>(gridToMidPixel(position, entity));
             }
         }
     }
@@ -242,7 +242,7 @@ void ScenePlatformer::sMovement()
             // Jump if on ground and W pressed
             if (input.up && input.canJump)
 			{
-				transform.velocity.y = -m_playerConfig.JUMP_SPEED;
+				transform.velocity.y = m_playerConfig.JUMP_SPEED;
 				input.canJump = false;
 			}
 
@@ -273,7 +273,7 @@ void ScenePlatformer::sMovement()
 		// Apply gravity if Entity has CGravity
         if (entity->hasComponent<CGravity>())
 		{
-	        transform.velocity.y += entity->getComponent<CGravity>().acceleration;
+	        transform.velocity.y -= entity->getComponent<CGravity>().acceleration;
 		}
 
         // Cap velocity in both directions; necessary in y direction to ensure no moving through floor
@@ -398,66 +398,45 @@ void ScenePlatformer::sRender()
     // Establishes variables for centring view
     sf::View view = window.getView();
     view.setSize(m_viewSize);
-    Vec2f playerPosition = m_player->getComponent<CTransform>().position;
+    const Vec2f& playerPosition = m_player->getComponent<CTransform>().position;
 
     // Centres view on player if further to right than middle of screen
-    float newViewCentreX = std::max(m_viewSize.x / 2.f, playerPosition.x);        // Ensures view doesn't exceed left side of level
-    view.setCenter(newViewCentreX, view.getCenter().y);    // y value was window.getSize().y - view.getCenter().y
+	float newViewCentreX = std::max(m_viewSize.x / 2.f, playerPosition.x);        // Ensures view doesn't exceed left side of level; to stop going off right side, use std::min of this and level width
+	view.setCenter(newViewCentreX, view.getCenter().y);
     window.setView(view);
 
     // Drawing of textures/animations and bounding boxes
     EntityVector& entities = m_entityManager.getEntities();
-    for (auto entity : entities)    // Entity shared ptrs
+    for (auto entity : entities)
     {
         renderEntity(entity);
     }
 
-    // Find and re-render player last, if it exists
-    auto playerIterator = std::find_if(entities.begin(), entities.end(), [](std::shared_ptr<Entity> e) {
+	// Check whether player exists
+    auto playerIterator = std::find_if(entities.begin(), entities.end(), [](std::shared_ptr<Entity> e)
+    {
         return e->getTag() == "Player"; 
     });
 
+	// If player exists, render it last
     if (playerIterator != entities.end())
     {
         renderEntity(*playerIterator);
     } 
 
+	// Render bounding boxes if enabled; in a separate loop to ensure they are drawn on top of textures
+    for (auto entity : entities)
+    {
+        if (m_drawBoundingBoxes && entity->hasComponent<CBody>())
+        {
+            renderBBox(entity);
+        }
+    }
+
     // Draw grid for debugging
     if (m_drawGrid)
     {
-        float leftEdgeX = view.getCenter().x - (m_viewSize.x / 2);                                  // Left edge of viewable area
-        float rightEdgeX = leftEdgeX + m_viewSize.x + m_gridCellSize.x;                             // Right edge of viewable area - width of a cell is added to ensure full coverage
-        float firstVertLineX = leftEdgeX - (static_cast<int>(leftEdgeX) % m_gridCellSize.x);        // X position of leftmost cell starting just outside of window
-        float bottomEdgeY = m_viewSize.y;                                                           // Bottom of viewable area - height of cell added to ensure full coverage; top edge is 0
-
-        sf::VertexArray lines(sf::Lines);
-
-        // Add verticle lines to vertex array
-        for (float x = firstVertLineX; x < rightEdgeX; x += m_gridCellSize.x)
-        {
-            lines.append(sf::Vertex(sf::Vector2f(x, 0)));
-            lines.append(sf::Vertex(sf::Vector2f(x, bottomEdgeY)));
-        }
-
-        // Draw horizontal lines
-        for (float y = bottomEdgeY; y > 0; y -= m_gridCellSize.y)
-        {
-            lines.append(sf::Vertex(sf::Vector2f(leftEdgeX, y)));
-            lines.append(sf::Vertex(sf::Vector2f(rightEdgeX, y)));
-
-            // Draw coordinate text for each cell
-            for (float x = firstVertLineX; x < rightEdgeX; x += m_gridCellSize.x)
-            {
-                int gridX = static_cast<int>(x) / m_gridCellSize.x;
-                int gridY = (static_cast<int>(m_viewSize.y) - static_cast<int>(y)) / m_gridCellSize.y;
-
-                m_gridText.setString("(" + std::to_string(gridX) + ", " + std::to_string(gridY) + ")");
-                m_gridText.setPosition(x, y - m_gridCellSize.y);
-                window.draw(m_gridText);
-            }
-        }
-
-        window.draw(lines);
+		renderGrid(window, view);
     }
 
     window.display();
@@ -470,7 +449,7 @@ void ScenePlatformer::spawnPlayer()
     
     m_player->addComponent<CInput>();
     m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("Stand"), true);
-    m_player->addComponent<CTransform>(gridToMidPixel(m_playerConfig.X, m_playerConfig.Y, m_player));       // Adding CTransform must follow adding CAnimation because gridToMidPixel uses CAnimation
+    m_player->addComponent<CTransform>(gridToMidPixel(Vec2f(m_playerConfig.X, m_playerConfig.Y), m_player));       // Adding CTransform must follow adding CAnimation because gridToMidPixel uses CAnimation
     m_player->addComponent<CBody>(Vec2f(m_playerConfig.BB_WIDTH, m_playerConfig.BB_HEIGHT), 1.f);
     m_player->addComponent<CGravity>(m_playerConfig.GRAVITY);
     m_player->addComponent<CState>();
@@ -482,7 +461,7 @@ void ScenePlatformer::spawnBullet(std::shared_ptr<Entity> entity)
 }
 
 // Used to position of entity so bottom left of sprite is at bottom left of the cell
-Vec2f ScenePlatformer::gridToMidPixel(float gridPositionX, float gridPositionY, std::shared_ptr<Entity> entity)
+Vec2f ScenePlatformer::gridToMidPixel(const Vec2f& gridPosition, std::shared_ptr<Entity> entity)
 {
     if (!entity->hasComponent<CAnimation>())
     {
@@ -491,11 +470,9 @@ Vec2f ScenePlatformer::gridToMidPixel(float gridPositionX, float gridPositionY, 
     }
 
     const Vec2f& spriteSize = entity->getComponent<CAnimation>().animation.getSize();
-    
-    float x = (gridPositionX * m_gridCellSize.x) + (spriteSize.x / 2.f);
-    float y = m_viewSize.y - (gridPositionY * m_gridCellSize.y) - spriteSize.y / 2.f;
-        
-    return Vec2f(x, y);
+    Vec2f offset = (gridPosition * Vec2f(m_gridCellSize)) + (spriteSize / 2.f);
+
+    return offset;
 }
 
 void ScenePlatformer::renderEntity(std::shared_ptr<Entity> e)
@@ -505,12 +482,13 @@ void ScenePlatformer::renderEntity(std::shared_ptr<Entity> e)
     {
         auto& transform = e->getComponent<CTransform>();
         auto& animationSprite = e->getComponent<CAnimation>().animation.getSprite();
-        animationSprite.setPosition(transform.position.x, transform.position.y);
-        animationSprite.setScale(transform.scale.x, transform.scale.y);
+        animationSprite.setPosition(transform.position.x, -transform.position.y);
+		animationSprite.setScale(transform.scale.x, transform.scale.y);
         animationSprite.setRotation(transform.angle);
         m_game->getWindow().draw(animationSprite);
     }
 
+    /*
     // Draw Entity bounding boxes
     if (m_drawBoundingBoxes && e->hasComponent<CBody>())
     {
@@ -520,10 +498,66 @@ void ScenePlatformer::renderEntity(std::shared_ptr<Entity> e)
         sf::RectangleShape rectangle;
         rectangle.setSize(sf::Vector2f(bBox.size.x - 1, bBox.size.y - 1));  // Only takes sf::Vector2f
         rectangle.setOrigin(bBox.size.x / 2.f, bBox.size.y / 2.f);
-        rectangle.setPosition(transform.position.x, transform.position.y);      
+        rectangle.setPosition(transform.position.x, -transform.position.y);      
         rectangle.setFillColor(sf::Color(0, 0, 0, 0));                  // Sets alpha of fill colour to 0 i.e. transparent
         rectangle.setOutlineColor(sf::Color(255, 255, 255, 255));       // Sets alpha of outline to 255 i.e. opaque
         rectangle.setOutlineThickness(1);
         m_game->getWindow().draw(rectangle);
     }
+    */
+}
+
+void ScenePlatformer::renderGrid(sf::RenderWindow& window, const sf::View& view)
+{
+    float leftEdgeX = view.getCenter().x - (m_viewSize.x / 2);                                      // Left edge of viewable area
+    float rightEdgeX = leftEdgeX + m_viewSize.x + m_gridCellSize.x;                                 // Right edge of viewable area - width of a cell is added to ensure full coverage
+    float firstVertLineX = leftEdgeX - (static_cast<int>(leftEdgeX) % m_gridCellSize.x);            // X position of leftmost viewable cell starting just outside of window
+    
+    float topEdgeY = view.getCenter().y - (m_viewSize.y / 2.f);                                     // Top of viewable area
+    float bottomEdgeY = view.getCenter().y + (m_viewSize.y / 2.f) + m_gridCellSize.y;               // Bottom of viewable area; height of a cell added to ensure full coverage
+	float firstHorizontalLineY = topEdgeY + (static_cast<int>(topEdgeY) % m_gridCellSize.y);        // Y position of topmost cell starting just outside of window
+
+    sf::VertexArray lines(sf::Lines);
+
+    // Add verticle lines to vertex array
+    for (float x = firstVertLineX; x < rightEdgeX; x += m_gridCellSize.x)
+    {
+        lines.append(sf::Vertex(sf::Vector2f(x, 0)));
+        lines.append(sf::Vertex(sf::Vector2f(x, topEdgeY)));
+    }
+
+    // Draw horizontal lines
+    for (float y = firstHorizontalLineY; y < bottomEdgeY; y += m_gridCellSize.y)
+    {
+        lines.append(sf::Vertex(sf::Vector2f(leftEdgeX, y)));
+        lines.append(sf::Vertex(sf::Vector2f(rightEdgeX, y)));
+
+        // Draw coordinate text for each cell
+        for (float x = firstVertLineX; x < rightEdgeX; x += m_gridCellSize.x)
+        {
+            int gridX = static_cast<int>(x) / m_gridCellSize.x;
+            int gridY = -static_cast<int>(y) / m_gridCellSize.y;
+
+            m_gridText.setString("(" + std::to_string(gridX) + ", " + std::to_string(gridY) + ")");
+            m_gridText.setPosition(x, y - m_gridCellSize.y);
+            window.draw(m_gridText);
+        }
+    }
+
+    window.draw(lines);
+}
+
+void ScenePlatformer::renderBBox(std::shared_ptr<Entity> entity)
+{
+    auto& bBox = entity->getComponent<CBody>().bBox;
+    auto& transform = entity->getComponent<CTransform>();
+
+    sf::RectangleShape rectangle;
+    rectangle.setSize(sf::Vector2f(bBox.size.x - 1, bBox.size.y - 1));  // Only takes sf::Vector2f
+    rectangle.setOrigin(bBox.size.x / 2.f, bBox.size.y / 2.f);
+    rectangle.setPosition(transform.position.x, -transform.position.y);
+    rectangle.setFillColor(sf::Color(0, 0, 0, 0));                  // Sets alpha of fill colour to 0 i.e. transparent
+    rectangle.setOutlineColor(sf::Color(255, 255, 255, 255));       // Sets alpha of outline to 255 i.e. opaque
+    rectangle.setOutlineThickness(1);
+    m_game->getWindow().draw(rectangle);
 }

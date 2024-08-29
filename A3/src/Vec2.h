@@ -12,12 +12,17 @@ public:
     Vec2();
     Vec2(T xIn, T yIn);
 
+    // Conversion constructor
+	template <typename U>
+    Vec2(const Vec2<U>& other) : x(static_cast<T>(other.x)), y(static_cast<T>(other.y)) {}
+
     bool operator == (const Vec2<T>& other) const;
     bool operator != (const Vec2<T>& other) const;
 
     Vec2<T> operator + (const Vec2<T>& other) const;
     Vec2<T> operator - (const Vec2<T>& other) const;
     Vec2<T> operator * (float scalar) const;            // Allows multiplication with scalar on right; see non-member function for scalar on left version
+    Vec2<T> operator * (const Vec2<T>& other) const;            // Allows multiplication with scalar on right; see non-member function for scalar on left version
     Vec2<T> operator / (const float scalar) const;
 
     void operator += (const Vec2<T>& other);
@@ -50,10 +55,18 @@ Vec2<T> Vec2<T>::operator - (const Vec2<T>& other) const
     return Vec2<T>(x - other.x, y - other.y);
 }
 
+// Scalar multiplication
 template <typename T>
 Vec2<T> Vec2<T>::operator * (float scalar) const
 {
     return Vec2<T>(x * scalar, y * scalar);
+}
+
+// Element-wise multiplication
+template <typename T>
+Vec2<T> Vec2<T>::operator * (const Vec2<T>& other) const
+{
+	return Vec2<T>(x * other.x, y * other.y);
 }
 
 template <typename T>

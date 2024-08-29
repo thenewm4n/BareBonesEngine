@@ -12,7 +12,6 @@ Animation::Animation(const sf::Texture& tex, const std::string& animationName, i
 {
     m_size = Vec2f(static_cast<float>(tex.getSize().x) / frameCount, static_cast<float>(tex.getSize().y));
     m_sprite.setOrigin(m_size.x / 2.f, m_size.y / 2.f);                                                                 // Origin set to centre of sprite
-    // m_sprite.setTextureRect(sf::IntRect(std::floor(m_currentAnimationFrame * m_size.x), 0, m_size.x, m_size.y));        // left, top, width, height
     m_sprite.setTextureRect(sf::IntRect(0, 0, static_cast<int>(m_size.x), static_cast<int>(m_size.y)));        // left, top, width, height
 }
 

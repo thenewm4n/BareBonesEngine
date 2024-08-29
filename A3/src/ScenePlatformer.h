@@ -51,6 +51,8 @@ private:
     void spawnPlayer();
     void spawnBullet(std::shared_ptr<Entity> entity);
     
-    Vec2f gridToMidPixel(float gridPositionX, float gridPositionY, std::shared_ptr<Entity> entity);
+    Vec2f gridToMidPixel(const Vec2f& gridPosition, std::shared_ptr<Entity> entity);
     void renderEntity(std::shared_ptr<Entity> e);
+    void renderGrid(sf::RenderWindow& window, const sf::View& view);
+    void renderBBox(std::shared_ptr<Entity> entity);
 };
