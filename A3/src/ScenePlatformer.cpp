@@ -487,24 +487,6 @@ void ScenePlatformer::renderEntity(std::shared_ptr<Entity> e)
         animationSprite.setRotation(transform.angle);
         m_game->getWindow().draw(animationSprite);
     }
-
-    /*
-    // Draw Entity bounding boxes
-    if (m_drawBoundingBoxes && e->hasComponent<CBody>())
-    {
-        auto& bBox = e->getComponent<CBody>().bBox;
-        auto& transform = e->getComponent<CTransform>();
-        
-        sf::RectangleShape rectangle;
-        rectangle.setSize(sf::Vector2f(bBox.size.x - 1, bBox.size.y - 1));  // Only takes sf::Vector2f
-        rectangle.setOrigin(bBox.size.x / 2.f, bBox.size.y / 2.f);
-        rectangle.setPosition(transform.position.x, -transform.position.y);      
-        rectangle.setFillColor(sf::Color(0, 0, 0, 0));                  // Sets alpha of fill colour to 0 i.e. transparent
-        rectangle.setOutlineColor(sf::Color(255, 255, 255, 255));       // Sets alpha of outline to 255 i.e. opaque
-        rectangle.setOutlineThickness(1);
-        m_game->getWindow().draw(rectangle);
-    }
-    */
 }
 
 void ScenePlatformer::renderGrid(sf::RenderWindow& window, const sf::View& view)
@@ -513,16 +495,18 @@ void ScenePlatformer::renderGrid(sf::RenderWindow& window, const sf::View& view)
     float rightEdgeX = leftEdgeX + m_viewSize.x + m_gridCellSize.x;                                 // Right edge of viewable area - width of a cell is added to ensure full coverage
     float firstVertLineX = leftEdgeX - (static_cast<int>(leftEdgeX) % m_gridCellSize.x);            // X position of leftmost viewable cell starting just outside of window
     
+    sf::Vector2f viewSize = view.getSize();
+
     float topEdgeY = view.getCenter().y - (m_viewSize.y / 2.f);                                     // Top of viewable area
     float bottomEdgeY = view.getCenter().y + (m_viewSize.y / 2.f) + m_gridCellSize.y;               // Bottom of viewable area; height of a cell added to ensure full coverage
-	float firstHorizontalLineY = topEdgeY + (static_cast<int>(topEdgeY) % m_gridCellSize.y);        // Y position of topmost cell starting just outside of window
+	float firstHorizontalLineY = topEdgeY + (-static_cast<int>(topEdgeY) % m_gridCellSize.y);        // Y position of topmost cell starting just outside of window
 
     sf::VertexArray lines(sf::Lines);
 
     // Add verticle lines to vertex array
     for (float x = firstVertLineX; x < rightEdgeX; x += m_gridCellSize.x)
     {
-        lines.append(sf::Vertex(sf::Vector2f(x, 0)));
+        lines.append(sf::Vertex(sf::Vector2f(x, bottomEdgeY)));
         lines.append(sf::Vertex(sf::Vector2f(x, topEdgeY)));
     }
 
@@ -532,7 +516,7 @@ void ScenePlatformer::renderGrid(sf::RenderWindow& window, const sf::View& view)
         lines.append(sf::Vertex(sf::Vector2f(leftEdgeX, y)));
         lines.append(sf::Vertex(sf::Vector2f(rightEdgeX, y)));
 
-        // Draw coordinate text for each cell
+        // Draw coordinate text for each cell in row
         for (float x = firstVertLineX; x < rightEdgeX; x += m_gridCellSize.x)
         {
             int gridX = static_cast<int>(x) / m_gridCellSize.x;
