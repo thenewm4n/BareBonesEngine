@@ -157,7 +157,8 @@ class CGravity : public Component
 public:
     float acceleration;
 
-    CGravity() : acceleration(1) {}
+    CGravity()
+        : acceleration(1) {}
     CGravity(float accel)
         : acceleration(accel) {}
 };

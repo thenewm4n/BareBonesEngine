@@ -13,12 +13,12 @@
 
 
 ScenePlatformer::ScenePlatformer(GameEngine* game, const std::string& levelPath)
-    : Scene(game)
+    : Scene(game), m_levelPath(levelPath)
 {
-    init(levelPath);
+    init();
 }
 
-void ScenePlatformer::init(const std::string& levelPath)
+void ScenePlatformer::init()
 {
     registerAction(sf::Keyboard::P, "PAUSE");
     registerAction(sf::Keyboard::Escape, "QUIT");
@@ -40,7 +40,7 @@ void ScenePlatformer::init(const std::string& levelPath)
 	sf::View view(sf::FloatRect(0, -m_viewSize.y, m_viewSize.x, m_viewSize.y));     // Top left corner of view is at (0, 0); view extends in negative y direction (upwards)
     m_game->getWindow().setView(view);
 
-    loadLevel(levelPath);
+    loadLevel(m_levelPath);
 }
 
 void ScenePlatformer::loadLevel(const std::string& filename)
@@ -105,18 +105,17 @@ void ScenePlatformer::loadLevel(const std::string& filename)
 
 void ScenePlatformer::update()
 {
-    if (m_paused)
+    if (!m_paused)
 	{
-		return;
+        // Adds and removes entities while avoiding iterator invalidation
+        m_entityManager.update();
+
+        sMovement();
+        sLifespan();
+        sCollision();
+        sAnimation();
 	}
 
-    // Adds and removes entities while avoiding iterator invalidation
-    m_entityManager.update();
-
-    sMovement();
-    sLifespan();
-    sCollision();
-    sAnimation();
     sRender();
 }
 
@@ -131,6 +130,22 @@ void ScenePlatformer::sDoAction(const Action& action)
 
     if (action.getType() == "START")
     {
+        // Check for pausing or quitting
+        if (actionName == "PAUSE")
+        {
+            m_paused = !m_paused;
+        }
+        else if (actionName == "QUIT")
+        {
+            endScene();
+        }
+
+        // If paused, don't allow player input or toggling
+        if (m_paused)
+        {
+            return;
+        }
+
         if (m_player->hasComponent<CInput>())
         {
             // Handle player input and return early to decrease latency
@@ -154,9 +169,16 @@ void ScenePlatformer::sDoAction(const Action& action)
                 m_player->getComponent<CInput>().right = true;
                 return;
             }
+            else if (actionName == "SHOOT")
+            {
+                std::cout << "Shooting!" << std::endl;
+                m_player->getComponent<CState>().currentState = PlayerState::Shooting;
+                // spawnBullet(m_player);
+                return;
+            }
         }
 
-        // Toggle toggle actions
+        // Toggle actions
         if (actionName == "TOGGLE_TEXTURES")
         {
             m_drawTextures = !m_drawTextures;
@@ -168,14 +190,6 @@ void ScenePlatformer::sDoAction(const Action& action)
         else if (actionName == "TOGGLE_GRID")
         {
             m_drawGrid = !m_drawGrid;
-        }
-        else if (actionName == "PAUSE")
-        {
-            m_paused = !m_paused;
-        }
-        else if (actionName == "QUIT")
-        {
-            endScene();
         }
         // Handle view manipulation actions
         else if (actionName == "ZOOM_IN")
@@ -258,7 +272,7 @@ void ScenePlatformer::sMovement()
                     transform.scale.x *= -1;
                 }
             }
-            else
+            else if (state.currentState != PlayerState::Shooting)
             {
                 state.currentState = PlayerState::Standing;     // No change to direction when velocity is 0
             }
@@ -294,13 +308,9 @@ void ScenePlatformer::sLifespan()
 void ScenePlatformer::sCollision()
 {
     // TODO: Implement player/tile collisions and resolutions
-        // Update the CState component of player to store whether it's currently on ground or in air; this will be used by Animation system
     // TODO: Implement bullet/tile collisions
         // Destroy tile if it has Brick animation
-    // TODO: Check to see if player has fallen down hole i.e. y > height
-    // TODO: Don't let player walk off left side of map
-
-    // If collision in y axis and coming from above, resolve collision, and set y velocity to 0, and set CInput.canJump to true
+    // TODO: Check to see if player has fallen down hole i.e. y < height
 
     EntityVector& entities = m_entityManager.getEntities();
 
@@ -328,6 +338,16 @@ void ScenePlatformer::sCollision()
                 }
             }
         }
+    }
+
+    // Restrict player from moving off left of map
+    Vec2f& posPlayer = m_player->getComponent<CTransform>().position;
+    posPlayer.x = std::max(m_player->getComponent<CBody>().bBox.size.x / 2.f, posPlayer.x);
+
+    // Restart level if player has fallen down hole
+    if (posPlayer.y < 0)
+    {
+        loadLevel(m_levelPath);
     }
 }
 
@@ -366,7 +386,7 @@ void ScenePlatformer::sAnimation()
                 if (entity == m_player)
                 {
                     const Animation& standingAnimation = m_game->getAssets().getAnimation(m_stateToAnimationMap[PlayerState::Standing]);
-                    entity->addComponent<CAnimation>(standingAnimation, true);
+                    entity->addComponent<CAnimation>(standingAnimation, true);                    
                 }
                 else
                 {

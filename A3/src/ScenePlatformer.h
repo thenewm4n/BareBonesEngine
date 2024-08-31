@@ -26,6 +26,7 @@ private:
         {PlayerState::Shooting, "Shoot"}
     };
 
+    std::string m_levelPath;
     std::shared_ptr<Entity> m_player;
     PlayerConfig m_playerConfig;
     EntityManager m_entityManager;
@@ -36,7 +37,7 @@ private:
     bool m_drawGrid = false;
     bool m_drawTextures = true;
 
-    void init(const std::string& levelPath);
+    void init();
     void loadLevel(const std::string& filename);
     void update() override;
     void endScene() override;

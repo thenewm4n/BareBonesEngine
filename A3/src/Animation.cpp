@@ -37,17 +37,11 @@ void Animation::update()
     sf::IntRect frameRect(std::floor(m_currentAnimationFrame * m_size.x), 0, m_size.x, m_size.y);
 
     m_sprite.setTextureRect(frameRect);
-     
 }
 
 bool Animation::hasEnded() const
 {
-    if (m_currentAnimationFrame > m_frameCount - 1)
-    {
-        return true;
-    }
-
-    return false;
+    return m_currentAnimationFrame > m_frameCount - 1;
 }
 
 const std::string& Animation::getName() const { return m_name; }

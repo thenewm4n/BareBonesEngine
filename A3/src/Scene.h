@@ -33,6 +33,4 @@ protected:
 
     virtual void sRender() = 0;
     virtual void endScene() = 0;
-
-    void setPaused(bool paused);        // Necessary in most scenes, hence in Scene base class
 };
