@@ -21,7 +21,7 @@ public:
 private:
     std::string m_name;
     sf::Sprite m_sprite;
-    Vec2f m_size;                       // Pixel dimensions of each animation frame
+    Vec2f m_frameSize;                       // Pixel dimensions of each animation frame
     int m_currentAnimationFrame = 0;
     size_t m_gameLoopsSinceStart = 0;   
     int m_frameCount;                   // No. frames in one loop of animation

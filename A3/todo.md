@@ -1,10 +1,9 @@
 # To complete
-- Clean up ScenePlatformer::sAnimation().    
+- Fix disappearing after shooting animation.
 - ScenePlatformer::sCollision()
 	- Bullet tile collisions.
 - Bullet animation: get bullet sprite
 - Text for SceneStartMenu - levels, controls legend at bottom
-- Fix jittery camera when moving.
 
 # Recommended order of implementation
 1. Implement Scene_Play::spawnBullet().
@@ -17,6 +16,7 @@
 3. Implement detection of which side player collided with tile.
 
 # Improvements
+- Fix jittery camera when moving.
 - SceneStartMenu: make initialisation of title, menu strings & level paths dynamic according to e.g. config file, levels file.
 - Decouple logic from framerate using delta time.
 - Use mass in collision resolution.

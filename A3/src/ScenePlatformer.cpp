@@ -353,9 +353,9 @@ void ScenePlatformer::sCollision()
 
 void ScenePlatformer::sAnimation()
 {
-    // Set player animation based on state
     for (auto& entity : m_entityManager.getEntities())
     {
+        // Set player animation based on state
         if (entity == m_player)
 		{
             CState& stateComponent = m_player->getComponent<CState>();
@@ -381,30 +381,18 @@ void ScenePlatformer::sAnimation()
         {
             CAnimation& animComponent = entity->getComponent<CAnimation>();
 
-            if (!animComponent.toRepeat)
-            {
-                if (animComponent.animation.hasEnded())
-                {
-                    std::cout << animComponent.animation.getName() << " animation has ended" << std::endl << std::endl;
-                }   
-            }
-
             if (animComponent.animation.hasEnded() && !animComponent.toRepeat)
             {
-                std::cout << "Animation has completed" << std::endl;
-                if (entity == m_player)
-                {
-					m_player->getComponent<CState>().currentState = PlayerState::Standing;
-                }
-                else
+                if (entity != m_player)
                 {
                     entity->removeComponent<CAnimation>();
+                    continue;
                 }
+
+                m_player->getComponent<CState>().currentState = PlayerState::Standing;
             }
-            else
-            {   
-                animComponent.update();
-            }
+
+			animComponent.update();
         }
     }
 }
