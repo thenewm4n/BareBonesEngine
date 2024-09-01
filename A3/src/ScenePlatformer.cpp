@@ -361,7 +361,7 @@ void ScenePlatformer::sAnimation()
             CState& stateComponent = m_player->getComponent<CState>();
             CAnimation& animComponent = m_player->getComponent<CAnimation>();
 
-            // If state has changed, replace animation according to state
+            // Replace animation according to new state if state has changed
             if (stateComponent.currentState != stateComponent.previousState)
             { 
                 // Determine whether animation will be repeated or played once
@@ -370,7 +370,7 @@ void ScenePlatformer::sAnimation()
                 // Replace animation according to new state
                 const std::string& animationName = m_stateToAnimationMap[stateComponent.currentState];
                 animComponent = m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation(animationName), toRepeat);
-            
+
                 // Update previous state to current state
                 stateComponent.previousState = stateComponent.currentState;
             }
@@ -381,8 +381,17 @@ void ScenePlatformer::sAnimation()
         {
             CAnimation& animComponent = entity->getComponent<CAnimation>();
 
+            if (!animComponent.toRepeat)
+            {
+                if (animComponent.animation.hasEnded())
+                {
+                    std::cout << animComponent.animation.getName() << " animation has ended" << std::endl << std::endl;
+                }   
+            }
+
             if (animComponent.animation.hasEnded() && !animComponent.toRepeat)
             {
+                std::cout << "Animation has completed" << std::endl;
                 if (entity == m_player)
                 {
 					m_player->getComponent<CState>().currentState = PlayerState::Standing;
