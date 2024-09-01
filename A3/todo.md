@@ -1,5 +1,5 @@
 # To complete
-- Fix shoot animation (look at sAnimation()).
+- Clean up ScenePlatformer::sAnimation().    
 - ScenePlatformer::sCollision()
 	- Bullet tile collisions.
 - Bullet animation: get bullet sprite

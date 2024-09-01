@@ -11,6 +11,7 @@ public:
     Animation(const sf::Texture& tex, const std::string& animationName = "NONE", int frameCount = 1, int frameDuration = 1);
 
     void update();
+    void reset();
     
     bool hasEnded() const;
     const std::string& getName() const;

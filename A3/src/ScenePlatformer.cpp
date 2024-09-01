@@ -385,8 +385,7 @@ void ScenePlatformer::sAnimation()
             {
                 if (entity == m_player)
                 {
-                    const Animation& standingAnimation = m_game->getAssets().getAnimation(m_stateToAnimationMap[PlayerState::Standing]);
-                    entity->addComponent<CAnimation>(standingAnimation, true);                    
+					m_player->getComponent<CState>().currentState = PlayerState::Standing;
                 }
                 else
                 {
@@ -395,7 +394,7 @@ void ScenePlatformer::sAnimation()
             }
             else
             {   
-                animComponent.animation.update();       // Animation cycles by default
+                animComponent.update();
             }
         }
     }

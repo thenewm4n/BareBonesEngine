@@ -17,7 +17,7 @@ Texture TexPoleTop assets/images/mario/flagpoletop.png
 Animation Stand TexStand 1 1
 Animation Run TexRun 4 10
 Animation Air TexAir 1 1
-Animation Shoot TexShoot 1 60
+Animation Shoot TexShoot 1 20
 Animation Explosion TexExplosion 8 20
 Animation Coin TexCoin 4 5
 Animation QMark TexQMark 5 8

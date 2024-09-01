@@ -21,6 +21,7 @@ void Animation::update()
     // Calculate correct frame to display
     m_currentAnimationFrame = (m_gameLoopsSinceStart - (m_gameLoopsSinceStart % m_frameDuration)) / m_frameDuration;        // for standing animation, this results in 0 / 1
 
+    /*
     // Reset animation frame to start (this should only happen if toRepeat == true, as checked in ScenePlatformer::sAnimation())
     if (m_currentAnimationFrame > m_frameCount - 1)
     {
@@ -32,11 +33,21 @@ void Animation::update()
         // Add the speed variable to the current frame (?)
         m_gameLoopsSinceStart++;
     }
+    */
+
+    // Add the speed variable to the current frame (?)
+    m_gameLoopsSinceStart++;
 
     // Set texture rectangle properly (see constructor for sample)
     sf::IntRect frameRect(std::floor(m_currentAnimationFrame * m_size.x), 0, m_size.x, m_size.y);
 
     m_sprite.setTextureRect(frameRect);
+}
+
+void Animation::reset()
+{
+    m_currentAnimationFrame = 0;
+	m_gameLoopsSinceStart = 0;
 }
 
 bool Animation::hasEnded() const

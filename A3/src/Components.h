@@ -150,6 +150,16 @@ public:
     CAnimation() {}
     CAnimation(const Animation& animation, bool toRepeat)
         : animation(animation), toRepeat(toRepeat) {}
+
+    void update()
+    {
+        animation.update();
+
+        if (animation.hasEnded() && toRepeat)
+        {
+            animation.reset();
+        }
+    }
 };
 
 class CGravity : public Component
