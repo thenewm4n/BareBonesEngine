@@ -1,5 +1,7 @@
 # To complete
-- Fix shoot animation (look at sAnimation()).
+- Shooting animation never ends
+    - Look at Animation::update() and Animation::hasEnded()
+    - Maybe a problem with it only being one frame?
 - ScenePlatformer::sCollision()
 	- Bullet tile collisions.
 - Bullet animation: get bullet sprite
