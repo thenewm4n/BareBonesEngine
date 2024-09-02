@@ -56,4 +56,7 @@ private:
     void renderEntity(std::shared_ptr<Entity> e);
     void renderGrid(sf::RenderWindow& window, const sf::View& view);
     void renderBBox(std::shared_ptr<Entity> entity);
+
+    void updatePlayerAnimation(CAnimation& animComponent);
+    void updateEntityAnimation(std::shared_ptr<Entity> entity, CAnimation& animComponent);
 };

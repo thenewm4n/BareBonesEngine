@@ -355,44 +355,21 @@ void ScenePlatformer::sAnimation()
 {
     for (auto& entity : m_entityManager.getEntities())
     {
-        // Set player animation based on state
-        if (entity == m_player)
-		{
-            CState& stateComponent = m_player->getComponent<CState>();
-            CAnimation& animComponent = m_player->getComponent<CAnimation>();
-
-            // Replace animation according to new state if state has changed
-            if (stateComponent.currentState != stateComponent.previousState)
-            { 
-                // Determine whether animation will be repeated or played once
-                bool toRepeat = stateComponent.currentState == PlayerState::Shooting ? false : true;
-
-                // Replace animation according to new state
-                const std::string& animationName = m_stateToAnimationMap[stateComponent.currentState];
-                animComponent = m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation(animationName), toRepeat);
-
-                // Update previous state to current state
-                stateComponent.previousState = stateComponent.currentState;
-            }
-		}
-      
         // If entity has Animation component, either update it, or remove if has ended
         if (entity->hasComponent<CAnimation>())
         {
             CAnimation& animComponent = entity->getComponent<CAnimation>();
 
-            if (animComponent.animation.hasEnded() && !animComponent.toRepeat)
+            animComponent.update();
+
+            if (entity == m_player)
             {
-                if (entity != m_player)
-                {
-                    entity->removeComponent<CAnimation>();
-                    continue;
-                }
-
-                m_player->getComponent<CState>().currentState = PlayerState::Standing;
+                updatePlayerAnimation(animComponent);
             }
-
-			animComponent.update();
+            else      // if entity is non-player
+            {
+                updateEntityAnimation(entity, animComponent);
+            }
         }
     }
 }
@@ -560,4 +537,34 @@ void ScenePlatformer::renderBBox(std::shared_ptr<Entity> entity)
     rectangle.setOutlineColor(sf::Color(255, 255, 255, 255));       // Sets alpha of outline to 255 i.e. opaque
     rectangle.setOutlineThickness(1);
     m_game->getWindow().draw(rectangle);
+}
+
+void ScenePlatformer::updatePlayerAnimation(CAnimation& animComponent)
+{
+    CState& stateComponent = m_player->getComponent<CState>();
+
+    // Default to standing animation if previous animation ended and wasn't to repeat
+    if (animComponent.animation.hasEnded() && !animComponent.toRepeat)
+    {
+        stateComponent.currentState = PlayerState::Standing;
+    }
+
+    // Update CAnimation if state has changed
+    if (stateComponent.currentState != stateComponent.previousState)
+    {
+        bool toRepeat = stateComponent.currentState != PlayerState::Shooting;
+
+        const std::string& animationName = m_stateToAnimationMap[stateComponent.currentState];
+        animComponent = m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation(animationName), toRepeat);
+
+        stateComponent.previousState = stateComponent.currentState;
+    }
+}
+
+void ScenePlatformer::updateEntityAnimation(std::shared_ptr<Entity> entity, CAnimation& animComponent)
+{
+    if (animComponent.animation.hasEnded() && !animComponent.toRepeat)
+    {
+        entity->removeComponent<CAnimation>();
+    }
 }
