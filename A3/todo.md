@@ -8,6 +8,7 @@
     - Bullets should be destroyed upon colliding with a non-decorative tile.
     - If tile has brick animation, destroy it upon collision as well.
 3. Implement detection of which side player collided with tile.
+4. Clean up README.
 
 
 # Improvements
