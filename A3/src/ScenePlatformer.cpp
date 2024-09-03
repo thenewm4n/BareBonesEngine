@@ -171,9 +171,13 @@ void ScenePlatformer::sDoAction(const Action& action)
             }
             else if (actionName == "SHOOT")
             {
-                std::cout << "Shooting!" << std::endl;
-                m_player->getComponent<CState>().currentState = PlayerState::Shooting;
-                // spawnBullet(m_player);
+                if (m_player->getComponent<CInput>().canShoot)
+                {
+                    m_player->getComponent<CState>().currentState = PlayerState::Shooting;      // Change state, and hence animation
+                    spawnBullet(m_player);
+                    m_player->getComponent<CInput>().canShoot = false;                          // Can't shoot again until SHOOT released
+                }
+                
                 return;
             }
         }
@@ -222,6 +226,10 @@ void ScenePlatformer::sDoAction(const Action& action)
             else if (actionName == "RIGHT")
             {
                 m_player->getComponent<CInput>().right = false;
+            }
+            else if (actionName == "SHOOT")
+            {
+                m_player->getComponent<CInput>().canShoot = true;
             }
         }
     }
@@ -450,7 +458,27 @@ void ScenePlatformer::spawnPlayer()
 
 void ScenePlatformer::spawnBullet(std::shared_ptr<Entity> entity)
 {
-    // TODO: this should spawn a bullet at a given entity, going in direction entity is facing
+    // Create entity
+    std::shared_ptr<Entity> bullet = m_entityManager.addEntity("Bullet");
+    const auto& animationBullet = m_game->getAssets().getAnimation("Bullet");
+
+    auto transformEntity = entity->getComponent<CTransform>();
+    Vec2f positionEntity = transformEntity.position;
+    bool facingLeft = transformEntity.scale.x > 0;
+
+    float spriteWidthEntity = entity->getComponent<CAnimation>().animation.getSize().x;
+    float spriteWidthBullet = animationBullet.getSize().x;
+
+    float bulletSpeed = 4.f;
+    Vec2f velocity = facingLeft ? Vec2f(-bulletSpeed, 0.f) : Vec2f(bulletSpeed, 0.f);
+    float offsetX = facingLeft ? (-spriteWidthEntity / 2.f) - (spriteWidthBullet / 2.f) : (spriteWidthEntity / 2.f) + (spriteWidthBullet / 2.f);
+
+    bullet->addComponent<CAnimation>(animationBullet, true);
+    bullet->addComponent<CBody>(animationBullet.getSize());
+    bullet->addComponent<CTransform>(positionEntity + Vec2f(offsetX, 0.f), velocity, 0.f);
+    bullet->getComponent<CTransform>().scale = facingLeft ? Vec2f(-1.f, 1.f) : Vec2f(1.f, 1.f);
+    
+    // Add Lifespan
 }
 
 // Used to position of entity so bottom left of sprite is at bottom left of the cell

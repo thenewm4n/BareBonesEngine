@@ -11,7 +11,7 @@ class ScenePlatformer : public Scene
     struct PlayerConfig
     {
         float X = 0.0f, Y = 0.0f, BB_WIDTH = 1.0f, BB_HEIGHT = 1.0f, X_SPEED = 0.0f, JUMP_SPEED = 0.0f, MAX_SPEED = 10.0f, GRAVITY = 2.0f;
-        std::string WEAPON = "NONE";
+        std::string WEAPON = "PISTOL";
     };
 
 public:

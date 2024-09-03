@@ -1,13 +1,11 @@
 # To complete
-1. Implement Scene_Play::spawnBullet().
-    - Bullet animation: get bullet sprite
-    - Bullet should shoot in same direction player is facing when space is pressed.
-    - Holding down spawn should only fire one bullet i.e. a  new bullet can only be fired after space released (when space pressed, shoot, and set CInput.canShoot to false; when space released, set CInput.canShoot to true.).
-2. Implement collision checking with bullets/brick tiles such that brick is destroyed when a bullet collides with it.
-    - Remember, collision occurs when overlap is non-zero in both x and y components.
-    - Bullets should be destroyed upon colliding with a non-decorative tile.
-    - If tile has brick animation, destroy it upon collision as well.
-3. Implement detection of which side player collided with tile.
+1. Scene_Play::spawnBullet().
+    - Clean it up and add comments.
+    - Implement sLifespan().
+    - Add CLifepan
+2. Implement destruction of brick if player collides from below.
+3. Implement collision checking with bullets/brick tiles -> brick destroyed when bullet collides with it.
+    - If solid has brick animation, destroy it upon collision as well.
 4. Clean up README.
 
 

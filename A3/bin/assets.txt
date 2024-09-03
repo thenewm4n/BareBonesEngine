@@ -3,6 +3,7 @@ Texture TexRun assets/images/megaman/run.png
 Texture TexAir assets/images/megaman/air.png
 Texture TexShoot assets/images/megaman/shoot.png
 Texture TexExplosion assets/images/misc/explosion.png
+Texture TexBullet assets/images/misc/bullet.png
 Texture TexCoin assets/images/mario/coinspin.png
 Texture TexBrick assets/images/mario/brick.png
 Texture TexQMark assets/images/mario/qmarkfade.png
@@ -19,6 +20,7 @@ Animation Run TexRun 4 10
 Animation Air TexAir 1 1
 Animation Shoot TexShoot 1 20
 Animation Explosion TexExplosion 8 20
+Animation Bullet TexBullet 1 1
 Animation Coin TexCoin 4 5
 Animation QMark TexQMark 5 8
 Animation Brick TexBrick 1 1
