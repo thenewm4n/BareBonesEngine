@@ -310,7 +310,22 @@ void ScenePlatformer::sMovement()
 
 void ScenePlatformer::sLifespan()
 {
-    // TODO: Check lifespan of entities that have them, and destroy if they go over
+    for (auto& entity : m_entityManager.getEntities())
+    {
+        if (entity->hasComponent<CLifespan>())
+        {
+            const auto& lifespanComponent = entity->getComponent<CLifespan>();
+
+            std::cout << "Current frame: " << m_currentFrame << std::endl;
+            std::cout << "Frame created: " << lifespanComponent.frameCreated << std::endl;
+            std::cout << "Duration of entity: " << lifespanComponent.framesDuration << std::endl;
+
+            if (m_currentFrame - lifespanComponent.frameCreated > lifespanComponent.framesDuration)
+            {
+                entity->destroy();
+            }
+        }
+    }
 }
 
 void ScenePlatformer::sCollision()
@@ -318,7 +333,6 @@ void ScenePlatformer::sCollision()
     // TODO: Implement player/tile collisions and resolutions
     // TODO: Implement bullet/tile collisions
         // Destroy tile if it has Brick animation
-    // TODO: Check to see if player has fallen down hole i.e. y < height
 
     EntityVector& entities = m_entityManager.getEntities();
 
@@ -458,27 +472,29 @@ void ScenePlatformer::spawnPlayer()
 
 void ScenePlatformer::spawnBullet(std::shared_ptr<Entity> entity)
 {
+    const float bulletSpeed = 4.f;
+    const int framesAlive = 30;
+
     // Create entity
     std::shared_ptr<Entity> bullet = m_entityManager.addEntity("Bullet");
+
+    // For CAnimation, CBody
     const auto& animationBullet = m_game->getAssets().getAnimation("Bullet");
+    
+    // For CTransform
+    Vec2f positionEntity = entity->getComponent<CTransform>().position;
+    bool isFacingLeft = entity->getComponent<CTransform>().scale.x > 0;
+    float widthEntity = entity->getComponent<CAnimation>().animation.getSize().x;
+    float widthBullet = animationBullet.getSize().x;
+    Vec2f velocity = isFacingLeft ? Vec2f(-bulletSpeed, 0.f) : Vec2f(bulletSpeed, 0.f);
+    float offsetX = isFacingLeft ? (-widthEntity / 2.f) - (widthBullet / 2.f) : (widthEntity / 2.f) + (widthBullet / 2.f);
 
-    auto transformEntity = entity->getComponent<CTransform>();
-    Vec2f positionEntity = transformEntity.position;
-    bool facingLeft = transformEntity.scale.x > 0;
-
-    float spriteWidthEntity = entity->getComponent<CAnimation>().animation.getSize().x;
-    float spriteWidthBullet = animationBullet.getSize().x;
-
-    float bulletSpeed = 4.f;
-    Vec2f velocity = facingLeft ? Vec2f(-bulletSpeed, 0.f) : Vec2f(bulletSpeed, 0.f);
-    float offsetX = facingLeft ? (-spriteWidthEntity / 2.f) - (spriteWidthBullet / 2.f) : (spriteWidthEntity / 2.f) + (spriteWidthBullet / 2.f);
-
+    // Add components with pre-calculated parameters
     bullet->addComponent<CAnimation>(animationBullet, true);
     bullet->addComponent<CBody>(animationBullet.getSize());
     bullet->addComponent<CTransform>(positionEntity + Vec2f(offsetX, 0.f), velocity, 0.f);
-    bullet->getComponent<CTransform>().scale = facingLeft ? Vec2f(-1.f, 1.f) : Vec2f(1.f, 1.f);
-    
-    // Add Lifespan
+    bullet->getComponent<CTransform>().scale = isFacingLeft ? Vec2f(-1.f, 1.f) : Vec2f(1.f, 1.f);
+    bullet->addComponent<CLifespan>(framesAlive, m_currentFrame);
 }
 
 // Used to position of entity so bottom left of sprite is at bottom left of the cell

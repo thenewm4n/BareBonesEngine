@@ -1,8 +1,6 @@
 # To complete
-1. Scene_Play::spawnBullet().
-    - Clean it up and add comments.
-    - Implement sLifespan().
-    - Add CLifepan
+1. Fix sLifespan().
+    - Does Scene::m_currentFrame not increase i.e. always 0?  
 2. Implement destruction of brick if player collides from below.
 3. Implement collision checking with bullets/brick tiles -> brick destroyed when bullet collides with it.
     - If solid has brick animation, destroy it upon collision as well.
