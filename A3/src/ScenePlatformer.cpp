@@ -117,6 +117,8 @@ void ScenePlatformer::update()
 	}
 
     sRender();
+
+    m_currentFrame++;
 }
 
 void ScenePlatformer::endScene()
@@ -315,11 +317,7 @@ void ScenePlatformer::sLifespan()
         if (entity->hasComponent<CLifespan>())
         {
             const auto& lifespanComponent = entity->getComponent<CLifespan>();
-
-            std::cout << "Current frame: " << m_currentFrame << std::endl;
-            std::cout << "Frame created: " << lifespanComponent.frameCreated << std::endl;
-            std::cout << "Duration of entity: " << lifespanComponent.framesDuration << std::endl;
-
+            
             if (m_currentFrame - lifespanComponent.frameCreated > lifespanComponent.framesDuration)
             {
                 entity->destroy();
