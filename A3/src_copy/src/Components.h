@@ -14,8 +14,7 @@ enum class PlayerState
 {
     Running,
     Standing,
-    Jumping,
-    Falling,
+    InAir,
     Shooting
 };
 
@@ -135,8 +134,7 @@ public:
         {
             case PlayerState::Running: return "Running";
             case PlayerState::Standing: return "Standing";
-            case PlayerState::Jumping: return "Jumping";
-            case PlayerState::Falling: return "Falling";
+            case PlayerState::InAir: return "InAir";
             case PlayerState::Shooting: return "Shooting";
             default: return "Unknown";
         }

@@ -3,10 +3,10 @@ Texture TexArcherIdle assets/images/archer/archer_idle.png
 Texture TexArcherRun assets/images/archer/archer_run.png
 Texture TexRun assets/images/megaman/run.png
 Texture TexAir assets/images/megaman/air.png
-Texture TexArcherJump assets/images/archer/archer_jump_big.png
+Texture TexArcherJump assets/images/archer/archer_jump.png
 Texture TexArcherFall assets/images/archer/archer_fall.png
 Texture TexShoot assets/images/megaman/shoot.png
-Texture TexArcherShoot assets/images/archer/archer_shoot.png
+Texture TexArcherShoots assets/images/archer/archer_shoot.png
 Texture TexExplosion assets/images/misc/explosion.png
 Texture TexBullet assets/images/misc/bullet.png
 Texture TexCoin assets/images/mario/coinspin.png

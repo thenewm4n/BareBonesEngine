@@ -20,11 +20,10 @@ public:
 private:
     std::unordered_map<PlayerState, std::string> m_stateToAnimationMap =
     {
-        {PlayerState::Running, "ArcherRun"},
-        {PlayerState::Standing, "ArcherIdle"},
-        {PlayerState::Jumping, "ArcherJump"},
-        {PlayerState::Falling, "ArcherFall"},
-        {PlayerState::Shooting, "ArcherShoot"}
+        {PlayerState::Running, "Run"},
+        {PlayerState::Standing, "Stand"},
+        {PlayerState::InAir, "Air"},
+        {PlayerState::Shooting, "Shoot"}
     };
 
     std::string m_levelPath;

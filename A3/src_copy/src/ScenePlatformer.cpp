@@ -267,7 +267,6 @@ void ScenePlatformer::sMovement()
             if (input.up && input.canJump)
 			{
 				transform.velocity.y = m_playerConfig.JUMP_SPEED;
-                state.currentState = PlayerState::Jumping;          // Changes animation
 				input.canJump = false;
 			}
 
@@ -289,9 +288,9 @@ void ScenePlatformer::sMovement()
             }
             
             // Falling animation overrides running or standing animations
-            if (transform.velocity.y < 0)
+            if (transform.velocity.y != 0)
             {
-                state.currentState = PlayerState::Falling;
+                state.currentState = PlayerState::InAir;
             }
         }
 
