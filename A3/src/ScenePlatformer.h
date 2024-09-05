@@ -43,6 +43,7 @@ private:
     void update() override;
     void endScene() override;
 
+    // System methods
     void sDoAction(const Action& action) override;
     void sMovement();
     void sLifespan();
@@ -53,14 +54,17 @@ private:
     void spawnPlayer();
     void spawnArrow(std::shared_ptr<Entity> entity);
     
+    // Render helper functions
     Vec2f gridToMidPixel(const Vec2f& gridPosition, std::shared_ptr<Entity> entity);
     void renderEntity(std::shared_ptr<Entity> e);
     void renderGrid(sf::RenderWindow& window, const sf::View& view);
     void renderBBox(std::shared_ptr<Entity> entity);
 
+    // Animation helper functions
     void updatePlayerAnimation(CAnimation& animComponent);
     void updateEntityAnimation(std::shared_ptr<Entity> entity, CAnimation& animComponent);
     void spawnTempAnimation(Vec2f position, std::string animationName);
 
+    // Collision helper functions
     void handlePlayerCollision(std::shared_ptr<Entity> object);
 };
