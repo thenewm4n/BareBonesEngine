@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cmath>
+#include <algorithm>
 
 template <typename T>
 class Vec2
@@ -32,6 +33,7 @@ public:
 
     float distance(const Vec2<T>& other) const;
     void normalise();
+    void clampMax(T maxMagnitude);
 };
 
 
@@ -129,6 +131,13 @@ void Vec2<T>::normalise()
     // Distance distance from (0,0) to end of vector
     float length = distance(Vec2<T>(0, 0));
     *this /= length;
+}
+
+template <typename T>
+void Vec2<T>::clampMax(T maxMagnitude)
+{
+    this->x = x > 0 ? std::min(x, maxMagnitude) : -std::min(std::abs(x), maxMagnitude);
+    this->y = y > 0 ? std::min(y, maxMagnitude) : -std::min(std::abs(y), maxMagnitude);
 }
 
 

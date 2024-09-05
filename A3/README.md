@@ -52,14 +52,14 @@ Dec N X Y
     YPosition       Y   float
 
 *Player*
-Player GX GY CW CH SX SY SM GY B
+Player GX GY CW CH SX SY SM GY W
     GridPosX,Y          GX,GY   float,float
     BoundingBoxW,H      CW,CH   float,float
     HorizontalSpeed     SX      float
     JumpSpeed           SY      float
     MaxSpeed            SM      float
     Gravity             G       float
-    BulletAnim          B       std::string
+    WeaponAnim          B       std::string
 
 ### Keys: (All are remappable)
 - W: Jump

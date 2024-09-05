@@ -33,9 +33,11 @@ void ScenePlatformer::init()
     registerAction(sf::Keyboard::Equal, "ZOOM_IN");
     registerAction(sf::Keyboard::Hyphen, "ZOOM_OUT");
 
+    float textScale = m_viewSize.x * 0.0001;
+
     m_gridText.setFont(m_game->getAssets().getFont("Tech"));
     m_gridText.setCharacterSize(50);
-    m_gridText.setScale(0.05f, 0.05f);
+    m_gridText.setScale(textScale, textScale); // 0.05f, 0.05f);
 
 	sf::View view(sf::FloatRect(0, -m_viewSize.y, m_viewSize.x, m_viewSize.y));     // Top left corner of view is at (0, 0); view extends in negative y direction (upwards)
     m_game->getWindow().setView(view);
@@ -176,7 +178,7 @@ void ScenePlatformer::sDoAction(const Action& action)
                 if (m_player->getComponent<CInput>().canShoot)
                 {
                     m_player->getComponent<CState>().currentState = PlayerState::Shooting;      // Change state, and hence animation
-                    spawnBullet(m_player);
+                    spawnArrow(m_player);
                     m_player->getComponent<CInput>().canShoot = false;                          // Can't shoot again until SHOOT released
                 }
                 
@@ -249,6 +251,17 @@ void ScenePlatformer::sMovement()
             auto& input = m_player->getComponent<CInput>();
             auto& state = m_player->getComponent<CState>();
 
+            // If both are pressed or not pressed, x velocity is 0
+            if (input.left == input.right)
+            {
+                transform.velocity.x = 0;
+            }
+            else
+            {
+                transform.velocity.x = input.right ? m_playerConfig.X_SPEED : -m_playerConfig.X_SPEED;
+            }
+
+            /*
             // Change velocity and animation direction according to input
             if (input.right && !input.left)
             {
@@ -277,8 +290,8 @@ void ScenePlatformer::sMovement()
                 state.currentState = PlayerState::Running;
 
                  // Flip animation in X direction if mismatch between velocity and orientation of animation in X
-                if ((transform.velocity.x < 0 && transform.scale.x < 0) ||
-                    (transform.velocity.x > 0 && transform.scale.x > 0))
+                if ((transform.velocity.x < 0 && transform.scale.x > 0) ||
+                    (transform.velocity.x > 0 && transform.scale.x < 0))
                 {
                     transform.scale.x *= -1;
                 }
@@ -293,6 +306,7 @@ void ScenePlatformer::sMovement()
             {
                 state.currentState = PlayerState::Falling;
             }
+            */
         }
 
 		// Apply gravity if Entity has CGravity
@@ -302,8 +316,7 @@ void ScenePlatformer::sMovement()
 		}
 
         // Cap velocity in both directions; necessary in y direction to ensure no moving through floor
-        transform.velocity.x = std::min(transform.velocity.x, m_playerConfig.MAX_SPEED);
-        transform.velocity.y = std::min(transform.velocity.y, m_playerConfig.MAX_SPEED);
+        transform.velocity.clampMax(m_playerConfig.MAX_SPEED);
 
         // Update Entity's position according to velocity
         transform.previousPosition = transform.position;
@@ -467,31 +480,31 @@ void ScenePlatformer::spawnPlayer()
     m_player->addComponent<CState>();
 }
 
-void ScenePlatformer::spawnBullet(std::shared_ptr<Entity> entity)
+void ScenePlatformer::spawnArrow(std::shared_ptr<Entity> entity)
 {
-    const float bulletSpeed = 4.f;
+    const float arrowSpeed = 10.f;
     const int framesAlive = 60;
 
     // Create entity
-    std::shared_ptr<Entity> bullet = m_entityManager.addEntity("Bullet");
+    std::shared_ptr<Entity> arrow = m_entityManager.addEntity("Arrow");
 
     // For CAnimation, CBody
-    const auto& animationBullet = m_game->getAssets().getAnimation("Bullet");
+    const auto& animationArrow = m_game->getAssets().getAnimation("Arrow");
     
     // For CTransform
     Vec2f positionEntity = entity->getComponent<CTransform>().position;
-    bool isFacingLeft = entity->getComponent<CTransform>().scale.x > 0;
+    bool isFacingLeft = entity->getComponent<CTransform>().scale.x < 0;
     float widthEntity = entity->getComponent<CAnimation>().animation.getSize().x;
-    float widthBullet = animationBullet.getSize().x;
-    Vec2f velocity = isFacingLeft ? Vec2f(-bulletSpeed, 0.f) : Vec2f(bulletSpeed, 0.f);
-    float offsetX = isFacingLeft ? (-widthEntity / 2.f) - (widthBullet / 2.f) : (widthEntity / 2.f) + (widthBullet / 2.f);
+    float widthArrow = animationArrow.getSize().x;
+    Vec2f velocity = isFacingLeft ? Vec2f(-arrowSpeed, 0.f) : Vec2f(arrowSpeed, 0.f);
+    float offsetX = isFacingLeft ? (-widthEntity / 2.f) - (widthArrow / 2.f) : (widthEntity / 2.f) + (widthArrow / 2.f);
 
     // Add components with pre-calculated parameters
-    bullet->addComponent<CAnimation>(animationBullet, true);
-    bullet->addComponent<CBody>(animationBullet.getSize());
-    bullet->addComponent<CTransform>(positionEntity + Vec2f(offsetX, 0.f), velocity, 0.f);
-    bullet->getComponent<CTransform>().scale = isFacingLeft ? Vec2f(-1.f, 1.f) : Vec2f(1.f, 1.f);
-    bullet->addComponent<CLifespan>(framesAlive, m_currentFrame);
+    arrow->addComponent<CAnimation>(animationArrow, true);
+    arrow->addComponent<CBody>(animationArrow.getSize());
+    arrow->addComponent<CTransform>(positionEntity + Vec2f(offsetX, 0.f), velocity, 0.f);
+    arrow->getComponent<CTransform>().scale = isFacingLeft ? Vec2f(-1.f, 1.f) : Vec2f(1.f, 1.f);
+    arrow->addComponent<CLifespan>(framesAlive, m_currentFrame);
 }
 
 // Used to position of entity so bottom left of sprite is at bottom left of the cell
