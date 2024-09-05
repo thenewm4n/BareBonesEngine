@@ -13,10 +13,12 @@ public:
     void update();
     void reset();
     
-    bool hasEnded() const;
+    const bool hasEnded() const;
     const std::string& getName() const;
     const Vec2f& getSize() const;
     sf::Sprite& getSprite();
+    const int getFrameCount() const;
+    const int getFrameDuration() const;
 
 private:
     std::string m_name;

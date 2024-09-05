@@ -20,8 +20,8 @@ public:
 private:
     std::unordered_map<PlayerState, std::string> m_stateToAnimationMap =
     {
+        {PlayerState::Idle, "ArcherIdle"},
         {PlayerState::Running, "ArcherRun"},
-        {PlayerState::Standing, "ArcherIdle"},
         {PlayerState::Jumping, "ArcherJump"},
         {PlayerState::Falling, "ArcherFall"},
         {PlayerState::Shooting, "ArcherShoot"}
@@ -60,6 +60,7 @@ private:
 
     void updatePlayerAnimation(CAnimation& animComponent);
     void updateEntityAnimation(std::shared_ptr<Entity> entity, CAnimation& animComponent);
+    void spawnTempAnimation(Vec2f position, std::string animationName);
 
     void handlePlayerCollision(std::shared_ptr<Entity> object);
 };

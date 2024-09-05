@@ -12,8 +12,8 @@ public:
 
 enum class PlayerState
 {
+    Idle,
     Running,
-    Standing,
     Jumping,
     Falling,
     Shooting
@@ -119,11 +119,11 @@ class CState : public Component
 {
 public:
     PlayerState currentState;
-    PlayerState previousState = PlayerState::Standing;
+    PlayerState previousState = PlayerState::Idle;
     bool isFacingRight = false;
 
     CState()
-        : currentState(PlayerState::Standing) {}
+        : currentState(PlayerState::Idle) {}
     CState(PlayerState state)
         : currentState(state) {}
 
@@ -133,8 +133,8 @@ public:
 
         switch (state)
         {
+            case PlayerState::Idle: return "Idle";
             case PlayerState::Running: return "Running";
-            case PlayerState::Standing: return "Standing";
             case PlayerState::Jumping: return "Jumping";
             case PlayerState::Falling: return "Falling";
             case PlayerState::Shooting: return "Shooting";

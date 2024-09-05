@@ -1,15 +1,11 @@
 # To complete
-1. Change sMovement() logic for new player animations.
-2. Speed up shooting animation.
-3. Fix direction of shooting.
-5. Add coin animation upon hitting question mark.
-6. Implement collision checking with bullets/brick tiles -> brick destroyed when bullet collides with it.
-    - If solid has brick animation, destroy it upon collision as well.
-7. Clean up README (use LLM).
-8. Do I need all those methods in ScenePlatformer?
-9. Clean up animations.
-10. Is there point in WEAPON in PlayerConfig in ScenePlatformer?
-11. Fix jumping off arrows.
+1. Implement collision checking with arrows/brick tiles -> brick destroyed when bullet collides with it.
+    - Refactor code in handlePlayerCollisions for Brick and QMark blocks.
+2. Decrease size of explosion animation frames to < 64x64.
+3. Clean up README (use LLM).
+4. Do I need all those methods in ScenePlatformer?
+5. Clean up shooting animation.
+6. Is there point in WEAPON in PlayerConfig in ScenePlatformer?
 
 
 # Improvements

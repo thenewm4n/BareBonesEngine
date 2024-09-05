@@ -251,7 +251,7 @@ void ScenePlatformer::sMovement()
             auto& input = m_player->getComponent<CInput>();
             auto& state = m_player->getComponent<CState>();
 
-            // If both are pressed or not pressed, x velocity is 0
+            // If both are pressed or not pressed, x velocity is 0, else set velocity
             if (input.left == input.right)
             {
                 transform.velocity.x = 0;
@@ -261,52 +261,46 @@ void ScenePlatformer::sMovement()
                 transform.velocity.x = input.right ? m_playerConfig.X_SPEED : -m_playerConfig.X_SPEED;
             }
 
-            /*
-            // Change velocity and animation direction according to input
-            if (input.right && !input.left)
-            {
-                transform.velocity.x = m_playerConfig.X_SPEED;
-            }
-            else if (input.left && !input.right)
-            {
-                transform.velocity.x = -m_playerConfig.X_SPEED;
-            }
-            else
-            {
-                transform.velocity.x = 0;
-            }
-
-            // Jump if on ground and W pressed
+            // If player is holding jump & can jump, set y velocity to jump speed
             if (input.up && input.canJump)
-			{
-				transform.velocity.y = m_playerConfig.JUMP_SPEED;
-                state.currentState = PlayerState::Jumping;          // Changes animation
-				input.canJump = false;
-			}
-
-            // Set CState according to horizontal velocity -> changes animation set in sAnimation()
-            if (transform.velocity.x != 0)
             {
-                state.currentState = PlayerState::Running;
-
-                 // Flip animation in X direction if mismatch between velocity and orientation of animation in X
-                if ((transform.velocity.x < 0 && transform.scale.x > 0) ||
-                    (transform.velocity.x > 0 && transform.scale.x < 0))
-                {
-                    transform.scale.x *= -1;
-                }
+                transform.velocity.y = m_playerConfig.JUMP_SPEED;
+                input.canJump = false;
             }
-            else if (state.currentState != PlayerState::Shooting)
+            // If player isn't holding jump, set y velocity to 0
+            else if (!input.up && transform.velocity.y > 0)
             {
-                state.currentState = PlayerState::Standing;     // No change to direction when velocity is 0
+                transform.velocity.y *= 0.75f;
             }
             
-            // Falling animation overrides running or standing animations
-            if (transform.velocity.y < 0)
+            // Update player state if not shooting
+            if (state.currentState != PlayerState::Shooting)
             {
-                state.currentState = PlayerState::Falling;
+                if (transform.velocity.x != 0)
+                {
+                    state.currentState = PlayerState::Running;
+                }
+                else if (transform.velocity.y == 0)
+                {
+                    state.currentState = PlayerState::Idle;
+                }
+
+                if (transform.velocity.y > 0)
+                {
+                    state.currentState = PlayerState::Jumping;
+                }
+                else if (transform.velocity.y < 0)
+                {
+                    state.currentState = PlayerState::Falling;
+                }
             }
-            */
+
+            // Flip animation in X direction if mismatch between velocity and orientation of animation in X
+            if ((transform.velocity.x < 0 && transform.scale.x > 0) ||
+                (transform.velocity.x > 0 && transform.scale.x < 0))
+            {
+                transform.scale.x *= -1;
+            }
         }
 
 		// Apply gravity if Entity has CGravity
@@ -342,9 +336,6 @@ void ScenePlatformer::sLifespan()
 
 void ScenePlatformer::sCollision()
 {
-    // TODO: Implement player/tile collisions and resolutions
-        // Destroy tile if it has Brick animation
-        // If has animation QMark, change to QMarkDead
     // TODO: Implement bullet/tile collisions
         // Destroy tile if it has Brick animation
         // If has animation QMark, change to QMarkDead
@@ -473,11 +464,15 @@ void ScenePlatformer::spawnPlayer()
     m_player = m_entityManager.addEntity("Player");
     
     m_player->addComponent<CInput>();
-    m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation("Stand"), true);
-    m_player->addComponent<CTransform>(gridToMidPixel(Vec2f(m_playerConfig.X, m_playerConfig.Y), m_player));       // Adding CTransform must follow adding CAnimation because gridToMidPixel uses CAnimation
     m_player->addComponent<CBody>(Vec2f(m_playerConfig.BB_WIDTH, m_playerConfig.BB_HEIGHT), 1.f);
     m_player->addComponent<CGravity>(m_playerConfig.GRAVITY);
-    m_player->addComponent<CState>();
+    
+    // Add CState, and use state to determine animation
+    const PlayerState& state = m_player->addComponent<CState>().currentState;
+    m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation(m_stateToAnimationMap[state]), true);
+
+    // Adding CTransform must follow adding CAnimation because gridToMidPixel uses CAnimation
+    m_player->addComponent<CTransform>(gridToMidPixel(Vec2f(m_playerConfig.X, m_playerConfig.Y), m_player));
 }
 
 void ScenePlatformer::spawnArrow(std::shared_ptr<Entity> entity)
@@ -600,7 +595,7 @@ void ScenePlatformer::updatePlayerAnimation(CAnimation& animComponent)
     // Default to standing animation if previous animation ended and wasn't to repeat
     if (animComponent.animation.hasEnded() && !animComponent.toRepeat)
     {
-        stateComponent.currentState = PlayerState::Standing;
+        stateComponent.currentState = PlayerState::Idle;
     }
 
     // Update CAnimation if state has changed
@@ -651,19 +646,30 @@ void ScenePlatformer::handlePlayerCollision(std::shared_ptr<Entity> object)
             {
                 std::string animationName = object->getComponent<CAnimation>().animation.getName();
 
-                // If brick
+                // If brick, destroy and spawn explosion animation
                 if (animationName == "Brick")
                 {
                     object->destroy();
+                    spawnTempAnimation(object->getComponent<CTransform>().position, "Explosion");
                 }
-                // If question mark, change animation to ?QMarkFade
+                // If question mark, change animation and spawn coin
                 else if (animationName == "QMark")
                 {
                     object->addComponent<CAnimation>(m_game->getAssets().getAnimation("QMarkDead"), true);
-
-                    // Play coin animation m_gridCellSize.y above the position of the block
+                    spawnTempAnimation(object->getComponent<CTransform>().position + Vec2f(0.f, m_gridCellSize.y), "Coin");
                 }
             }
         }
     }
+}
+
+void ScenePlatformer::spawnTempAnimation(Vec2f position, std::string animationName)
+{
+    const Animation& animation = m_game->getAssets().getAnimation(animationName);
+                    
+    // Create coin entity in grid cell above block
+    std::shared_ptr<Entity> animationEntity = m_entityManager.addEntity(animationName);
+    animationEntity->addComponent<CAnimation>(m_game->getAssets().getAnimation(animationName), true);
+    animationEntity->addComponent<CTransform>(position);
+    animationEntity->addComponent<CLifespan>(animation.getFrameCount() * animation.getFrameDuration(), m_currentFrame);
 }
