@@ -1,12 +1,10 @@
 # To complete
-1. Change bounding box to be set to bottom of sprite - not centre.
 1. Implement collision checking with arrows/brick tiles -> brick destroyed when bullet collides with it.
     - Refactor code in handlePlayerCollisions for Brick and QMark blocks.
-2. Decrease size of explosion animation frames to < 64x64.
-3. Clean up README (use LLM).
-4. Do I need all those methods in ScenePlatformer?
-5. Clean up shooting animation.
-6. Is there point in WEAPON in PlayerConfig in ScenePlatformer?
+2. Clean up README (use LLM).
+3. Do I need all those methods in ScenePlatformer?
+4. Clean up shooting animation.
+5. Is there point in WEAPON in PlayerConfig in ScenePlatformer?
 
 
 # Improvements

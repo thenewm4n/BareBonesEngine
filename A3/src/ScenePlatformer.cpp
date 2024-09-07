@@ -337,28 +337,40 @@ void ScenePlatformer::sLifespan()
 void ScenePlatformer::sCollision()
 {
     // TODO: Implement bullet/tile collisions
-        // Destroy tile if it has Brick animation
-        // If has animation QMark, change to QMarkDead
 
     EntityVector& entities = m_entityManager.getEntities();
+    size_t entityCount = entities.size();
 
-    for (std::shared_ptr<Entity> a : entities)
+    for (size_t i = 0; i < entityCount; ++i)
     {
+        auto& a = entities[i];
+
         if (!a->hasComponent<CBody>())
         {
             continue;
         }
 
-        for (std::shared_ptr<Entity> b : entities)
+        for (int j = i + 1; j < entityCount; ++j)
         {
-            if (!b->hasComponent<CBody>() || a == b)
+            auto& b = entities[j];
+
+            if (!b->hasComponent<CBody>())
             {
                 continue;
             }
 
-            if (a == m_player)
+            // If either entity is the player, handle potential collision
+            if (a == m_player || b == m_player)
             {
-                handlePlayerCollision(b);
+                handlePlayerCollision(a == m_player ? b : a);
+            }
+            
+            // If one entity is an arrow and the other a solid, handle potential collision
+            else if ((a->getTag() == "Arrow" || b->getTag() == "Arrow") && 
+                    (a->getTag() == "Solid" || b->getTag() == "Solid"))
+            {
+                bool aIsArrow = a->getTag() == "Arrow";
+                handleArrowSolidCollision(aIsArrow ? a : b, aIsArrow ? b : a);
             }
         }
     }
@@ -524,7 +536,15 @@ void ScenePlatformer::renderEntity(std::shared_ptr<Entity> e)
     {
         auto& transform = e->getComponent<CTransform>();
         auto& animationSprite = e->getComponent<CAnimation>().animation.getSprite();
-        animationSprite.setPosition(transform.position.x, -transform.position.y);
+
+        // If entity has CBody, align bottom of sprite to bottom of bounding box
+        float spriteCentreY = -transform.position.y;
+        if (e->hasComponent<CBody>())
+        {
+            spriteCentreY += (e->getComponent<CBody>().bBox.size.y - animationSprite.getGlobalBounds().height) / 2.f;
+        }
+        
+        animationSprite.setPosition(transform.position.x, spriteCentreY);
 		animationSprite.setScale(transform.scale.x, transform.scale.y);
         animationSprite.setRotation(transform.angle);
         m_game->getWindow().draw(animationSprite);
@@ -618,6 +638,17 @@ void ScenePlatformer::updateEntityAnimation(std::shared_ptr<Entity> entity, CAni
     }
 }
 
+void ScenePlatformer::spawnTempAnimation(Vec2f position, std::string animationName)
+{
+    const Animation& animation = m_game->getAssets().getAnimation(animationName);
+                    
+    // Create coin entity in grid cell above block
+    std::shared_ptr<Entity> animationEntity = m_entityManager.addEntity(animationName);
+    animationEntity->addComponent<CAnimation>(m_game->getAssets().getAnimation(animationName), true);
+    animationEntity->addComponent<CTransform>(position);
+    animationEntity->addComponent<CLifespan>(animation.getFrameCount() * animation.getFrameDuration(), m_currentFrame);
+}
+
 void ScenePlatformer::handlePlayerCollision(std::shared_ptr<Entity> object)
 {
     // If overlap in both x and y directions, resolve collision
@@ -644,32 +675,38 @@ void ScenePlatformer::handlePlayerCollision(std::shared_ptr<Entity> object)
             // If from below, destroy block/change animation accordingly
             else
             {
-                std::string animationName = object->getComponent<CAnimation>().animation.getName();
-
-                // If brick, destroy and spawn explosion animation
-                if (animationName == "Brick")
-                {
-                    object->destroy();
-                    spawnTempAnimation(object->getComponent<CTransform>().position, "Explosion");
-                }
-                // If question mark, change animation and spawn coin
-                else if (animationName == "QMark")
-                {
-                    object->addComponent<CAnimation>(m_game->getAssets().getAnimation("QMarkDead"), true);
-                    spawnTempAnimation(object->getComponent<CTransform>().position + Vec2f(0.f, m_gridCellSize.y), "Coin");
-                }
+                destroySolid(object);
             }
         }
     }
 }
 
-void ScenePlatformer::spawnTempAnimation(Vec2f position, std::string animationName)
+void ScenePlatformer::handleArrowSolidCollision(std::shared_ptr<Entity> arrow, std::shared_ptr<Entity> object)
 {
-    const Animation& animation = m_game->getAssets().getAnimation(animationName);
-                    
-    // Create coin entity in grid cell above block
-    std::shared_ptr<Entity> animationEntity = m_entityManager.addEntity(animationName);
-    animationEntity->addComponent<CAnimation>(m_game->getAssets().getAnimation(animationName), true);
-    animationEntity->addComponent<CTransform>(position);
-    animationEntity->addComponent<CLifespan>(animation.getFrameCount() * animation.getFrameDuration(), m_currentFrame);
+    Vec2f overlap = Physics::getOverlap(arrow, object);
+
+    // If overlap in x and y directions, destroy solid and arrow
+    if (overlap.x > 0 && overlap.y > 0)
+    {
+        destroySolid(object);
+        arrow->destroy();
+    }
+}
+
+void ScenePlatformer::destroySolid(std::shared_ptr<Entity> solid)
+{
+    std::string animationName = solid->getComponent<CAnimation>().animation.getName();
+
+    // If brick, destroy and spawn explosion animation
+    if (animationName == "Brick")
+    {
+        solid->destroy();
+        spawnTempAnimation(solid->getComponent<CTransform>().position, "Explosion");
+    }
+    // If question mark, change animation and spawn coin
+    else if (animationName == "QMark")
+    {
+        solid->addComponent<CAnimation>(m_game->getAssets().getAnimation("QMarkDead"), true);
+        spawnTempAnimation(solid->getComponent<CTransform>().position + Vec2f(0.f, m_gridCellSize.y), "Coin");
+    }
 }

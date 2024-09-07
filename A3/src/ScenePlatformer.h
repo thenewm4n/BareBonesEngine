@@ -51,20 +51,23 @@ private:
     void sAnimation();
     void sRender() override;
 
+    // Spawning methods
     void spawnPlayer();
     void spawnArrow(std::shared_ptr<Entity> entity);
     
-    // Render helper functions
+    // Render helper methods
     Vec2f gridToMidPixel(const Vec2f& gridPosition, std::shared_ptr<Entity> entity);
     void renderEntity(std::shared_ptr<Entity> e);
     void renderGrid(sf::RenderWindow& window, const sf::View& view);
     void renderBBox(std::shared_ptr<Entity> entity);
 
-    // Animation helper functions
+    // Animation helper methods
     void updatePlayerAnimation(CAnimation& animComponent);
     void updateEntityAnimation(std::shared_ptr<Entity> entity, CAnimation& animComponent);
     void spawnTempAnimation(Vec2f position, std::string animationName);
 
-    // Collision helper functions
+    // Collision helper methods
     void handlePlayerCollision(std::shared_ptr<Entity> object);
+    void handleArrowSolidCollision(std::shared_ptr<Entity> arrow, std::shared_ptr<Entity> object);
+    void destroySolid(std::shared_ptr<Entity> solid);
 };
