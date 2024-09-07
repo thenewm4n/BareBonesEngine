@@ -1,4 +1,5 @@
 # To complete
+1. Change bounding box to be set to bottom of sprite - not centre.
 1. Implement collision checking with arrows/brick tiles -> brick destroyed when bullet collides with it.
     - Refactor code in handlePlayerCollisions for Brick and QMark blocks.
 2. Decrease size of explosion animation frames to < 64x64.
