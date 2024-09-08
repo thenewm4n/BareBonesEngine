@@ -1,6 +1,5 @@
 # To complete
-1. Implement collision checking with arrows/brick tiles -> brick destroyed when bullet collides with it.
-    - Refactor code in handlePlayerCollisions for Brick and QMark blocks.
+1. Why do pipes destroy the arrow, but don't get destroyed themselves?
 2. Clean up README (use LLM).
 3. Do I need all those methods in ScenePlatformer?
 4. Clean up shooting animation.
