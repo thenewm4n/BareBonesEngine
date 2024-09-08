@@ -31,7 +31,7 @@ private:
     std::shared_ptr<Entity> m_player;
     PlayerConfig m_playerConfig;
     EntityManager m_entityManager;
-    sf::Vector2f m_viewSize{1536.f, 864.f};          // Was 320.f, 180.f on Mac, 384.f, 216.f on PC
+    sf::Vector2f m_viewSize{1536.0f, 864.0f};          // Was 320.0f, 180.0f on Mac, 384.0f, 216.0f on PC
     const Vec2i m_gridCellSize{64, 64};
     sf::Text m_gridText;
     bool m_drawBoundingBoxes = false;

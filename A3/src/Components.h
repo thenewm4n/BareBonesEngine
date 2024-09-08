@@ -22,11 +22,11 @@ enum class PlayerState
 class CTransform : public Component
 {
 public:
-    Vec2f position = { 0.f, 0.f };
-    Vec2f previousPosition = { 0.f, 0.f };
-    Vec2f scale = { 1.f, 1.f };
-    Vec2f velocity = { 0.f, 0.f };
-    float angle = 0.f;
+    Vec2f position = { 0.0f, 0.0f };
+    Vec2f previousPosition = { 0.0f, 0.0f };
+    Vec2f scale = { 1.0f, 1.0f };
+    Vec2f velocity = { 0.0f, 0.0f };
+    float angle = 0.0f;
 
     CTransform() {}
     CTransform(const Vec2f& pos)
@@ -48,7 +48,7 @@ public:
 class CBoundingCircle : public Component
 {
 public:
-    float radius = 0.f;
+    float radius = 0.0f;
 
     CBoundingCircle() {}
     CBoundingCircle(float rad)
@@ -63,9 +63,9 @@ public:
     float mass;         // 0 < mass <= 1
 
     CBody()
-        : mass(1.f) {}
+        : mass(1.0f) {}
     
-    CBody(Vec2f size, float mass = 1.f)
+    CBody(Vec2f size, float mass = 1.0f)
         : bBox(size), mass(mass)
     {
         if (mass < 0.001f)
@@ -73,19 +73,19 @@ public:
             std::cout << "Mass is negative or zero." << std::endl;
             this->mass = 0.001f;
         }
-        if (mass > 1.f) 
+        if (mass > 1.0f) 
         {
             std::cout << "Mass is greater than 1." << std::endl;
-			this->mass = 1.f;
+			this->mass = 1.0f;
         }
     }
     
     /*
-    CBody(float radius, float mass = 1.f)
+    CBody(float radius, float mass = 1.0f)
         : bCircle(radius)
     {
         if (mass < 0.001f) { std::cout << "Mass is negative or zero." << std::endl; }
-        if (mass > 1.f) { std::cout << "Mass is greater than 1." << std::endl; }
+        if (mass > 1.0f) { std::cout << "Mass is greater than 1." << std::endl; }
     }
     */
 };

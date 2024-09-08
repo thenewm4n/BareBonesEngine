@@ -1,9 +1,10 @@
 # To complete
-1. Why do pipes destroy the arrow, but don't get destroyed themselves?
-2. Clean up README (use LLM).
-3. Do I need all those methods in ScenePlatformer?
-4. Clean up shooting animation.
+1. Should I have specific getters in ConfigManager e.g. getResolution?
+2. Replace config with ConfigManager.
+3. Clean up README (use LLM).
+4. Do I need all those methods in ScenePlatformer?
 5. Is there point in WEAPON in PlayerConfig in ScenePlatformer?
+6. Change size/resolution of window according to windows window.
 
 
 # Improvements

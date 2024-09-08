@@ -3,7 +3,7 @@
 #include <cmath>
 #include <iostream>
 
-Animation::Animation() : m_name("NONE"), m_frameSize(Vec2f(1.f, 1.f)), m_frameCount(1), m_frameDuration(1) {}
+Animation::Animation() : m_name("NONE"), m_frameSize(Vec2f(1.0f, 1.0f)), m_frameCount(1), m_frameDuration(1) {}
 
 Animation::Animation(const sf::Texture& tex, const std::string& animationName, int frameCount, int frameDuration)
     : m_name(animationName),
@@ -12,7 +12,7 @@ Animation::Animation(const sf::Texture& tex, const std::string& animationName, i
     m_frameDuration(frameDuration)
 {
     m_frameSize = Vec2f(static_cast<float>(tex.getSize().x) / frameCount, static_cast<float>(tex.getSize().y));
-    m_sprite.setOrigin(m_frameSize.x / 2.f, m_frameSize.y / 2.f);                                                                 // Origin set to centre of sprite
+    m_sprite.setOrigin(m_frameSize.x / 2.0f, m_frameSize.y / 2.0f);                                                                 // Origin set to centre of sprite
     m_sprite.setTextureRect(sf::IntRect(0, 0, static_cast<int>(m_frameSize.x), static_cast<int>(m_frameSize.y)));        // left, top, width, height
 }
 

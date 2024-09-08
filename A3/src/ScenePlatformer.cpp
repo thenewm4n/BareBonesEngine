@@ -364,7 +364,7 @@ void ScenePlatformer::sCollision()
             {
                 handlePlayerCollision(a == m_player ? b : a);
             }
-            
+
             // If one entity is an arrow and the other a solid, handle potential collision
             else if ((a->getTag() == "Arrow" || b->getTag() == "Arrow") && 
                     (a->getTag() == "Solid" || b->getTag() == "Solid"))
@@ -377,7 +377,7 @@ void ScenePlatformer::sCollision()
 
     // Restrict player from moving off left of map
     Vec2f& posPlayer = m_player->getComponent<CTransform>().position;
-    posPlayer.x = std::max(m_player->getComponent<CBody>().bBox.size.x / 2.f, posPlayer.x);
+    posPlayer.x = std::max(m_player->getComponent<CBody>().bBox.size.x / 2.0f, posPlayer.x);
 
     // Restart level if player has fallen down hole
     if (posPlayer.y < 0)
@@ -429,7 +429,7 @@ void ScenePlatformer::sRender()
     const Vec2f& playerPosition = m_player->getComponent<CTransform>().position;
 
     // Centres view on player if further to right than middle of screen
-	float newViewCentreX = std::max(m_viewSize.x / 2.f, playerPosition.x);        // Ensures view doesn't exceed left side of level; to stop going off right side, use std::min of this and level width
+	float newViewCentreX = std::max(m_viewSize.x / 2.0f, playerPosition.x);        // Ensures view doesn't exceed left side of level; to stop going off right side, use std::min of this and level width
 	view.setCenter(newViewCentreX, view.getCenter().y);
     window.setView(view);
 
@@ -476,7 +476,7 @@ void ScenePlatformer::spawnPlayer()
     m_player = m_entityManager.addEntity("Player");
     
     m_player->addComponent<CInput>();
-    m_player->addComponent<CBody>(Vec2f(m_playerConfig.BB_WIDTH, m_playerConfig.BB_HEIGHT), 1.f);
+    m_player->addComponent<CBody>(Vec2f(m_playerConfig.BB_WIDTH, m_playerConfig.BB_HEIGHT), 1.0f);
     m_player->addComponent<CGravity>(m_playerConfig.GRAVITY);
     
     // Add CState, and use state to determine animation
@@ -489,7 +489,7 @@ void ScenePlatformer::spawnPlayer()
 
 void ScenePlatformer::spawnArrow(std::shared_ptr<Entity> entity)
 {
-    const float arrowSpeed = 10.f;
+    const float arrowSpeed = 10.0f;
     const int framesAlive = 60;
 
     // Create entity
@@ -503,14 +503,14 @@ void ScenePlatformer::spawnArrow(std::shared_ptr<Entity> entity)
     bool isFacingLeft = entity->getComponent<CTransform>().scale.x < 0;
     float widthEntity = entity->getComponent<CAnimation>().animation.getSize().x;
     float widthArrow = animationArrow.getSize().x;
-    Vec2f velocity = isFacingLeft ? Vec2f(-arrowSpeed, 0.f) : Vec2f(arrowSpeed, 0.f);
-    float offsetX = isFacingLeft ? (-widthEntity / 2.f) - (widthArrow / 2.f) : (widthEntity / 2.f) + (widthArrow / 2.f);
+    Vec2f velocity = isFacingLeft ? Vec2f(-arrowSpeed, 0.0f) : Vec2f(arrowSpeed, 0.0f);
+    float offsetX = isFacingLeft ? (-widthEntity / 2.0f) - (widthArrow / 2.0f) : (widthEntity / 2.0f) + (widthArrow / 2.0f);
 
     // Add components with pre-calculated parameters
     arrow->addComponent<CAnimation>(animationArrow, true);
     arrow->addComponent<CBody>(animationArrow.getSize());
-    arrow->addComponent<CTransform>(positionEntity + Vec2f(offsetX, 0.f), velocity, 0.f);
-    arrow->getComponent<CTransform>().scale = isFacingLeft ? Vec2f(-1.f, 1.f) : Vec2f(1.f, 1.f);
+    arrow->addComponent<CTransform>(positionEntity + Vec2f(offsetX, 0.0f), velocity, 0.0f);
+    arrow->getComponent<CTransform>().scale = isFacingLeft ? Vec2f(-1.0f, 1.0f) : Vec2f(1.0f, 1.0f);
     arrow->addComponent<CLifespan>(framesAlive, m_currentFrame);
 }
 
@@ -520,11 +520,11 @@ Vec2f ScenePlatformer::gridToMidPixel(const Vec2f& gridPosition, std::shared_ptr
     if (!entity->hasComponent<CAnimation>())
     {
         std::cerr << "ScenePlatformer.cpp: entity has no CAnimation." << std::endl;
-        return Vec2f(0.f, 0.f);
+        return Vec2f(0.0f, 0.0f);
     }
 
     const Vec2f& spriteSize = entity->getComponent<CAnimation>().animation.getSize();
-    Vec2f offset = (gridPosition * Vec2f(m_gridCellSize)) + (spriteSize / 2.f);
+    Vec2f offset = (gridPosition * Vec2f(m_gridCellSize)) + (spriteSize / 2.0f);
 
     return offset;
 }
@@ -541,7 +541,7 @@ void ScenePlatformer::renderEntity(std::shared_ptr<Entity> e)
         float spriteCentreY = -transform.position.y;
         if (e->hasComponent<CBody>())
         {
-            spriteCentreY += (e->getComponent<CBody>().bBox.size.y - animationSprite.getGlobalBounds().height) / 2.f;
+            spriteCentreY += (e->getComponent<CBody>().bBox.size.y - animationSprite.getGlobalBounds().height) / 2.0f;
         }
         
         animationSprite.setPosition(transform.position.x, spriteCentreY);
@@ -559,8 +559,8 @@ void ScenePlatformer::renderGrid(sf::RenderWindow& window, const sf::View& view)
     
     sf::Vector2f viewSize = view.getSize();
 
-    float topEdgeY = view.getCenter().y - (m_viewSize.y / 2.f);                                     // Top of viewable area
-    float bottomEdgeY = view.getCenter().y + (m_viewSize.y / 2.f) + m_gridCellSize.y;               // Bottom of viewable area; height of a cell added to ensure full coverage
+    float topEdgeY = view.getCenter().y - (m_viewSize.y / 2.0f);                                     // Top of viewable area
+    float bottomEdgeY = view.getCenter().y + (m_viewSize.y / 2.0f) + m_gridCellSize.y;               // Bottom of viewable area; height of a cell added to ensure full coverage
 	float firstHorizontalLineY = topEdgeY + (-static_cast<int>(topEdgeY) % m_gridCellSize.y);        // Y position of topmost cell starting just outside of window
 
     sf::VertexArray lines(sf::Lines);
@@ -600,7 +600,7 @@ void ScenePlatformer::renderBBox(std::shared_ptr<Entity> entity)
 
     sf::RectangleShape rectangle;
     rectangle.setSize(sf::Vector2f(bBox.size.x - 1, bBox.size.y - 1));  // Only takes sf::Vector2f
-    rectangle.setOrigin(bBox.size.x / 2.f, bBox.size.y / 2.f);
+    rectangle.setOrigin(bBox.size.x / 2.0f, bBox.size.y / 2.0f);
     rectangle.setPosition(transform.position.x, -transform.position.y);
     rectangle.setFillColor(sf::Color(0, 0, 0, 0));                  // Sets alpha of fill colour to 0 i.e. transparent
     rectangle.setOutlineColor(sf::Color(255, 255, 255, 255));       // Sets alpha of outline to 255 i.e. opaque
@@ -662,7 +662,7 @@ void ScenePlatformer::handlePlayerCollision(std::shared_ptr<Entity> object)
         if (!isXDirection)
         {
             // Whether collision from above or below, set y velocity to 0
-            m_player->getComponent<CTransform>().velocity.y = 0.f;
+            m_player->getComponent<CTransform>().velocity.y = 0.0f;
 
             // If player's previous position was less (i.e. closer to top of screen), collision from above
             bool isFromAbove = m_player->getComponent<CTransform>().previousPosition.y > object->getComponent<CTransform>().previousPosition.y;
@@ -707,6 +707,6 @@ void ScenePlatformer::destroySolid(std::shared_ptr<Entity> solid)
     else if (animationName == "QMark")
     {
         solid->addComponent<CAnimation>(m_game->getAssets().getAnimation("QMarkDead"), true);
-        spawnTempAnimation(solid->getComponent<CTransform>().position + Vec2f(0.f, m_gridCellSize.y), "Coin");
+        spawnTempAnimation(solid->getComponent<CTransform>().position + Vec2f(0.0f, m_gridCellSize.y), "Coin");
     }
 }

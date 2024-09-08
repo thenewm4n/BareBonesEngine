@@ -13,8 +13,8 @@ namespace
             const Vec2f positionA = usePrevious ? a->getComponent<CTransform>().previousPosition : a->getComponent<CTransform>().position;
             const Vec2f positionB = usePrevious ? b->getComponent<CTransform>().previousPosition : b->getComponent<CTransform>().position;
             
-            const Vec2f halfSizeA = a->getComponent<CBody>().bBox.size / 2.f;
-            const Vec2f halfSizeB = b->getComponent<CBody>().bBox.size / 2.f;
+            const Vec2f halfSizeA = a->getComponent<CBody>().bBox.size / 2.0f;
+            const Vec2f halfSizeB = b->getComponent<CBody>().bBox.size / 2.0f;
 
             Vec2f overlap;
 
@@ -28,7 +28,7 @@ namespace
         }
 
         std::cerr << "Physics.cpp: one or both entities lack a CBody or CTransform." << std::endl;
-        return Vec2f(0.f, 0.f);
+        return Vec2f(0.0f, 0.0f);
     }
 
     // Axis-agnostic move function to avoid repeated code
@@ -76,7 +76,7 @@ namespace Physics
         if (!isXDirection)
         {
             // Whether collision from above or below, set y velocity to 0
-            player->getComponent<CTransform>().velocity.y = 0.f;
+            player->getComponent<CTransform>().velocity.y = 0.0f;
 
             // If player's previous position was less (i.e. closer to top of screen), collision from above
             bool isFromAbove = player->getComponent<CTransform>().previousPosition.y > object->getComponent<CTransform>().previousPosition.y;
