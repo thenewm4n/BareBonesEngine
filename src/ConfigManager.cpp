@@ -39,7 +39,7 @@ bool ConfigManager::loadFromFile(const std::string& filename)
     return true;
 }
 
-std::string ConfigManager::getString(const std::string& key, const std::string& defaultValue = "") const
+std::string ConfigManager::getString(const std::string& key, const std::string& defaultValue) const
 {
     auto iterator = m_config.find(key);
     if (iterator != m_config.end())
@@ -57,7 +57,7 @@ std::string ConfigManager::getString(const std::string& key, const std::string& 
     return defaultValue;
 }
 
-int ConfigManager::getInt(const std::string& key, int defaultValue = 0) const
+int ConfigManager::getInt(const std::string& key, int defaultValue) const
 {
     auto iterator = m_config.find(key);
     if (iterator == m_config.end())
@@ -78,7 +78,7 @@ int ConfigManager::getInt(const std::string& key, int defaultValue = 0) const
     return defaultValue;
 }
 
-float ConfigManager::getFloat(const std::string& key, float defaultValue = 0.0f) const
+float ConfigManager::getFloat(const std::string& key, float defaultValue) const
 {
     auto iterator = m_config.find(key);
     if (iterator == m_config.end())
@@ -99,7 +99,7 @@ float ConfigManager::getFloat(const std::string& key, float defaultValue = 0.0f)
     return defaultValue;
 }
 
-bool ConfigManager::getBool(const std::string& key, bool defaultValue = false) const
+bool ConfigManager::getBool(const std::string& key, bool defaultValue) const
 {
     auto iterator = m_config.find(key);
     
@@ -128,7 +128,7 @@ bool ConfigManager::getBool(const std::string& key, bool defaultValue = false) c
     return defaultValue;
 }
 
-std::vector<std::string> ConfigManager::getStringVector(const std::string& key, const std::vector<std::string>& defaultValue = {}) const
+std::vector<std::string> ConfigManager::getStringVector(const std::string& key, const std::vector<std::string>& defaultValue) const
 {
     auto iterator = m_config.find(key);
     if (iterator == m_config.end())
