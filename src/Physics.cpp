@@ -61,38 +61,6 @@ namespace Physics
     {
         return getOverlapHelper(a, b, true);
     }
-    /*
-    void resolveCollision(std::shared_ptr<Entity> player, std::shared_ptr<Entity> object)
-    {
-        // This function is only called there's overlap in both x and y directions;
-        // if previous x overlap is negative, x overlap is new
-
-        const Vec2f previousOverlap = Physics::getPreviousOverlap(player, object); 
-        bool isXDirection = previousOverlap.x <= 0 && previousOverlap.y > 0;
-
-        movePlayer(player, object, isXDirection);
-		
-        // If collision in y direction, set velocity to 0 and handle according to direction
-        if (!isXDirection)
-        {
-            // Whether collision from above or below, set y velocity to 0
-            player->getComponent<CTransform>().velocity.y = 0.0f;
-
-            // If player's previous position was less (i.e. closer to top of screen), collision from above
-            bool isFromAbove = player->getComponent<CTransform>().previousPosition.y > object->getComponent<CTransform>().previousPosition.y;
-
-            // If collision is in y direction and is from above, reset player y velocity (sets player animation to standing) and allow jumping
-            if (isFromAbove)
-            {
-                player->getComponent<CInput>().canJump = true;
-            }
-            else
-            {
-                // TODO: Handle question mark collision here?
-            }
-        }
-    }
-    */
 
     bool resolveCollision(std::shared_ptr<Entity> a, std::shared_ptr<Entity> b)
     {
