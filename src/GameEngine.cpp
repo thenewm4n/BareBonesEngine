@@ -134,11 +134,11 @@ void GameEngine::sUserInput()
 
             continue;
         }
-
-        // Scene-agnostic screenshot key
-        if (event.type == sf::Event::KeyPressed)
+        // Instantiates an Action object and makes Scene perform Action if registered in the current scene
+        else if (event.type == sf::Event::KeyPressed || event.type == sf::Event::KeyReleased)
         {
-            if (event.key.code == sf::Keyboard::X)      // Screenshot
+            // If X pressed, take screenshot, regardless of scene
+            if (event.key.code == sf::Keyboard::X)
             {
                 sf::Texture texture;
                 texture.create(m_window.getSize().x, m_window.getSize().y);
@@ -153,11 +153,7 @@ void GameEngine::sUserInput()
                 // Continue to next event
                 continue;
             }
-        }
 
-        // Instantiates an Action object and makes Scene perform Action if registered in the current scene
-        if (event.type == sf::Event::KeyPressed || event.type == sf::Event::KeyReleased)
-        {
             // If the current scene doesn't have a mapping for the key pressed/released, continue
             if (getCurrentScene()->getActionMap().find(event.key.code) == getCurrentScene()->getActionMap().end())
             {

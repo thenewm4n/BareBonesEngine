@@ -1,5 +1,5 @@
 CXX := g++
-OUTPUT := A3
+OUTPUT := 2DEngine
 
 SFML_DIR := /opt/homebrew/Cellar/sfml/2.6.1
 
@@ -19,7 +19,7 @@ $(OUTPUT):$(OBJ_FILES) Makefile
 	$(CXX) -c $(CXX_FLAGS) $(INCLUDES) $< -o $@
 
 clean:
-	rm -f $(OBJ_FILES) ./bin/A3
+	rm -f $(OBJ_FILES) ./bin/$(OUTPUT)
 
 run: $(OUTPUT)
-	./bin/A3
+	./bin/$(OUTPUT)
