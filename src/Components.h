@@ -153,14 +153,23 @@ public:
     CAnimation(const Animation& animation, bool toRepeat)
         : animation(animation), toRepeat(toRepeat) {}
 
-    void update()
+    bool update()
     {
         animation.update();
 
-        if (animation.hasEnded() && toRepeat)
+        if (animation.hasEnded())
         {
-            animation.reset();
+            if (toRepeat)
+            {
+                animation.reset();
+            }
+            else
+            {
+                return true;
+            }
         }
+
+        return false;
     }
 };
 

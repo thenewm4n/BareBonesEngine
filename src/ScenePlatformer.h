@@ -62,8 +62,8 @@ private:
     void renderBBox(std::shared_ptr<Entity> entity);
 
     // Animation helper methods
-    void updatePlayerAnimation(CAnimation& animComponent);
-    void updateEntityAnimation(std::shared_ptr<Entity> entity, CAnimation& animComponent);
+    void endAnimation(std::shared_ptr<Entity> entity);
+    void changePlayerAnimation();
     void spawnTempAnimation(Vec2f position, std::string animationName);
 
     // Collision helper methods

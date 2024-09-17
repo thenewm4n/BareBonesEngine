@@ -394,17 +394,21 @@ void ScenePlatformer::sAnimation()
         // If entity has Animation component, either update it, or remove if has ended
         if (entity->hasComponent<CAnimation>())
         {
-            CAnimation& animComponent = entity->getComponent<CAnimation>();
-
-            animComponent.update();
+            bool hasEnded = entity->getComponent<CAnimation>().update();
+            
+            if (hasEnded)
+            {
+                endAnimation(entity);
+            }
 
             if (entity == m_player)
             {
-                updatePlayerAnimation(animComponent);
-            }
-            else      // if entity is non-player
-            {
-                updateEntityAnimation(entity, animComponent);
+                // If player state has changed, change animation 
+                const CState& stateComponent = m_player->getComponent<CState>();
+                if (stateComponent.currentState != stateComponent.previousState)
+                {
+                    changePlayerAnimation();
+                }       
             }
         }
     }
@@ -609,34 +613,27 @@ void ScenePlatformer::renderBBox(std::shared_ptr<Entity> entity)
     m_game->getWindow().draw(rectangle);
 }
 
-void ScenePlatformer::updatePlayerAnimation(CAnimation& animComponent)
+void ScenePlatformer::endAnimation(std::shared_ptr<Entity> entity)
 {
-    CState& stateComponent = m_player->getComponent<CState>();
-
-    // Default to standing animation if previous animation ended and wasn't to repeat
-    if (animComponent.animation.hasEnded() && !animComponent.toRepeat)
+    if (entity == m_player)
     {
-        stateComponent.currentState = PlayerState::Idle;
+        m_player->getComponent<CState>().currentState = PlayerState::Idle;
     }
-
-    // Update CAnimation if state has changed
-    if (stateComponent.currentState != stateComponent.previousState)
-    {
-        bool toRepeat = stateComponent.currentState != PlayerState::Shooting;
-
-        const std::string& animationName = m_stateToAnimationMap[stateComponent.currentState];
-        animComponent = m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation(animationName), toRepeat);
-
-        stateComponent.previousState = stateComponent.currentState;
-    }
-}
-
-void ScenePlatformer::updateEntityAnimation(std::shared_ptr<Entity> entity, CAnimation& animComponent)
-{
-    if (animComponent.animation.hasEnded() && !animComponent.toRepeat)
+    else
     {
         entity->removeComponent<CAnimation>();
     }
+}
+
+void ScenePlatformer::changePlayerAnimation()
+{
+    CState& stateComponent = m_player->getComponent<CState>();
+
+    const std::string& animationName = m_stateToAnimationMap[stateComponent.currentState];
+    bool toRepeat = stateComponent.currentState != PlayerState::Shooting;
+    m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation(animationName), toRepeat);
+
+    stateComponent.previousState = stateComponent.currentState;
 }
 
 void ScenePlatformer::spawnTempAnimation(Vec2f position, std::string animationName)
