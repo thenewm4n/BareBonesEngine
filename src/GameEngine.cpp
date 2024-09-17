@@ -106,63 +106,76 @@ void GameEngine::sUserInput()
     while (m_window.pollEvent(event))
     {
         // ImGui::SFML::ProcessEvent(m_window, event);
-
-        if (event.type == sf::Event::Closed)
+        switch (event.type)
         {
-            quit();
-        }
-        else if (event.type == sf::Event::Resized)
-        {
-            // If window hasn't changed size, continue to next event
-            if (event.size.width == m_resolution.x && event.size.height == m_resolution.y)
-            {
-                continue;
-            }
-
-            // Changes window size according to whether width or height has changed
-            sf::Vector2u newWindowSize = (event.size.width != m_resolution.x) ?
-                sf::Vector2u(event.size.width, event.size.width / m_aspectRatio) :
-                sf::Vector2u(static_cast<unsigned int>(event.size.height * m_aspectRatio), event.size.height);
-
-            m_window.setSize(newWindowSize);
-
-            // Update local resolution variable
-            m_resolution = m_window.getSize();
-
-            continue;
-        }
-        // Instantiates an Action object and makes Scene perform Action if registered in the current scene
-        else if (event.type == sf::Event::KeyPressed || event.type == sf::Event::KeyReleased)
-        {
-            // If X pressed, take screenshot, regardless of scene
-            if (event.key.code == sf::Keyboard::X)
-            {
-                sf::Texture texture;
-                texture.create(m_window.getSize().x, m_window.getSize().y);
-                texture.update(m_window);
-
-                // If successful screenshot, print
-                if (texture.copyToImage().saveToFile("test.png"))
+            case sf::Event::KeyPressed:
+            case sf::Event::KeyReleased:
+                // Instantiates an Action object and makes Scene perform Action if registered in the current scene
+                if (getCurrentScene()->getActionMap().find(event.key.code) != getCurrentScene()->getActionMap().end())
                 {
-                    std::cout << "Screenshot saved as test.png." << std::endl;
+                    const std::string actionType = (event.type == sf::Event::KeyPressed) ? "START" : "END";
+                    getCurrentScene()->sDoAction(Action(getCurrentScene()->getActionMap().at(event.key.code), actionType));
                 }
 
-                // Continue to next event
-                continue;
-            }
+                if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::L)
+                {
+                    takeScreenshot();
+                }
+                break;
+            
+            case sf::Event::Closed:
+                quit();
+                break;
 
-            // If the current scene doesn't have a mapping for the key pressed/released, continue
-            if (getCurrentScene()->getActionMap().find(event.key.code) == getCurrentScene()->getActionMap().end())
-            {
-                continue;
-            }
+            case sf::Event::Resized:
+                if ((event.size.width != m_resolution.x) || (event.size.height != m_resolution.y))
+                {
+                    // Changes window size according to whether width or height has changed
+                    sf::Vector2u newWindowSize = (event.size.width != m_resolution.x) ?
+                        sf::Vector2u(event.size.width, event.size.width / m_aspectRatio) :
+                        sf::Vector2u(static_cast<unsigned int>(event.size.height * m_aspectRatio), event.size.height);
 
-            // If the key was pressed, type is START, else type is END
-            const std::string actionType = (event.type == sf::Event::KeyPressed) ? "START" : "END";
+                    m_window.setSize(newWindowSize);
 
-            // Lookup action in current scene's action map, and do action within this scene
-            getCurrentScene()->sDoAction(Action(getCurrentScene()->getActionMap().at(event.key.code), actionType));
+                    // Update local resolution variable
+                    m_resolution = m_window.getSize();
+                }
+
+            default:
+                break;
         }
+    }
+}
+
+void GameEngine::takeScreenshot()
+{
+    // Create a texture to hold the current window contents
+    sf::Texture texture;
+    texture.create(m_window.getSize().x, m_window.getSize().y);
+    texture.update(m_window); // Capture the window contents
+
+    // Create an image from the texture
+    sf::Image screenshot = texture.copyToImage();
+
+    // Get current time
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_c = std::chrono::system_clock::to_time_t(now);
+    std::tm* now_tm = std::localtime(&now_c);
+
+    // Format the filename with date and time
+    std::ostringstream filename;
+    filename << "screenshot_" 
+             << std::put_time(now_tm, "%Y-%m-%d_%H-%M-%S") 
+             << ".png";
+
+    // Save the image to a file
+    if (screenshot.saveToFile(filename.str()))
+    {
+        std::cout << "Screenshot saved as " + filename.str() << '.' << std::endl;
+    }
+    else
+    {
+        std::cerr << "Error saving screenshot!" << std::endl;
     }
 }
 

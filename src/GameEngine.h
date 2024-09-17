@@ -35,6 +35,7 @@ protected:
     void init(const std::string& assetsFilePath);
     void update();
     void sUserInput();
+    void takeScreenshot();
 
     std::shared_ptr<Scene> getCurrentScene();
 };
