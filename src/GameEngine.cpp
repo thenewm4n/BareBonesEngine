@@ -113,21 +113,18 @@ void GameEngine::sUserInput()
         }
         else if (event.type == sf::Event::Resized)
         {
-            // If window hasn't changed size, continue to next iteration of while loop
+            // If window hasn't changed size, continue to next event
             if (event.size.width == m_resolution.x && event.size.height == m_resolution.y)
             {
                 continue;
             }
 
-            // If one dimension has changed, change the other according to aspect ratio
-            if (event.size.width != m_resolution.x)
-            {
-                m_window.setSize(sf::Vector2u(event.size.width, event.size.width / m_aspectRatio));
-            }
-            else
-            {
-                m_window.setSize(sf::Vector2u(event.size.height * m_aspectRatio, event.size.height));
-            }
+            // Changes window size according to whether width or height has changed
+            sf::Vector2u newWindowSize = (event.size.width != m_resolution.x) ?
+                sf::Vector2u(event.size.width, event.size.width / m_aspectRatio) :
+                sf::Vector2u(static_cast<unsigned int>(event.size.height * m_aspectRatio), event.size.height);
+
+            m_window.setSize(newWindowSize);
 
             // Update local resolution variable
             m_resolution = m_window.getSize();
