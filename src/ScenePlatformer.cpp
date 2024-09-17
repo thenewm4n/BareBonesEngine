@@ -336,8 +336,6 @@ void ScenePlatformer::sLifespan()
 
 void ScenePlatformer::sCollision()
 {
-    // TODO: Implement bullet/tile collisions
-
     EntityVector& entities = m_entityManager.getEntities();
     size_t entityCount = entities.size();
 
@@ -359,18 +357,21 @@ void ScenePlatformer::sCollision()
                 continue;
             }
 
-            // If either entity is the player, handle potential collision
-            if (a == m_player || b == m_player)
+            // If overlap in both x and y directions, resolve collision accordingly
+            const Vec2f& overlap = Physics::getOverlap(a, b);
+            if (overlap.x > 0 && overlap.y > 0)
             {
-                handlePlayerCollision(a == m_player ? b : a);
-            }
-
-            // If one entity is an arrow and the other a solid, handle potential collision
-            else if ((a->getTag() == "Arrow" || b->getTag() == "Arrow") && 
-                    (a->getTag() == "Solid" || b->getTag() == "Solid"))
-            {
-                bool aIsArrow = a->getTag() == "Arrow";
-                handleArrowSolidCollision(aIsArrow ? a : b, aIsArrow ? b : a);
+                if (a == m_player || b == m_player)
+                {
+                    handlePlayerCollision((a == m_player) ? b : a);
+                }
+                // If a combination of arrow and solid, handle collision according
+                else if((a->getTag() == "Arrow" || b->getTag() == "Arrow") && 
+                        (a->getTag() == "Solid" || b->getTag() == "Solid"))
+                {
+                    bool aIsArrow = a->getTag() == "Arrow";
+                    handleArrowCollision(aIsArrow ? a : b, aIsArrow ? b : a);
+                }
             }
         }
     }
@@ -651,46 +652,35 @@ void ScenePlatformer::spawnTempAnimation(Vec2f position, std::string animationNa
 
 void ScenePlatformer::handlePlayerCollision(std::shared_ptr<Entity> object)
 {
-    // If overlap in both x and y directions, resolve collision
-    Vec2f overlap = Physics::getOverlap(m_player, object);
-    if (overlap.x > 0 && overlap.y > 0)
+    // Resolve collision and determine if X or Y direction
+    bool isXDirection = Physics::resolveCollision(m_player, object);
+
+    // If collision in y direction, set velocity to 0 and handle according to direction
+    if (!isXDirection)
     {
-        // Resolve collision and determine if X or Y direction
-        bool isXDirection = Physics::resolveCollision(m_player, object);
+        // Whether collision from above or below, set y velocity to 0
+        m_player->getComponent<CTransform>().velocity.y = 0.0f;
 
-        // If collision in y direction, set velocity to 0 and handle according to direction
-        if (!isXDirection)
+        // If player's previous position was less (i.e. closer to top of screen), collision from above
+        bool isFromAbove = m_player->getComponent<CTransform>().previousPosition.y > object->getComponent<CTransform>().previousPosition.y;
+
+        // If collision from above, player can now jump
+        if (isFromAbove)
         {
-            // Whether collision from above or below, set y velocity to 0
-            m_player->getComponent<CTransform>().velocity.y = 0.0f;
-
-            // If player's previous position was less (i.e. closer to top of screen), collision from above
-            bool isFromAbove = m_player->getComponent<CTransform>().previousPosition.y > object->getComponent<CTransform>().previousPosition.y;
-
-            // If collision from above, player can now jump
-            if (isFromAbove)
-            {
-                m_player->getComponent<CInput>().canJump = true;
-            }
-            // If from below, destroy block/change animation accordingly
-            else
-            {
-                destroySolid(object);
-            }
+            m_player->getComponent<CInput>().canJump = true;
+        }
+        // If from below, destroy block/change animation accordingly
+        else
+        {
+            destroySolid(object);
         }
     }
 }
 
-void ScenePlatformer::handleArrowSolidCollision(std::shared_ptr<Entity> arrow, std::shared_ptr<Entity> object)
+void ScenePlatformer::handleArrowCollision(std::shared_ptr<Entity> arrow, std::shared_ptr<Entity> object)
 {
-    Vec2f overlap = Physics::getOverlap(arrow, object);
-
-    // If overlap in x and y directions, destroy solid and arrow
-    if (overlap.x > 0 && overlap.y > 0)
-    {
-        destroySolid(object);
-        arrow->destroy();
-    }
+    destroySolid(object);
+    arrow->destroy();
 }
 
 void ScenePlatformer::destroySolid(std::shared_ptr<Entity> solid)

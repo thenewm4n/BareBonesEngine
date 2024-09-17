@@ -68,6 +68,6 @@ private:
 
     // Collision helper methods
     void handlePlayerCollision(std::shared_ptr<Entity> object);
-    void handleArrowSolidCollision(std::shared_ptr<Entity> arrow, std::shared_ptr<Entity> object);
+    void handleArrowCollision(std::shared_ptr<Entity> arrow, std::shared_ptr<Entity> object);
     void destroySolid(std::shared_ptr<Entity> solid);
 };
