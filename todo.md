@@ -8,7 +8,7 @@
 
 
 # Improvements
-- Fix jittery camera when moving.
+- Fix jittery camera when moving -> could be due to frame rate dependency in the camera movement logic -> ensure camera updates are decoupled from frame rate by using delta time for smooth transitions.
 - SceneStartMenu: make initialisation of title, menu strings & level paths dynamic according to e.g. config file, levels file.
 - Decouple logic from framerate using delta time.
 - Use mass in collision resolution.

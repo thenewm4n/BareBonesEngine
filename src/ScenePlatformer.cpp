@@ -438,24 +438,28 @@ void ScenePlatformer::sRender()
 	view.setCenter(newViewCentreX, view.getCenter().y);
     window.setView(view);
 
-    // Drawing of textures/animations and bounding boxes
+    // Move player to end of entity vector, then draw entities
     EntityVector& entities = m_entityManager.getEntities();
-    for (auto entity : entities)
-    {
-        renderEntity(entity);
-    }
 
-	// Check whether player exists
+    // Check whether player exists
     auto playerIterator = std::find_if(entities.begin(), entities.end(), [](std::shared_ptr<Entity> e)
     {
         return e->getTag() == "Player"; 
     });
 
-	// If player exists, render it last
+    // If player exists, move to end of entity vector, so only a single pass needed
     if (playerIterator != entities.end())
     {
-        renderEntity(*playerIterator);
-    } 
+        std::shared_ptr<Entity> player = *playerIterator;
+        entities.erase(playerIterator);
+        entities.push_back(player);
+    }
+
+    // Drawing of textures/animations and bounding boxes
+    for (auto entity : entities)
+    {
+        renderEntity(entity);
+    }
 
 	// Render bounding boxes if enabled; in a separate loop to ensure they are drawn on top of textures
     for (auto entity : entities)
