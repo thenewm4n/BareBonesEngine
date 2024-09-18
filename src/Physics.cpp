@@ -32,19 +32,20 @@ namespace
     }
 
     // Axis-agnostic move function to avoid repeated code
-    void movePlayer(std::shared_ptr<Entity> player, std::shared_ptr<Entity> object, bool isXDirection)
+    // Moves entity a out of entity b
+    void moveEntity(std::shared_ptr<Entity> a, std::shared_ptr<Entity> b, bool isXDirection)
     {
-        float& posPlayer = isXDirection ? player->getComponent<CTransform>().position.x : player->getComponent<CTransform>().position.y;
-        float& prevPosPlayer = isXDirection ? player->getComponent<CTransform>().previousPosition.x : player->getComponent<CTransform>().previousPosition.y;
-        float posObject = isXDirection ? object->getComponent<CTransform>().position.x : object->getComponent<CTransform>().position.y;
-        float overlap = isXDirection ? Physics::getOverlap(player, object).x : Physics::getOverlap(player, object).y;
+        float& positionA = isXDirection ? a->getComponent<CTransform>().position.x : a->getComponent<CTransform>().position.y;
+        float& prevPositionA = isXDirection ? a->getComponent<CTransform>().previousPosition.x : a->getComponent<CTransform>().previousPosition.y;
+        float positionB = isXDirection ? b->getComponent<CTransform>().position.x : b->getComponent<CTransform>().position.y;
+        float overlap = isXDirection ? Physics::getOverlap(a, b).x : Physics::getOverlap(a, b).y;
 
         // Move player in correct direction
-        int direction = posPlayer > posObject ? 1 : -1;
-        posPlayer += direction * overlap;
+        int direction = positionA > positionB ? 1 : -1;
+        positionA += direction * overlap;
 
         // Previous position for the next frame is now the position after resolution
-        prevPosPlayer = posPlayer;
+        prevPositionA = positionA;
     }
 }
 
@@ -69,9 +70,7 @@ namespace Physics
 
         const Vec2f previousOverlap = Physics::getPreviousOverlap(a, b);
         bool isXDirection = previousOverlap.x <= 0 && previousOverlap.y > 0;
-
-        movePlayer(a, b, isXDirection);
-
+        moveEntity(a, b, isXDirection);
         return isXDirection;
     }
 }

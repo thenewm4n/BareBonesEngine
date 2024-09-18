@@ -58,7 +58,7 @@ private:
     // Render helper methods
     Vec2f gridToMidPixel(const Vec2f& gridPosition, std::shared_ptr<Entity> entity);
     void renderEntity(std::shared_ptr<Entity> e);
-    void renderGrid(sf::RenderWindow& window, const sf::View& view);
+    void renderGrid();
     void renderBBox(std::shared_ptr<Entity> entity);
 
     // Animation helper methods

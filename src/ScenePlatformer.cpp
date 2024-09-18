@@ -469,7 +469,7 @@ void ScenePlatformer::sRender()
     // Draw grid for debugging
     if (m_drawGrid)
     {
-		renderGrid(window, view);
+		renderGrid();
     }
 
     window.display();
@@ -556,8 +556,11 @@ void ScenePlatformer::renderEntity(std::shared_ptr<Entity> e)
     }
 }
 
-void ScenePlatformer::renderGrid(sf::RenderWindow& window, const sf::View& view)
+void ScenePlatformer::renderGrid()
 {
+    sf::RenderWindow& window = m_game->getWindow();
+    sf::View view = window.getView();
+
     float leftEdgeX = view.getCenter().x - (m_viewSize.x / 2);                                      // Left edge of viewable area
     float rightEdgeX = leftEdgeX + m_viewSize.x + m_gridCellSize.x;                                 // Right edge of viewable area - width of a cell is added to ensure full coverage
     float firstVertLineX = leftEdgeX - (static_cast<int>(leftEdgeX) % m_gridCellSize.x);            // X position of leftmost viewable cell starting just outside of window

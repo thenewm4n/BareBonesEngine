@@ -1,5 +1,4 @@
 # To complete
-1. Refactor ScenePlatformer::updatePlayerAnimation() and ScenePlatformer::updateObjectAnimation().
 1. Replace config with ConfigManager.
 2. Should I have specific getters in ConfigManager e.g. getResolution?
 3. Clean up README (use LLM).
