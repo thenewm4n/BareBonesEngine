@@ -3,7 +3,9 @@
 #include "Action.h"
 #include "SceneStartMenu.h"
 
+#include <chrono>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <sstream>
 
@@ -140,6 +142,7 @@ void GameEngine::sUserInput()
                     // Update local resolution variable
                     m_resolution = m_window.getSize();
                 }
+                break;
 
             default:
                 break;
@@ -160,12 +163,15 @@ void GameEngine::takeScreenshot()
     // Get current time
     auto now = std::chrono::system_clock::now();
     std::time_t now_c = std::chrono::system_clock::to_time_t(now);
-    std::tm* now_tm = std::localtime(&now_c);
+    //std::tm* now_tm = std::localtime_s(&now_c);
+
+    std::tm now_tm;
+    localtime_s(&now_tm, &now_c);
 
     // Format the filename with date and time
     std::ostringstream filename;
     filename << "screenshot_" 
-             << std::put_time(now_tm, "%Y-%m-%d_%H-%M-%S") 
+             << std::put_time(&now_tm, "%Y-%m-%d_%H-%M-%S") 
              << ".png";
 
     // Save the image to a file
