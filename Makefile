@@ -1,7 +1,7 @@
 CXX := g++
 OUTPUT := BareBones
 
-SFML_DIR := /opt/homebrew/Cellar/sfml/2.6.1
+SFML_DIR ?= /opt/homebrew/Cellar/sfml/2.6.1
 
 CXX_FLAGS := -O3 -std=c++20 -Wno-unused-result
 INCLUDES := -I./src -I./src/imgui -I$(SFML_DIR)/include

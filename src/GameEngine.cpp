@@ -78,7 +78,7 @@ void GameEngine::init(const std::string& configFilePath)
     file.close();
 
     // Create window using values from config.txt
-    m_window.create(sf::VideoMode(m_resolution.x, m_resolution.y), "Assignment 3");
+    m_window.create(sf::VideoMode(m_resolution.x, m_resolution.y), "BareBones");
     m_window.setFramerateLimit(framerateCap);
     m_aspectRatio = static_cast<float>(m_resolution.x) / static_cast<float>(m_resolution.y);
 
@@ -90,7 +90,8 @@ void GameEngine::init(const std::string& configFilePath)
     */
 
     // Load assets into Assets object
-    m_assets.loadFromFile("bin/assets.txt");
+    // m_assets.loadFromFile("bin/assets.txt");
+    m_assets.loadFromFile("assets.txt");
 
     // Create new menu scene, add it to scene map, and make it the current scene
     changeScene("MENU", std::make_shared<SceneStartMenu>(this));
@@ -163,10 +164,17 @@ void GameEngine::takeScreenshot()
     // Get current time
     auto now = std::chrono::system_clock::now();
     std::time_t now_c = std::chrono::system_clock::to_time_t(now);
-    //std::tm* now_tm = std::localtime_s(&now_c);
 
     std::tm now_tm;
-    localtime_s(&now_tm, &now_c);
+
+    // Uses correct version of function according to platform
+    #if defined(_WIN32) || defined(_WIN64)
+        localtime_s(&now_tm, &now_c);
+    #elif defined(__unix__) || defined(__linux__) || defined(__APPLE__)
+        localtime_r(&now_c, &now_tm);
+    #else
+        #error "Unsupported platform"
+    #endif
 
     // Format the filename with date and time
     std::ostringstream filename;
