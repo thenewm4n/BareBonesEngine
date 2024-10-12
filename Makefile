@@ -1,5 +1,5 @@
 CXX := g++
-OUTPUT := 2DEngine
+OUTPUT := BareBones
 
 SFML_DIR := /opt/homebrew/Cellar/sfml/2.6.1
 
