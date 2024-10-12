@@ -1,72 +1,103 @@
-# Specification
 
-## Config File
+# BareBones Engine
+
+## Overview
+Welcome to my C++ game engine, powered by SFML for graphics and sound. This engine is designed to help understand the ECS (Entity-Component-System) architecture through practical implementation.
+
+## Features
+- Customizable window settings
+- Easy-to-define assets (textures, animations, fonts)
+- Simple level configuration
+- Remappable control scheme
+
+## Prerequisites
+- C++17 or later
+- SFML 2.5.1 or later
+
+## Setup Instructions
+Clone the Repository:
+```
+git clone https://github.com/your-username/your-repo.git
+cd your-repo
+```
+
+Build the Project:
+```
+mkdir build
+cd build
+cmake ..
+make
+```
+
+Run the Game:
+```
+./game
+```
+
+## Usage
+### Config File
+Define window dimensions and framerate:
+```
 Window W H F
     W   Width       int
     H   Height      int
     F   Framerate   int
+```
 
-
-## Assets File
-*Textures*
+### Assets File
+> Note: A texture used in an animation must be defined before the animation.
+List textures, animations, and fonts:
+```
 Texture N P
     N   Name        std::string
     P   FilePath    std::string
 
-*Animations*
 Animation N T F D
     N   AnimationName   std::string
     T   TextureName     std::string
-    F   FrameCount      int             (no. frames in Animation)
-    D   FrameDuration   int             (no. game frames between animation frames; inverse of speed)
+    F   FrameCount      int
+    D   FrameDuration   int
 
-*Fonts*
 Font N P
     N   FontName    std::string
     P   FontPath    std::string
-
-*NOTE*
-A texture used in an animation must be defined before the animation.
+```
 
 
-# Level File
-Game levels are defined in a Level file, which includes a list of entity specifications, each on a separate line.
-It also contains a single line specifying the player's properties for that level.
+### Level File
+Specify game levels and player properties:
+```
+Player GX GY BW BH SX SY SM G W
+    GX,GY   GridPositionX,Y         float,float
+    BW,BH   BoundingBoxW,H          float,float
+    SX      HorizontalSpeed         float
+    SY      JumpSpeed               float
+    SM      MaxSpeed                float
+    G       Gravity                 float
+    W       WeaponAnim              std::string
 
-*Solid*
 Solid N GX GY
     N   AnimationName   std::string
     GX  GridPositionX   float
     GY  GridPositionY   float
 
-*Prop*
 Prop N GX GY
     N   AnimationName   std::string
     GX  GridPositionX   float
     GY  GridPositionY   float
+```
+> Note: GX and GY positions in the level specification file are in 'grid' coordinates. Each 'grid' cell measures 64 by 64 pixels. Entities are positioned so that the bottom-left corner of their texture aligns with the bottom-left corner of the specified grid coordinate.
+> Note: Solid entities have bodies, i.e., bounding boxes, whereas props don't.
 
-*Player*
-Player GX GY BW BH SX SY SM G W
-    GX,GY   GridPositionX,Y          float,float
-    BW,BH   BoundingBoxW,H      float,float
-    SX      HorizontalSpeed     float
-    SY      JumpSpeed           float
-    SM      MaxSpeed            float
-    G       Gravity             float
-    W       WeaponAnim          std::string
+## Controls for Platformer scene
+W: Jump
+A: Move left
+D: Move right
+P: Pause game
+T: Toggle drawing textures
+C: Toggle drawing bounding boxes
+G: Toggle drawing grid
+ESC: Return to main menu
 
-*NOTE*
-The GX and GY positions in the level specification file are in 'grid' coordinates. 
-Each 'grid' cell measures 64 by 64 pixels.
-Entities are positioned so that the bottom-left corner of their texture aligns with the bottom-left corner of the specified grid coordinate.
-
-
-### Keys: (All are remappable)
-- W: Jump
-- A: Move left
-- D: Move right
-- P: Pause game
-- T: Toggles drawing textures
-- C: Toggles drawing bounding boxes of entities
-- G: Toggles drawing of the grid
-- ESC: Toggle menu
+## License
+This project is licensed under the MIT License - see the LICENSE file for details.
