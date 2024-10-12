@@ -122,5 +122,15 @@ Prop N GX GY
 ### All scenes
 - L: Screenshot
 
+## Acknowledgments
+- SFML: https://www.sfml-dev.org/
+- ImGui: https://github.com/ocornut/imgui
+- Archer animations: https://chierit.itch.io/elementals-leaf-ranger
+- Explosion animation: https://xthekendrick.itch.io/2d-explosions-pixel-art-pack-1
+- Mario sprites: https://www.spriters-resource.com/nes/supermariobros/
+
 ## License
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Contact
+Feel free to reach out with any questions or suggestions! You can contact me at: bobby.newman@outlook.com
