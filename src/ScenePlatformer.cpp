@@ -394,8 +394,9 @@ void ScenePlatformer::sAnimation()
         // If entity has Animation component, either update it, or remove if has ended
         if (entity->hasComponent<CAnimation>())
         {
-            bool hasEnded = entity->getComponent<CAnimation>().update();
-            
+            auto& animationComponent = entity->getComponent<CAnimation>();
+            bool hasEnded = animationComponent.update();
+
             if (hasEnded)
             {
                 endAnimation(entity);
@@ -518,7 +519,7 @@ void ScenePlatformer::spawnArrow(std::shared_ptr<Entity> entity)
     // Add components with pre-calculated parameters
     arrow->addComponent<CAnimation>(animationArrow, true);
     arrow->addComponent<CBody>(animationArrow.getSize());
-    arrow->addComponent<CTransform>(positionEntity + Vec2f(offsetX, 0.0f), velocity, 0.0f);
+    arrow->addComponent<CTransform>(positionEntity + Vec2f(offsetX, 8.0f), velocity, 0.0f);
     arrow->getComponent<CTransform>().scale = isFacingLeft ? Vec2f(-1.0f, 1.0f) : Vec2f(1.0f, 1.0f);
     arrow->addComponent<CLifespan>(framesAlive, m_currentFrame);
 }

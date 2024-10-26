@@ -48,6 +48,8 @@ const Vec2f& Animation::getSize() const { return m_frameSize; }
 
 sf::Sprite& Animation::getSprite() { return m_sprite; }
 
+const int Animation::getCurrentFrame() const { return m_currentAnimationFrame; }
+
 const int Animation::getFrameCount() const { return m_frameCount; }
 
 const int Animation::getFrameDuration() const { return m_frameDuration; }

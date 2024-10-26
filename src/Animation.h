@@ -17,6 +17,7 @@ public:
     const std::string& getName() const;
     const Vec2f& getSize() const;
     sf::Sprite& getSprite();
+    const int getCurrentFrame() const;
     const int getFrameCount() const;
     const int getFrameDuration() const;
 

@@ -90,7 +90,6 @@ void GameEngine::init(const std::string& configFilePath)
     */
 
     // Load assets into Assets object
-    // m_assets.loadFromFile("bin/assets.txt");
     m_assets.loadFromFile("assets.txt");
 
     // Create new menu scene, add it to scene map, and make it the current scene
@@ -156,7 +155,7 @@ void GameEngine::takeScreenshot()
     // Create a texture to hold the current window contents
     sf::Texture texture;
     texture.create(m_window.getSize().x, m_window.getSize().y);
-    texture.update(m_window); // Capture the window contents
+    texture.update(m_window);
 
     // Create an image from the texture
     sf::Image screenshot = texture.copyToImage();
@@ -167,7 +166,7 @@ void GameEngine::takeScreenshot()
 
     std::tm now_tm;
 
-    // Uses correct version of function according to platform
+    // Uses correct version of localtime function according to platform
     #if defined(_WIN32) || defined(_WIN64)
         localtime_s(&now_tm, &now_c);
     #elif defined(__unix__) || defined(__linux__) || defined(__APPLE__)
@@ -182,7 +181,6 @@ void GameEngine::takeScreenshot()
              << std::put_time(&now_tm, "%Y-%m-%d_%H-%M-%S") 
              << ".png";
 
-    // Save the image to a file
     if (screenshot.saveToFile(filename.str()))
     {
         std::cout << "Screenshot saved as " + filename.str() << '.' << std::endl;

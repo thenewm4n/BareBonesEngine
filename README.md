@@ -7,7 +7,7 @@ Welcome to my C++ game engine, powered by SFML for graphics and sound. This engi
 ## Features
 - Entity-Component-System (ECS) architecture for efficient game object management
 - SFML-powered graphics and sound system
-- Customizable window settings (resolution, fullscreen, vsync, max FPS)
+- Customizable window settings (resolution, fullscreen, VSync, max FPS)
 - Easy-to-define assets (textures, animations, fonts)
 - Simple level configuration system
 - Remappable control scheme
