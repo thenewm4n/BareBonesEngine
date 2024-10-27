@@ -6,3 +6,4 @@
 *.ipch
 *.obj
 *.code-workspace
+/build/
