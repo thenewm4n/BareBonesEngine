@@ -426,7 +426,7 @@ void ScenePlatformer::sRender()
     }
     else
     {
-        window.clear(sf::Color(100, 100, 255));        // Indigo 
+        window.clear(sf::Color(200, 200, 255));        // Light blue
     }
 
     // Establishes variables for centring view

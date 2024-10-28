@@ -12,7 +12,7 @@ Texture TexQMarkDead ../assets/images/mario/qmarkdead.png
 Texture TexPipe ../assets/images/mario/pipe.png
 Texture TexCloud ../assets/images/mario/cloud.png
 Texture TexBush ../assets/images/mario/bush.png
-Texture TexGround ../assets/images/mario/ground.png
+Texture TexGround ../assets/images/environment/ground.png
 Texture TexBlock ../assets/images/mario/block.png
 Texture TexPole ../assets/images/mario/flagpole.png
 Texture TexPoleTop ../assets/images/mario/flagpoletop.png
