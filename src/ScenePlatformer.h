@@ -31,12 +31,15 @@ private:
     std::shared_ptr<Entity> m_player;
     PlayerConfig m_playerConfig;
     EntityManager m_entityManager;
+    sf::Clock m_clock;
+
     sf::Vector2f m_viewSize{1536.0f, 864.0f};          // Was 320.0f, 180.0f on Mac, 384.0f, 216.0f on PC
     const Vec2i m_gridCellSize{64, 64};
     sf::Text m_gridText;
     bool m_drawBoundingBoxes = false;
     bool m_drawGrid = false;
     bool m_drawTextures = true;
+    bool m_drawGui = false;
 
     void init();
     void loadLevel(const std::string& filename);
@@ -50,6 +53,7 @@ private:
     void sCollision();
     void sAnimation();
     void sRender() override;
+    void sGUI();
 
     // Spawning methods
     void spawnPlayer();

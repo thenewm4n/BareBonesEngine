@@ -25,6 +25,7 @@ void GameEngine::run()
     }
 
     m_window.close();
+    ImGui::SFML::Shutdown();
 }
 
 void GameEngine::quit() { m_running = false; }
@@ -81,18 +82,18 @@ void GameEngine::init(const std::string& configFilePath)
     file.close();
 
     // Create window using values from config.txt
-    m_window.create(sf::VideoMode(m_resolution.x, m_resolution.y), "BareBones");    // TODO: change title
+    m_window.create(sf::VideoMode(m_resolution.x, m_resolution.y), "BareBones", sf::Style::Fullscreen);    // TODO: change title
     m_window.setFramerateLimit(framerateCap);
     m_aspectRatio = static_cast<float>(m_resolution.x) / static_cast<float>(m_resolution.y);
 
-    // Creates GUI
+    // Create and resize ImGui
     auto result = ImGui::SFML::Init(m_window);
     if (!result)
     {
         std::cerr << "ImGui::SFML::Init failed." << std::endl;
         exit(-8);
     }
-    ImGui::GetStyle().ScaleAllSizes(3.5f);		// Scales imgui GUI
+    ImGui::GetStyle().ScaleAllSizes(3.5f);		// Scales imgui elements
     ImGui::GetIO().FontGlobalScale = 1.3f;		// Scales imgui text size
 
     // Load assets into Assets object
@@ -113,7 +114,11 @@ void GameEngine::sUserInput()
     sf::Event event;
     while (m_window.pollEvent(event))
     {
-        // ImGui::SFML::ProcessEvent(m_window, event);
+        if (m_currentScene != "MENU")
+        {
+            ImGui::SFML::ProcessEvent(m_window, event);
+        }
+        
         switch (event.type)
         {
             case sf::Event::KeyPressed:
@@ -140,7 +145,7 @@ void GameEngine::sUserInput()
                 {
                     // Changes window size according to whether width or height has changed
                     sf::Vector2u newWindowSize = (event.size.width != m_resolution.x) ?
-                        sf::Vector2u(event.size.width, event.size.width / m_aspectRatio) :
+                        sf::Vector2u(event.size.width, event.size.width / static_cast<unsigned int>(m_aspectRatio)) :
                         sf::Vector2u(static_cast<unsigned int>(event.size.height * m_aspectRatio), event.size.height);
 
                     m_window.setSize(newWindowSize);
