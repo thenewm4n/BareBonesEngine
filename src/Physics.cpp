@@ -8,13 +8,13 @@ namespace
     // Helper function to avoid code repetition
     Vec2f getOverlapHelper(std::shared_ptr<Entity> a, std::shared_ptr<Entity> b, bool usePrevious)
     {
-        if (a->hasComponent<CBody>() && b->hasComponent<CBody>() && a->hasComponent<CTransform>() && b->hasComponent<CTransform>())
+        if (a->has<CBody>() && b->has<CBody>() && a->has<CTransform>() && b->has<CTransform>())
         {
-            const Vec2f positionA = usePrevious ? a->getComponent<CTransform>().previousPosition : a->getComponent<CTransform>().position;
-            const Vec2f positionB = usePrevious ? b->getComponent<CTransform>().previousPosition : b->getComponent<CTransform>().position;
+            const Vec2f positionA = usePrevious ? a->get<CTransform>().previousPosition : a->get<CTransform>().position;
+            const Vec2f positionB = usePrevious ? b->get<CTransform>().previousPosition : b->get<CTransform>().position;
             
-            const Vec2f halfSizeA = a->getComponent<CBody>().bBox.size / 2.0f;
-            const Vec2f halfSizeB = b->getComponent<CBody>().bBox.size / 2.0f;
+            const Vec2f halfSizeA = a->get<CBody>().bBox.size / 2.0f;
+            const Vec2f halfSizeB = b->get<CBody>().bBox.size / 2.0f;
 
             Vec2f overlap;
 
@@ -35,9 +35,9 @@ namespace
     // Moves entity a out of entity b
     void moveEntity(std::shared_ptr<Entity> a, std::shared_ptr<Entity> b, bool isXDirection)
     {
-        float& positionA = isXDirection ? a->getComponent<CTransform>().position.x : a->getComponent<CTransform>().position.y;
-        float& prevPositionA = isXDirection ? a->getComponent<CTransform>().previousPosition.x : a->getComponent<CTransform>().previousPosition.y;
-        float positionB = isXDirection ? b->getComponent<CTransform>().position.x : b->getComponent<CTransform>().position.y;
+        float& positionA = isXDirection ? a->get<CTransform>().position.x : a->get<CTransform>().position.y;
+        float& prevPositionA = isXDirection ? a->get<CTransform>().previousPosition.x : a->get<CTransform>().previousPosition.y;
+        float positionB = isXDirection ? b->get<CTransform>().position.x : b->get<CTransform>().position.y;
         float overlap = isXDirection ? Physics::getOverlap(a, b).x : Physics::getOverlap(a, b).y;
 
         // Move player in correct direction

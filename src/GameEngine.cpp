@@ -43,7 +43,7 @@ float GameEngine::getAspectRatio() { return m_aspectRatio; }
 const Assets& GameEngine::getAssets() const { return m_assets; }
 
 
-// Protected methods
+// Private methods
 
 void GameEngine::init(const std::string& configFilePath)
 {

@@ -24,36 +24,36 @@ class Entity
 
 public:
     template <typename T, typename... TArgs>                // TArgs is 1 or more arguments, in this case the arguments passed to the constructor
-    T& addComponent(TArgs&&... args)                        // rvalue references
+    T& add(TArgs&&... args)                        // rvalue references
     {
-        auto& component = getComponent<T>();
+        auto& component = get<T>();
         component = T(std::forward<TArgs>(args)...);        // Overwrites the current component
         component.has = true;
         return component;
     }
     
     template <typename T>
-    void removeComponent()
+    void remove()
     {
-		getComponent<T>() = T();                            // component.has set to false
+		get<T>() = T();                            // component.has set to false
     }
 
     template <typename T>
-    T& getComponent()
+    T& get()
     {
         return std::get<T>(m_components);
     }
 
     template <typename T>
-    const T& getComponent() const
+    const T& get() const
     {
         return std::get<T>(m_components);
     }
 
     template <typename T>
-    bool hasComponent()
+    bool has()
     {
-        return getComponent<T>().has;
+        return get<T>().has;
     }
 
     void destroy();

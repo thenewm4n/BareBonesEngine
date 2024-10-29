@@ -89,15 +89,15 @@ void ScenePlatformer::loadLevel(const std::string& filename)
                 if (token == "Solid")
                 {
                     entity = m_entityManager.addEntity("Solid");
-                    entity->addComponent<CBody>(m_game->getAssets().getAnimation(animationName).getSize());
+                    entity->add<CBody>(m_game->getAssets().getAnimation(animationName).getSize());
                 }
                 else    // if Prop
                 {
                     entity = m_entityManager.addEntity("Prop");
                 }
 
-                entity->addComponent<CAnimation>(m_game->getAssets().getAnimation(animationName), true);    // IMPORTANT: add CAnimation first so gridToMidPixel can compute correctly
-                entity->addComponent<CTransform>(gridToMidPixel(position, entity));
+                entity->add<CAnimation>(m_game->getAssets().getAnimation(animationName), true);    // IMPORTANT: add CAnimation first so gridToMidPixel can compute correctly
+                entity->add<CTransform>(gridToMidPixel(position, entity));
             }
         }
     }
@@ -150,36 +150,36 @@ void ScenePlatformer::sDoAction(const Action& action)
             return;
         }
 
-        if (m_player->hasComponent<CInput>())
+        if (m_player->has<CInput>())
         {
             // Handle player input and return early to decrease latency
             if (actionName == "UP")
             {
-                m_player->getComponent<CInput>().up = true;
+                m_player->get<CInput>().up = true;
                 return;
             }
             else if (actionName == "DOWN")
             {
-                m_player->getComponent<CInput>().down = true;
+                m_player->get<CInput>().down = true;
                 return;
             }
             else if (actionName == "LEFT")
             {
-                m_player->getComponent<CInput>().left = true;
+                m_player->get<CInput>().left = true;
                 return;
             }
             else if (actionName == "RIGHT")
             {
-                m_player->getComponent<CInput>().right = true;
+                m_player->get<CInput>().right = true;
                 return;
             }
             else if (actionName == "SHOOT")
             {
-                if (m_player->getComponent<CInput>().canShoot)
+                if (m_player->get<CInput>().canShoot)
                 {
-                    m_player->getComponent<CState>().currentState = PlayerState::Shooting;      // Change state, and hence animation
+                    m_player->get<CState>().currentState = PlayerState::Shooting;      // Change state, and hence animation
                     spawnArrow(m_player);
-                    m_player->getComponent<CInput>().canShoot = false;                          // Can't shoot again until SHOOT released
+                    m_player->get<CInput>().canShoot = false;                          // Can't shoot again until SHOOT released
                 }
                 
                 return;
@@ -213,27 +213,27 @@ void ScenePlatformer::sDoAction(const Action& action)
     }
     else if (action.getType() == "END")
     {
-        if (m_player->hasComponent<CInput>())
+        if (m_player->has<CInput>())
         {
             if (actionName == "UP")
             {
-                m_player->getComponent<CInput>().up = false;
+                m_player->get<CInput>().up = false;
             }
             else if (actionName == "DOWN")
             {
-                m_player->getComponent<CInput>().down = false;
+                m_player->get<CInput>().down = false;
             }
             else if (actionName == "LEFT")
             {
-                m_player->getComponent<CInput>().left = false;
+                m_player->get<CInput>().left = false;
             }
             else if (actionName == "RIGHT")
             {
-                m_player->getComponent<CInput>().right = false;
+                m_player->get<CInput>().right = false;
             }
             else if (actionName == "SHOOT")
             {
-                m_player->getComponent<CInput>().canShoot = true;
+                m_player->get<CInput>().canShoot = true;
             }
         }
     }
@@ -244,12 +244,12 @@ void ScenePlatformer::sMovement()
     // For each entity in scene, handle movement according to entity's velocity
     for (auto entity : m_entityManager.getEntities())
     {
-        auto& transform = entity->getComponent<CTransform>();
+        auto& transform = entity->get<CTransform>();
 
         if (entity == m_player)
         {
-            auto& input = m_player->getComponent<CInput>();
-            auto& state = m_player->getComponent<CState>();
+            auto& input = m_player->get<CInput>();
+            auto& state = m_player->get<CState>();
 
             // If both are pressed or not pressed, x velocity is 0, else set velocity
             if (input.left == input.right)
@@ -304,9 +304,9 @@ void ScenePlatformer::sMovement()
         }
 
 		// Apply gravity if Entity has CGravity
-        if (entity->hasComponent<CGravity>())
+        if (entity->has<CGravity>())
 		{
-	        transform.velocity.y -= entity->getComponent<CGravity>().acceleration;
+	        transform.velocity.y -= entity->get<CGravity>().acceleration;
 		}
 
         // Cap velocity in both directions; necessary in y direction to ensure no moving through floor
@@ -322,9 +322,9 @@ void ScenePlatformer::sLifespan()
 {
     for (auto& entity : m_entityManager.getEntities())
     {
-        if (entity->hasComponent<CLifespan>())
+        if (entity->has<CLifespan>())
         {
-            const auto& lifespanComponent = entity->getComponent<CLifespan>();
+            const auto& lifespanComponent = entity->get<CLifespan>();
             
             if (m_currentFrame - lifespanComponent.frameCreated > lifespanComponent.framesDuration)
             {
@@ -343,7 +343,7 @@ void ScenePlatformer::sCollision()
     {
         auto& a = entities[i];
 
-        if (!a->hasComponent<CBody>())
+        if (!a->has<CBody>())
         {
             continue;
         }
@@ -352,7 +352,7 @@ void ScenePlatformer::sCollision()
         {
             auto& b = entities[j];
 
-            if (!b->hasComponent<CBody>())
+            if (!b->has<CBody>())
             {
                 continue;
             }
@@ -377,8 +377,8 @@ void ScenePlatformer::sCollision()
     }
 
     // Restrict player from moving off left of map
-    Vec2f& posPlayer = m_player->getComponent<CTransform>().position;
-    posPlayer.x = std::max(m_player->getComponent<CBody>().bBox.size.x / 2.0f, posPlayer.x);
+    Vec2f& posPlayer = m_player->get<CTransform>().position;
+    posPlayer.x = std::max(m_player->get<CBody>().bBox.size.x / 2.0f, posPlayer.x);
 
     // Restart level if player has fallen down hole
     if (posPlayer.y < 0)
@@ -392,9 +392,9 @@ void ScenePlatformer::sAnimation()
     for (auto& entity : m_entityManager.getEntities())
     {
         // If entity has Animation component, either update it, or remove if has ended
-        if (entity->hasComponent<CAnimation>())
+        if (entity->has<CAnimation>())
         {
-            auto& animationComponent = entity->getComponent<CAnimation>();
+            auto& animationComponent = entity->get<CAnimation>();
             bool hasEnded = animationComponent.update();
 
             if (hasEnded)
@@ -405,7 +405,7 @@ void ScenePlatformer::sAnimation()
             if (entity == m_player)
             {
                 // If player state has changed, change animation 
-                const CState& stateComponent = m_player->getComponent<CState>();
+                const CState& stateComponent = m_player->get<CState>();
                 if (stateComponent.currentState != stateComponent.previousState)
                 {
                     changePlayerAnimation();
@@ -432,7 +432,7 @@ void ScenePlatformer::sRender()
     // Establishes variables for centring view
     sf::View view = window.getView();
     view.setSize(m_viewSize);
-    const Vec2f& playerPosition = m_player->getComponent<CTransform>().position;
+    const Vec2f& playerPosition = m_player->get<CTransform>().position;
 
     // Centres view on player if further to right than middle of screen
 	float newViewCentreX = std::max(m_viewSize.x / 2.0f, playerPosition.x);        // Ensures view doesn't exceed left side of level; to stop going off right side, use std::min of this and level width
@@ -465,7 +465,7 @@ void ScenePlatformer::sRender()
 	// Render bounding boxes if enabled; in a separate loop to ensure they are drawn on top of textures
     for (auto entity : entities)
     {
-        if (m_drawBoundingBoxes && entity->hasComponent<CBody>())
+        if (m_drawBoundingBoxes && entity->has<CBody>())
         {
             renderBBox(entity);
         }
@@ -485,16 +485,16 @@ void ScenePlatformer::spawnPlayer()
     // Add Player entity and add components according to playerConfig struct
     m_player = m_entityManager.addEntity("Player");
     
-    m_player->addComponent<CInput>();
-    m_player->addComponent<CBody>(Vec2f(m_playerConfig.BB_WIDTH, m_playerConfig.BB_HEIGHT), 1.0f);
-    m_player->addComponent<CGravity>(m_playerConfig.GRAVITY);
+    m_player->add<CInput>();
+    m_player->add<CBody>(Vec2f(m_playerConfig.BB_WIDTH, m_playerConfig.BB_HEIGHT), 1.0f);
+    m_player->add<CGravity>(m_playerConfig.GRAVITY);
     
     // Add CState, and use state to determine animation
-    const PlayerState& state = m_player->addComponent<CState>().currentState;
-    m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation(m_stateToAnimationMap[state]), true);
+    const PlayerState& state = m_player->add<CState>().currentState;
+    m_player->add<CAnimation>(m_game->getAssets().getAnimation(m_stateToAnimationMap[state]), true);
 
     // Adding CTransform must follow adding CAnimation because gridToMidPixel uses CAnimation
-    m_player->addComponent<CTransform>(gridToMidPixel(Vec2f(m_playerConfig.X, m_playerConfig.Y), m_player));
+    m_player->add<CTransform>(gridToMidPixel(Vec2f(m_playerConfig.X, m_playerConfig.Y), m_player));
 }
 
 void ScenePlatformer::spawnArrow(std::shared_ptr<Entity> entity)
@@ -509,31 +509,31 @@ void ScenePlatformer::spawnArrow(std::shared_ptr<Entity> entity)
     const auto& animationArrow = m_game->getAssets().getAnimation("Arrow");
     
     // For CTransform
-    Vec2f positionEntity = entity->getComponent<CTransform>().position;
-    bool isFacingLeft = entity->getComponent<CTransform>().scale.x < 0;
-    float widthEntity = entity->getComponent<CAnimation>().animation.getSize().x;
+    Vec2f positionEntity = entity->get<CTransform>().position;
+    bool isFacingLeft = entity->get<CTransform>().scale.x < 0;
+    float widthEntity = entity->get<CAnimation>().animation.getSize().x;
     float widthArrow = animationArrow.getSize().x;
     Vec2f velocity = isFacingLeft ? Vec2f(-arrowSpeed, 0.0f) : Vec2f(arrowSpeed, 0.0f);
     float offsetX = isFacingLeft ? (-widthEntity / 2.0f) - (widthArrow / 2.0f) : (widthEntity / 2.0f) + (widthArrow / 2.0f);
 
     // Add components with pre-calculated parameters
-    arrow->addComponent<CAnimation>(animationArrow, true);
-    arrow->addComponent<CBody>(animationArrow.getSize());
-    arrow->addComponent<CTransform>(positionEntity + Vec2f(offsetX, 8.0f), velocity, 0.0f);
-    arrow->getComponent<CTransform>().scale = isFacingLeft ? Vec2f(-1.0f, 1.0f) : Vec2f(1.0f, 1.0f);
-    arrow->addComponent<CLifespan>(framesAlive, m_currentFrame);
+    arrow->add<CAnimation>(animationArrow, true);
+    arrow->add<CBody>(animationArrow.getSize());
+    arrow->add<CTransform>(positionEntity + Vec2f(offsetX, 8.0f), velocity, 0.0f);
+    arrow->get<CTransform>().scale = isFacingLeft ? Vec2f(-1.0f, 1.0f) : Vec2f(1.0f, 1.0f);
+    arrow->add<CLifespan>(framesAlive, m_currentFrame);
 }
 
 // Used to position of entity so bottom left of sprite is at bottom left of the cell
 Vec2f ScenePlatformer::gridToMidPixel(const Vec2f& gridPosition, std::shared_ptr<Entity> entity)
 {
-    if (!entity->hasComponent<CAnimation>())
+    if (!entity->has<CAnimation>())
     {
         std::cerr << "ScenePlatformer.cpp: entity has no CAnimation." << std::endl;
         return Vec2f(0.0f, 0.0f);
     }
 
-    const Vec2f& spriteSize = entity->getComponent<CAnimation>().animation.getSize();
+    const Vec2f& spriteSize = entity->get<CAnimation>().animation.getSize();
     Vec2f offset = (gridPosition * Vec2f(m_gridCellSize)) + (spriteSize / 2.0f);
 
     return offset;
@@ -542,16 +542,16 @@ Vec2f ScenePlatformer::gridToMidPixel(const Vec2f& gridPosition, std::shared_ptr
 void ScenePlatformer::renderEntity(std::shared_ptr<Entity> e)
 {
     // Draw Entity textures/animations
-    if (m_drawTextures && e->hasComponent<CAnimation>())
+    if (m_drawTextures && e->has<CAnimation>())
     {
-        auto& transform = e->getComponent<CTransform>();
-        auto& animationSprite = e->getComponent<CAnimation>().animation.getSprite();
+        auto& transform = e->get<CTransform>();
+        auto& animationSprite = e->get<CAnimation>().animation.getSprite();
 
         // If entity has CBody, align bottom of sprite to bottom of bounding box
         float spriteCentreY = -transform.position.y;
-        if (e->hasComponent<CBody>())
+        if (e->has<CBody>())
         {
-            spriteCentreY += (e->getComponent<CBody>().bBox.size.y - animationSprite.getGlobalBounds().height) / 2.0f;
+            spriteCentreY += (e->get<CBody>().bBox.size.y - animationSprite.getGlobalBounds().height) / 2.0f;
         }
         
         animationSprite.setPosition(transform.position.x, spriteCentreY);
@@ -608,8 +608,8 @@ void ScenePlatformer::renderGrid()
 
 void ScenePlatformer::renderBBox(std::shared_ptr<Entity> entity)
 {
-    auto& bBox = entity->getComponent<CBody>().bBox;
-    auto& transform = entity->getComponent<CTransform>();
+    auto& bBox = entity->get<CBody>().bBox;
+    auto& transform = entity->get<CTransform>();
 
     sf::RectangleShape rectangle;
     rectangle.setSize(sf::Vector2f(bBox.size.x - 1, bBox.size.y - 1));  // Only takes sf::Vector2f
@@ -625,21 +625,21 @@ void ScenePlatformer::endAnimation(std::shared_ptr<Entity> entity)
 {
     if (entity == m_player)
     {
-        m_player->getComponent<CState>().currentState = PlayerState::Idle;
+        m_player->get<CState>().currentState = PlayerState::Idle;
     }
     else
     {
-        entity->removeComponent<CAnimation>();
+        entity->remove<CAnimation>();
     }
 }
 
 void ScenePlatformer::changePlayerAnimation()
 {
-    CState& stateComponent = m_player->getComponent<CState>();
+    CState& stateComponent = m_player->get<CState>();
 
     const std::string& animationName = m_stateToAnimationMap[stateComponent.currentState];
     bool toRepeat = stateComponent.currentState != PlayerState::Shooting;
-    m_player->addComponent<CAnimation>(m_game->getAssets().getAnimation(animationName), toRepeat);
+    m_player->add<CAnimation>(m_game->getAssets().getAnimation(animationName), toRepeat);
 
     stateComponent.previousState = stateComponent.currentState;
 }
@@ -650,9 +650,9 @@ void ScenePlatformer::spawnTempAnimation(Vec2f position, std::string animationNa
                     
     // Create coin entity in grid cell above block
     std::shared_ptr<Entity> animationEntity = m_entityManager.addEntity(animationName);
-    animationEntity->addComponent<CAnimation>(m_game->getAssets().getAnimation(animationName), true);
-    animationEntity->addComponent<CTransform>(position);
-    animationEntity->addComponent<CLifespan>(animation.getFrameCount() * animation.getFrameDuration(), m_currentFrame);
+    animationEntity->add<CAnimation>(m_game->getAssets().getAnimation(animationName), true);
+    animationEntity->add<CTransform>(position);
+    animationEntity->add<CLifespan>(animation.getFrameCount() * animation.getFrameDuration(), m_currentFrame);
 }
 
 void ScenePlatformer::handlePlayerCollision(std::shared_ptr<Entity> object)
@@ -664,15 +664,15 @@ void ScenePlatformer::handlePlayerCollision(std::shared_ptr<Entity> object)
     if (!isXDirection)
     {
         // Whether collision from above or below, set y velocity to 0
-        m_player->getComponent<CTransform>().velocity.y = 0.0f;
+        m_player->get<CTransform>().velocity.y = 0.0f;
 
         // If player's previous position was less (i.e. closer to top of screen), collision from above
-        bool isFromAbove = m_player->getComponent<CTransform>().previousPosition.y > object->getComponent<CTransform>().previousPosition.y;
+        bool isFromAbove = m_player->get<CTransform>().previousPosition.y > object->get<CTransform>().previousPosition.y;
 
         // If collision from above, player can now jump
         if (isFromAbove)
         {
-            m_player->getComponent<CInput>().canJump = true;
+            m_player->get<CInput>().canJump = true;
         }
         // If from below, destroy block/change animation accordingly
         else
@@ -690,18 +690,18 @@ void ScenePlatformer::handleArrowCollision(std::shared_ptr<Entity> arrow, std::s
 
 void ScenePlatformer::destroySolid(std::shared_ptr<Entity> solid)
 {
-    std::string animationName = solid->getComponent<CAnimation>().animation.getName();
+    std::string animationName = solid->get<CAnimation>().animation.getName();
 
     // If brick, destroy and spawn explosion animation
     if (animationName == "Brick")
     {
         solid->destroy();
-        spawnTempAnimation(solid->getComponent<CTransform>().position, "Explosion");
+        spawnTempAnimation(solid->get<CTransform>().position, "Explosion");
     }
     // If question mark, change animation and spawn coin
     else if (animationName == "QMark")
     {
-        solid->addComponent<CAnimation>(m_game->getAssets().getAnimation("QMarkDead"), true);
-        spawnTempAnimation(solid->getComponent<CTransform>().position + Vec2f(0.0f, m_gridCellSize.y), "Coin");
+        solid->add<CAnimation>(m_game->getAssets().getAnimation("QMarkDead"), true);
+        spawnTempAnimation(solid->get<CTransform>().position + Vec2f(0.0f, m_gridCellSize.y), "Coin");
     }
 }

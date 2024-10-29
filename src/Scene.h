@@ -6,6 +6,8 @@
 
 using ActionMap = std::map<int, std::string>;
 
+// Declaration to avoid including GameEngine.h -> reduces dependencies and compilation time
+// Possible because GameEngine* used
 class GameEngine;
 
 class Scene
