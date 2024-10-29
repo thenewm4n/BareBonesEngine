@@ -3,6 +3,9 @@
 #include "Action.h"
 #include "SceneStartMenu.h"
 
+#include "imgui.h"
+#include "imgui-SFML.h"
+
 #include <chrono>
 #include <fstream>
 #include <iomanip>
@@ -78,16 +81,19 @@ void GameEngine::init(const std::string& configFilePath)
     file.close();
 
     // Create window using values from config.txt
-    m_window.create(sf::VideoMode(m_resolution.x, m_resolution.y), "BareBones");
+    m_window.create(sf::VideoMode(m_resolution.x, m_resolution.y), "BareBones");    // TODO: change title
     m_window.setFramerateLimit(framerateCap);
     m_aspectRatio = static_cast<float>(m_resolution.x) / static_cast<float>(m_resolution.y);
 
     // Creates GUI
-    /*
-    ImGui::SFML::Init(m_window);
+    auto result = ImGui::SFML::Init(m_window);
+    if (!result)
+    {
+        std::cerr << "ImGui::SFML::Init failed." << std::endl;
+        exit(-8);
+    }
     ImGui::GetStyle().ScaleAllSizes(3.5f);		// Scales imgui GUI
-    ImGui::GetIO().FontGlobalScale = 1.3f;		// Scale imgui text size
-    */
+    ImGui::GetIO().FontGlobalScale = 1.3f;		// Scales imgui text size
 
     // Load assets into Assets object
     m_assets.loadFromFile("assets.txt");
