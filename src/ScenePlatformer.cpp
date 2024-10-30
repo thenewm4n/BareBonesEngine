@@ -505,14 +505,56 @@ void ScenePlatformer::sGUI()
 
     ImGui::ShowDemoWindow();
     
-    
-    ImGui::Begin("Debug Menu");
+    ImGui::Begin("Scene Properties");
 
-    // Debugger
-        // Entity manager tab
-            // Tab for entities by tag (include ID, button to delete entity)
-        // Actions tab
+    if (ImGui::BeginTabBar("Tabs"))
+    {
+        if (ImGui::BeginTabItem("Enity Manager"))
+        {
+            // 2x collapsing headers
+                // All entities (include textured button, ID, tag, animation name, position, button to delete entity)
+                // Entities by tag (exclude tag)
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::BeginTabItem("Animations"))
+        {
+            // for animations in assets.getAnimations()
+                // ImGui::TexturedButton()
+
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::BeginTabItem("Performance"))
+        {
+            // Toggle for FPS overlay
+            // Toggle for frame times / frame time graph
+            // Toggle memory usage stats(total memory used, no.entities currently)
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::BeginTabItem("Actions"))
+        {
             // Buttons for starting and ending each action
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::BeginTabItem("Debug"))
+        {
+            static bool placeholder = false;
+
+            ImGui::Checkbox("Draw Grid", &m_drawGrid);
+            ImGui::Checkbox("Draw Bounding Boxes", &m_drawBoundingBoxes);
+            ImGui::Checkbox("Draw AI Patrol/Home Nodes", &placeholder);
+            ImGui::Checkbox("Draw Vision Rays", &placeholder);
+            ImGui::Separator();
+            ImGui::Checkbox("Free Camera", &placeholder);
+
+            ImGui::EndTabItem();
+        }
+
+        ImGui::EndTabBar();
+    }
 
     ImGui::End();
 }
