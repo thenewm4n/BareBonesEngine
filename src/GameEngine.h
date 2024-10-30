@@ -8,79 +8,115 @@
 using SceneMap = std::map<std::string, std::shared_ptr<Scene>>;
 
 /**
- * Main game engine class that handles the core game loop, scene management, and rendering
+ * The core class responsible for initialising the game, managing the core game 
+ * loop, managing scenes and providing access to assets and the render window.
  * 
- * The GameEngine class is responsible for:
- * - Initializing and managing the game window
- * - Managing the game loop
- * - Handling scene transitions
- * - Managing game assets
- * - Processing user input
- * - Maintaining core game state
- * 
- * The engine uses SFML for rendering and window management, and supports a scene-based
- * architecture where different game states are represented as Scene objects.
+ * Thread Safety:
+ * - This class is not thread-safe. All methods should be called from the main thread.
+ *
+ * Usage Example:
+ * @code
+ * int main() {
+ *     GameEngine engine("config.txt");
+ *     engine.run();
+ *     return 0;
+ * }
+ * @endcode
+ *
+ * Dependencies:
+ * - SFML (Simple and Fast Multimedia Library) for rendering, window management and sound.
+ * - A valid configuration file for initializing the game engine.
  */
 class GameEngine
 {
 public:
     /**
-     * Constructs a new GameEngine instance
-     * @param configFilePath Path to the configuration file containing initial engine settings
+     * Initializes the game engine with the provided configuration file path.
+     * Sets up resources, loads assets, and prepares the initial game state.
+     *
+     * Parameters:
+     * @param configFilePath Path to the configuration file used to initialize the game engine.
+     *
+     * Side Effects:
+     * - Initializes the game engine's internal state.
+     * - Loads game assets from the specified configuration file.
+     * - Sets up the initial scene and render window.
+     *
+     * Dependencies:
+     * - Requires a valid configuration file at the specified path.
      */
     GameEngine(const std::string& configFilePath);
 
     /**
-     * Starts the main game loop
-     * 
-     * This function runs the core game loop which:
-     * - Processes input
-     * - Updates game logic
-     * - Renders the current scene
-     * The loop continues until quit() is called or the window is closed.
+     * Runs the main game loop, updating the game state and rendering frames until the game is quit.
+     *
+     * Side Effects:
+     * - Continuously updates the game state and renders frames.
+     * - Processes user input and handles scene transitions.
      */
     void run();
 
     /**
-     * Signals the engine to stop running and exit the game loop
+     * Quits the game loop and performs necessary cleanup before shutting down the game engine.
+     *
+     * Side Effects:
+     * - Sets the running state to false, causing the main game loop to exit.
      */
     void quit();
 
     /**
-     * Changes the currently active scene
-     * @param sceneName Unique identifier for the scene
-     * @param scene Shared pointer to the new scene instance
+     * Either creates new scene or transitions to pre-existing scene; allows for different game states or levels.
+     *
+     * Parameters:
+     * @param sceneName The name of the new scene to switch to.
+     * @param scene A shared pointer to the new scene object.
+     *
+     * Side Effects:
+     * - Updates the current scene to the new scene.
+     * - May trigger loading of new assets or resources.
      */
     void changeScene(const std::string& sceneName, std::shared_ptr<Scene> scene);
 
     /**
-     * Checks if the game engine is currently running
-     * @return true if the engine is running, false otherwise
+     * Checks if the game engine is currently running.
+     *
+     * Return Values:
+     * @return True if the game engine is running, false otherwise.
      */
     bool isRunning();
 
     /**
-     * Gets the main render window
-     * @return Reference to the SFML render window
+     * Provides access to the render window used by the engine, mostly for rendering operations.
+     *
+     * Return Values:
+     * @return A reference to the sf::RenderWindow object used by the game engine.
+     *
+     * Dependencies:
+     * - Requires the game engine to be initialized and the render window to be created.
      */
     sf::RenderWindow& getWindow();
 
     /**
-     * Gets the current window resolution
-     * @return Vector containing the window width and height
+     * Gets the resolution of the render window.
+     *
+     * Return Values:
+     * @return An sf::Vector2u object representing the resolution of the render window.
      */
     sf::Vector2u getResolution();
 
     /**
-     * Gets the current aspect ratio of the window
-     * @return The window's width divided by height
-     * @note This is primarily used for camera zooming in the platformer scene
+     * Gets the aspect ratio of the render window.
+     *
+     * Return Values:
+     * @return A float representing the aspect ratio of the render window.
      */
     float getAspectRatio();
 
     /**
-     * Gets the asset manager containing all game resources
-     * @return Const reference to the Assets instance
+     * Gets the assets instance holding all loaded textures, animations, fonts and sounds.
+     *
+     * Return Values:
+     * @return A constant reference to the Assets object managed by the game engine.
      */
     const Assets& getAssets() const;
 

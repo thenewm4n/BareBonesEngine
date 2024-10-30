@@ -24,8 +24,8 @@ void GameEngine::run()
         update();
     }
 
-    m_window.close();
     ImGui::SFML::Shutdown();
+    m_window.close();
 }
 
 void GameEngine::quit() { m_running = false; }
@@ -36,7 +36,7 @@ void GameEngine::changeScene(const std::string& sceneName, std::shared_ptr<Scene
     m_currentScene = sceneName;
 }
 
-bool GameEngine::isRunning() { return m_running && m_window.isOpen(); }   // true if game is running and sf::Window exists
+bool GameEngine::isRunning() { return m_running && m_window.isOpen(); }
 
 sf::RenderWindow& GameEngine::getWindow() { return m_window; }
 

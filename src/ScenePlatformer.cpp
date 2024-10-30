@@ -113,8 +113,7 @@ void ScenePlatformer::update()
 {
     if (!m_paused)
 	{
-        // Adds and removes entities while avoiding iterator invalidation
-        m_entityManager.update();
+        m_entityManager.update();    // Adds and removes entities while avoiding iterator invalidation
 
         sMovement();
         sLifespan();

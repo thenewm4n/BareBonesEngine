@@ -13,6 +13,9 @@ class EntityManager
 public:
 	EntityManager();
 
+	/**
+	* Adds and removes entities while avoiding iterator invalidation
+	*/
 	void update();
 	std::shared_ptr<Entity> addEntity(const std::string& tag);
 
