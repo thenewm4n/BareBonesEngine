@@ -114,10 +114,7 @@ void GameEngine::sUserInput()
     sf::Event event;
     while (m_window.pollEvent(event))
     {
-        if (m_currentScene != "MENU")
-        {
-            ImGui::SFML::ProcessEvent(m_window, event);
-        }
+        ImGui::SFML::ProcessEvent(m_window, event);
         
         switch (event.type)
         {

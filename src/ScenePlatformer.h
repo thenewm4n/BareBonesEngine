@@ -39,7 +39,7 @@ private:
     bool m_drawBoundingBoxes = false;
     bool m_drawGrid = false;
     bool m_drawTextures = true;
-    bool m_drawGui = false;
+    bool m_drawGui = true;
 
     void init();
     void loadLevel(const std::string& filename);

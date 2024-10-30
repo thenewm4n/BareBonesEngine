@@ -486,19 +486,27 @@ void ScenePlatformer::sRender()
 		renderGrid();
     }
 
-    ImGui::SFML::Render(window);
+    if (m_drawGui)
+    {
+        ImGui::SFML::Render(window);
+    }
 
     window.display();
 }
 
 void ScenePlatformer::sGUI()
 {
+    if (!m_drawGui)
+    {
+        return;
+    }
+
     sf::RenderWindow& window = m_game->getWindow();
     ImGui::SFML::Update(window, m_clock.restart());
 
     ImGui::ShowDemoWindow();
     
-    /*
+    
     ImGui::Begin("Debug Menu");
 
     // Debugger
@@ -507,96 +515,7 @@ void ScenePlatformer::sGUI()
         // Actions tab
             // Buttons for starting and ending each action
 
-    // Systems tab
-    if (ImGui::BeginTabBar("MyTabBar"))
-    {
-        if (ImGui::BeginTabItem("Systems"))
-        {
-            // Change the bool refs
-            ImGui::Checkbox("Rendering", &m_renderActive);
-            ImGui::Checkbox("Movement", &m_movementActive);
-            ImGui::Checkbox("Enemy Spawner", &m_enemySpawnerActive);
-            ImGui::Indent();
-            ImGui::SliderInt("Spawn Interval", &m_enemyConfig.spawnInterval, 0, 250);
-            if (ImGui::Button("Spawn Enemy"))
-                spawnEnemy();
-            ImGui::Unindent();
-            ImGui::Checkbox("User Input", &m_userInputActive);
-            ImGui::Checkbox("Collisions", &m_collisionActive);
-            ImGui::Checkbox("Lifespan", &m_lifespanActive);
-            ImGui::EndTabItem();
-        }
-
-        // Entity Manager tab
-        if (ImGui::BeginTabItem("Entity Manager"))
-        {
-            if (ImGui::CollapsingHeader("All Entities"))
-            {
-                // Will this call getEntities every loop?
-                for (auto& entity : m_entities.getEntities())
-                {
-                    // Delete button
-                    std::string idString = "Del###" + std::to_string(entity->getId());
-                    if (ImGui::Button(idString.c_str()))      // Is it three hashes? Also, is it %i for size_t variables? Also, do I have to form the string in advance?
-                    {
-                        entity->destroy();
-                    }
-                    ImGui::SameLine();
-
-                    // Unique identity
-                    ImGui::Text("%s", std::to_string(entity->getId()).c_str());       // How do I convert the size_t to string?
-                    ImGui::SameLine();
-
-                    // Tag
-                    ImGui::Text("%s", entity->getTag().c_str());                  // Won't this be implicitly converted?
-                    ImGui::SameLine();
-
-                    // Position
-                    ImGui::Text("(%f, %f)", entity->cShape->shape.getPosition().x, entity->cShape->shape.getPosition().y);
-                }
-            }
-
-            if (ImGui::CollapsingHeader("Entities by Tag"))
-            {
-                ImGui::Indent();
-
-                for (auto& [tag, entityVector] : m_entities.getEntityMap())
-                {
-                    if (ImGui::CollapsingHeader(tag.c_str()))           // Need to convert from std::string to char *
-                    {
-                        for (auto& entity : entityVector)
-                        {
-                            // Delete button
-                            std::string idString = "Del###" + std::to_string(entity->getId());
-                            if (ImGui::Button(idString.c_str()))      // Is it three hashes? Also, is it %i for size_t variables? Also, do I have to form the string in advance?
-                            {
-                                entity->destroy();
-                            }
-                            ImGui::SameLine();
-
-                            // Unique identity
-                            ImGui::Text("%s", std::to_string(entity->getId()).c_str());       // How do I convert the size_t to string?
-                            ImGui::SameLine();
-
-                            // Tag
-                            ImGui::Text("%s", entity->getTag().c_str());                  // Won't this be implicitly converted?
-                            ImGui::SameLine();
-
-                            // Position
-                            ImGui::Text("(%f, %f)", entity->cShape->shape.getPosition().x, entity->cShape->shape.getPosition().y);
-                        }
-                    }
-                }
-
-                ImGui::Unindent();
-            }
-            ImGui::EndTabItem();
-        }
-        ImGui::EndTabBar();
-    }
-
     ImGui::End();
-    */
 }
 
 void ScenePlatformer::spawnPlayer()
