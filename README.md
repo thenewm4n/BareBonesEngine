@@ -87,7 +87,7 @@ Player GX GY BW BH SX SY SM G W
     SY      JumpSpeed               float
     SM      MaxSpeed                float
     G       Gravity                 float
-    W       WeaponAnim              std::string
+    W       WeaponName              std::string
 
 Solid N GX GY
     N   AnimationName   std::string

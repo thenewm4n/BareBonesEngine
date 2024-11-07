@@ -3,6 +3,7 @@ Texture TexArcherRun ../assets/images/archer/archer_run.png
 Texture TexArcherJump ../assets/images/archer/archer_jump.png
 Texture TexArcherFall ../assets/images/archer/archer_fall.png
 Texture TexArcherShoot ../assets/images/archer/archer_shoot.png
+
 Texture TexExplosion ../assets/images/misc/explosion.png
 Texture TexArrow ../assets/images/misc/arrow.png
 Texture TexCoin ../assets/images/mario/coinspin.png
@@ -16,11 +17,17 @@ Texture TexGround ../assets/images/environment/ground.png
 Texture TexBlock ../assets/images/mario/block.png
 Texture TexPole ../assets/images/mario/flagpole.png
 Texture TexPoleTop ../assets/images/mario/flagpoletop.png
+
+Texture TexForestBack ../assets/images/environment/forest_background.png
+Texture TexForestMid ../assets/images/environment/forest_midground.png
+Texture TexForestFore ../assets/images/environment/forest_foreground.png
+
 Animation ArcherIdle TexArcherIdle 12 5
 Animation ArcherRun TexArcherRun 10 5
 Animation ArcherJump TexArcherJump 9 4
 Animation ArcherFall TexArcherFall 8 5
 Animation ArcherShoot TexArcherShoot 6 3
+
 Animation Explosion TexExplosion 8 4
 Animation Bullet TexBullet 1 1
 Animation Arrow TexArrow 1 1
@@ -35,5 +42,11 @@ Animation Ground TexGround 1 1
 Animation Block TexBlock 1 1
 Animation Pole TexPole 1 1
 Animation PoleTop TexPoleTop 1 1
+
+Animation ForestBack TexForestBack 1 1
+Animation ForestMid TexForestMid 1 1
+Animation ForestFore TexForestFore 1 1
+
 Font Pixel ../assets/fonts/rainyhearts.ttf
 Font Tech ../assets/fonts/nulshock.otf
+

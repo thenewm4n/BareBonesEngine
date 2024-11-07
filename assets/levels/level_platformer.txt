@@ -1,4 +1,7 @@
-Player 2 1 36 44 8.5 14 15 0.45 Bullet 
+Player 2 1 36 44 8.5 14 15 0.45 BOW 
+Prop ForestBack 0 0 
+Prop ForestMid 0 0
+Prop ForestFore 0 0
 Solid Ground 0 0
 Solid Ground 1 0
 Solid Ground 2 0
@@ -25,19 +28,3 @@ Solid Ground 22 0
 Solid Ground 23 0
 Solid Ground 24 0
 Solid Ground 25 0
-Solid QMark 6 3
-Solid QMark 7 6
-Solid QMark 8 3
-Solid QMark 8 9
-Solid QMark 9 6
-Solid QMark 10 3
-Solid Brick 5 3
-Solid Brick 7 3
-Solid Brick 8 6
-Solid Brick 9 3
-Solid Brick 11 3
-Solid Pipe 15 1
-Solid Pipe 21 1
-Prop Bush 0 1
-Prop Cloud 13 8
-Prop Cloud 22 7

@@ -142,7 +142,7 @@ void GameEngine::sUserInput()
                 {
                     // Changes window size according to whether width or height has changed
                     sf::Vector2u newWindowSize = (event.size.width != m_resolution.x) ?
-                        sf::Vector2u(event.size.width, event.size.width / static_cast<unsigned int>(m_aspectRatio)) :
+                        sf::Vector2u(event.size.width, static_cast<unsigned int>(event.size.width / m_aspectRatio)) :
                         sf::Vector2u(static_cast<unsigned int>(event.size.height * m_aspectRatio), event.size.height);
 
                     m_window.setSize(newWindowSize);
