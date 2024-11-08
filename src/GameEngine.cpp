@@ -94,8 +94,8 @@ void GameEngine::init(const std::string& configFilePath)
         std::cerr << "ImGui::SFML::Init failed." << std::endl;
         exit(-8);
     }
-    ImGui::GetStyle().ScaleAllSizes(3.5f);		// Scales imgui elements
-    ImGui::GetIO().FontGlobalScale = 1.3f;		// Scales imgui text size
+    ImGui::GetStyle().ScaleAllSizes(2.5f);		// Scales imgui elements
+    ImGui::GetIO().FontGlobalScale = 1.0f;		// Scales imgui text size
 
     // Load assets into Assets object
     m_assets.loadFromFile("assets.txt");
