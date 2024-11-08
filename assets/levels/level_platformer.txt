@@ -1,7 +1,7 @@
 Player 2 1 36 44 8.5 14 15 0.45 BOW 
-Prop ForestBack 0 0 
-Prop ForestMid 0 0
-Prop ForestFore 0 0
+Background TexForestBack
+Background TexForestMid
+Background TexForestFore
 Solid Ground 0 0
 Solid Ground 1 0
 Solid Ground 2 0

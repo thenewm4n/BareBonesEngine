@@ -11,7 +11,7 @@ find_package(OpenGL REQUIRED)
 
 # Source files
 file(GLOB_RECURSE SOURCES "src/*.cpp")
-add_executable(${PROJECT_NAME} ${SOURCES})
+add_executable(${PROJECT_NAME} ${SOURCES} "src/ParallaxLayer.h" "src/ParallaxLayer.cpp")
 target_include_directories(${PROJECT_NAME} PRIVATE src)
 target_link_libraries(${PROJECT_NAME} PRIVATE sfml-graphics sfml-audio OpenGL::GL)
 

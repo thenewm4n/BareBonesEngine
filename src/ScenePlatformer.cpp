@@ -46,6 +46,9 @@ void ScenePlatformer::init()
 	sf::View view(sf::FloatRect(0, -m_viewSize.y, m_viewSize.x, m_viewSize.y));     // Top left corner of view is at (0, 0); view extends in negative y direction (upwards)
     m_game->getWindow().setView(view);
 
+    // Set static window member variable of ParallaxLayer class
+    ParallaxLayer::setWindow(&m_game->getWindow());
+
     loadLevel(m_levelPath);
 }
 
@@ -82,6 +85,21 @@ void ScenePlatformer::loadLevel(const std::string& filename)
                 // Spawn player according to PlayerConfig values
                 spawnPlayer();
             }
+            else if (token == "Background")
+            {
+                std::string textureName;
+                lineStream >> textureName;
+
+                const sf::Texture& texture = m_game->getAssets().getTexture(textureName);
+                unsigned int index = m_parallaxLayers.size();
+
+                // Add layer to vector
+                ParallaxLayer layer(texture, index);
+                m_parallaxLayers.push_back(std::make_shared<ParallaxLayer>(layer));
+                
+                // Update static variable
+                ParallaxLayer::setNumLayers(m_parallaxLayers.size());
+            }
             else
             {
                 std::string animationName;
@@ -95,11 +113,11 @@ void ScenePlatformer::loadLevel(const std::string& filename)
                     entity = m_entityManager.addEntity("Solid");
                     entity->add<CBody>(m_game->getAssets().getAnimation(animationName).getSize());
                 }
-                else    // if Prop
+                else        // if "Prop"     
                 {
                     entity = m_entityManager.addEntity("Prop");
                 }
-
+                
                 entity->add<CAnimation>(m_game->getAssets().getAnimation(animationName), true);    // IMPORTANT: add CAnimation first so gridToMidPixel can compute correctly
                 entity->add<CTransform>(gridToMidPixel(position, entity));
             }
@@ -427,7 +445,6 @@ void ScenePlatformer::sRender()
 {
     sf::RenderWindow& window = m_game->getWindow();
 
-    // Different colour background to indicate game paused
     if (m_paused)
     {
         window.clear(sf::Color(50, 50, 150));          // Dark blue
@@ -443,9 +460,21 @@ void ScenePlatformer::sRender()
     const Vec2f& playerPosition = m_player->get<CTransform>().position;
 
     // Centres view on player if further to right than middle of screen
-	float newViewCentreX = std::max(m_viewSize.x / 2.0f, playerPosition.x);        // Ensures view doesn't exceed left side of level; to stop going off right side, use std::min of this and level width
+	float newViewCentreX = std::max(m_viewSize.x / 2.0f, playerPosition.x);        // Ensures view doesn't exceed left side of level
+
+    // Calculate view horizontal movement for rendering of parallax background layers
+    float viewDeltaX = newViewCentreX - view.getCenter().x;
+
+    // Recentre view
 	view.setCenter(newViewCentreX, view.getCenter().y);
     window.setView(view);
+
+    // Render background layers
+    for (auto parallaxLayer : m_parallaxLayers)
+    {
+        parallaxLayer->update(viewDeltaX);
+    }
+
 
     // Move player to end of entity vector, then draw entities
     EntityVector& entities = m_entityManager.getEntities();
