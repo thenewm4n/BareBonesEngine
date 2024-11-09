@@ -46,15 +46,12 @@ void ScenePlatformer::init()
 	sf::View view(sf::FloatRect(0, -m_viewSize.y, m_viewSize.x, m_viewSize.y));     // Top left corner of view is at (0, 0); view extends in negative y direction (upwards)
     m_game->getWindow().setView(view);
 
-    // Set static window member variable of ParallaxLayer class
-    ParallaxLayer::setWindow(&m_game->getWindow());
-
     loadLevel(m_levelPath);
 }
 
 void ScenePlatformer::loadLevel(const std::string& filename)
 {
-    // Overwrites previous EntityManager
+    // Overwrites previous EntityManager and parallax layers vector
     m_entityManager = EntityManager();
 
     // Can be Player, Block, or Prop
@@ -67,6 +64,7 @@ void ScenePlatformer::loadLevel(const std::string& filename)
 
     std::string line;
     std::string token;
+    unsigned int bgLayerIndex = 0;
 
     while (std::getline(levelFile, line))
     {
@@ -85,21 +83,6 @@ void ScenePlatformer::loadLevel(const std::string& filename)
                 // Spawn player according to PlayerConfig values
                 spawnPlayer();
             }
-            else if (token == "Background")
-            {
-                std::string textureName;
-                lineStream >> textureName;
-
-                const sf::Texture& texture = m_game->getAssets().getTexture(textureName);
-                unsigned int index = m_parallaxLayers.size();
-
-                // Add layer to vector
-                ParallaxLayer layer(texture, index);
-                m_parallaxLayers.push_back(std::make_shared<ParallaxLayer>(layer));
-                
-                // Update static variable
-                ParallaxLayer::setNumLayers(m_parallaxLayers.size());
-            }
             else
             {
                 std::string animationName;
@@ -113,9 +96,16 @@ void ScenePlatformer::loadLevel(const std::string& filename)
                     entity = m_entityManager.addEntity("Solid");
                     entity->add<CBody>(m_game->getAssets().getAnimation(animationName).getSize());
                 }
-                else        // if "Prop"     
+                else if (token == "Prop")  
                 {
                     entity = m_entityManager.addEntity("Prop");
+                }
+                else        // i.e. if "Background"   
+                {
+                    entity = m_entityManager.addEntity("Background");
+
+                    entity->add<CParallax>(bgLayerIndex);
+                    bgLayerIndex++;
                 }
                 
                 entity->add<CAnimation>(m_game->getAssets().getAnimation(animationName), true);    // IMPORTANT: add CAnimation first so gridToMidPixel can compute correctly
@@ -464,17 +454,11 @@ void ScenePlatformer::sRender()
 
     // Calculate view horizontal movement for rendering of parallax background layers
     float viewDeltaX = newViewCentreX - view.getCenter().x;
+    sParallax(viewDeltaX);
 
     // Recentre view
 	view.setCenter(newViewCentreX, view.getCenter().y);
     window.setView(view);
-
-    // Render background layers
-    for (auto parallaxLayer : m_parallaxLayers)
-    {
-        parallaxLayer->update(viewDeltaX);
-    }
-
 
     // Move player to end of entity vector, then draw entities
     EntityVector& entities = m_entityManager.getEntities();
@@ -588,6 +572,24 @@ void ScenePlatformer::sGUI()
     ImGui::End();
 }
 
+void ScenePlatformer::sParallax(float viewDeltaX)
+{
+    auto parallaxLayers = m_entityManager.getEntities("Background");
+    unsigned int numLayers = parallaxLayers.size();
+
+    // Move each background according to layer number
+    for (auto& layer : parallaxLayers)
+    {
+        float& positionX = layer->get<CTransform>().position.x;
+        unsigned int layerIndex = layer->get<CParallax>().layerIndex;
+
+        // Calculate speed according to layer: the further back, the more the layer moves in the virtual world
+        float speed = static_cast<float>(numLayers - (layerIndex + 1)) / numLayers;
+
+        positionX += viewDeltaX * speed;
+    }
+}
+
 void ScenePlatformer::spawnPlayer()
 {
     // Add Player entity and add components according to playerConfig struct
@@ -653,19 +655,38 @@ void ScenePlatformer::renderEntity(std::shared_ptr<Entity> e)
     if (m_drawTextures && e->has<CAnimation>())
     {
         auto& transform = e->get<CTransform>();
-        auto& animationSprite = e->get<CAnimation>().animation.getSprite();
+        auto& sprite = e->get<CAnimation>().animation.getSprite();
 
         // If entity has CBody, align bottom of sprite to bottom of bounding box
         float spriteCentreY = -transform.position.y;
         if (e->has<CBody>())
         {
-            spriteCentreY += (e->get<CBody>().bBox.size.y - animationSprite.getGlobalBounds().height) / 2.0f;
+            spriteCentreY += (e->get<CBody>().bBox.size.y - sprite.getGlobalBounds().height) / 2.0f;
         }
-        
-        animationSprite.setPosition(transform.position.x, spriteCentreY);
-		animationSprite.setScale(transform.scale.x, transform.scale.y);
-        animationSprite.setRotation(transform.angle);
-        m_game->getWindow().draw(animationSprite);
+
+        // If entity is background, render copies either side to ensure screen covered
+        if (e->getTag() == "Background")
+        {
+            float layerWidth = sprite.getGlobalBounds().width;
+
+            // Calculate the number of times the layer needs to be drawn to cover the screen width
+            int numRepeats = static_cast<int>(std::ceil(m_viewSize.x / layerWidth)) + 1;
+            std::cout << "Num repeats: " << numRepeats << std::endl;
+
+            // Draw the layer multiple times
+            for (int i = -1; i < numRepeats; ++i)
+            {
+                sprite.setPosition(transform.position.x + i * layerWidth, -transform.position.y);
+                m_game->getWindow().draw(sprite);
+            }
+        }
+        else
+        {
+            sprite.setPosition(transform.position.x, spriteCentreY);
+            sprite.setScale(transform.scale.x, transform.scale.y);
+            sprite.setRotation(transform.angle);
+            m_game->getWindow().draw(sprite);
+        }   
     }
 }
 

@@ -183,3 +183,12 @@ public:
     CGravity(float accel)
         : acceleration(accel) {}
 };
+
+class CParallax : public Component
+{
+public:
+    unsigned int layerIndex;
+
+    CParallax(unsigned int index = 0)
+        : layerIndex(index) {}
+};

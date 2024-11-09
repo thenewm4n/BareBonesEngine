@@ -1,7 +1,6 @@
 #pragma once
 
 #include "EntityManager.h"
-#include "ParallaxLayer.h"
 #include "Scene.h"
 
 #include <memory>
@@ -37,7 +36,6 @@ private:
     sf::Vector2f m_viewSize{ 1152.0f, 648.0f };          // Was 1536.0f, 864.0f
     const Vec2i m_gridCellSize{ 64, 64 };
     sf::Text m_gridText;
-    std::vector<std::shared_ptr<ParallaxLayer>> m_parallaxLayers;
     bool m_drawBoundingBoxes = false;
     bool m_drawGrid = false;
     bool m_drawTextures = true;
@@ -56,6 +54,7 @@ private:
     void sAnimation();
     void sRender() override;
     void sGUI();
+    void sParallax(float viewDeltaX);
 
     // Spawning methods
     void spawnPlayer();

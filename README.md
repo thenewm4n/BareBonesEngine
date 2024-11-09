@@ -58,7 +58,7 @@ Window W H F
 ```
 
 ### Assets File
-> Note: A texture used in an animation must be defined before the animation.
+Applying a texture to an entity can be done by adding an Animation component with a frame count and frame duration of 1, and toRepeat parameter set to true.
 List textures, animations, and fonts:
 ```
 Texture N P
@@ -75,7 +75,7 @@ Font N P
     N   FontName    std::string
     P   FontPath    std::string
 ```
-
+> Note: A texture used in an animation must be defined before the animation.
 
 ### Level File
 Specify game levels and player properties:

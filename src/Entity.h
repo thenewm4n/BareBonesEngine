@@ -15,7 +15,8 @@ using ComponentTuple =  std::tuple
                             CInput,
                             CAnimation,
                             CGravity,
-                            CState
+                            CState,
+                            CParallax
                         >;
 
 class Entity
