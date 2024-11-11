@@ -671,7 +671,6 @@ void ScenePlatformer::renderEntity(std::shared_ptr<Entity> e)
 
             // Calculate the number of times the layer needs to be drawn to cover the screen width
             int numRepeats = static_cast<int>(std::ceil(m_viewSize.x / layerWidth)) + 1;
-            std::cout << "Num repeats: " << numRepeats << std::endl;
 
             // Draw the layer multiple times
             for (int i = -1; i < numRepeats; ++i)
