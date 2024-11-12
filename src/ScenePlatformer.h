@@ -33,8 +33,8 @@ private:
     EntityManager m_entityManager;
     sf::Clock m_clock;
 
-    sf::Vector2f m_viewSize{ 1152.0f, 648.0f };          // Was 1536.0f, 864.0f
-    const Vec2i m_gridCellSize{ 64, 64 };
+    sf::Vector2f m_viewSize{ 1152.0f, 648.0f };             // Was 1536.0f, 864.0f
+    const Vec2i m_gridCellSize{ 45, 45 };                   // was 64x64
     sf::Text m_gridText;
     bool m_drawBoundingBoxes = false;
     bool m_drawGrid = false;
