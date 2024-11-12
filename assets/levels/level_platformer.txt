@@ -28,3 +28,11 @@ Solid Ground 22 0
 Solid Ground 23 0
 Solid Ground 24 0
 Solid Ground 25 0
+Prop Barrel 1 1
+Prop Well 3 1
+Solid BoxBig 5 1
+Prop BoxSmall 7 1
+Prop Fence 9 1
+Prop Lamp 14 1
+Prop Rock 17 1
+Prop Sign 20 1

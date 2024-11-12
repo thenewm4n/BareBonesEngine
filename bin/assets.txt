@@ -22,6 +22,16 @@ Texture TexForestBack ../assets/images/environment/forest_background.png
 Texture TexForestMid ../assets/images/environment/forest_midground.png
 Texture TexForestFore ../assets/images/environment/forest_foreground.png
 
+Texture TexSign ../assets/images/environment/sign.png
+Texture TexFence ../assets/images/environment/fence.png
+Texture TexRock ../assets/images/environment/rock.png
+Texture TexLamp ../assets/images/environment/lamp.png
+
+Texture TexBarrel ../assets/images/environment/barrel.png
+Texture TexBoxBig ../assets/images/environment/box_big.png
+Texture TexBoxSmall ../assets/images/environment/box_small.png
+Texture TexWell ../assets/images/environment/well.png
+
 Animation ArcherIdle TexArcherIdle 12 5
 Animation ArcherRun TexArcherRun 10 5
 Animation ArcherJump TexArcherJump 9 4
@@ -46,6 +56,16 @@ Animation PoleTop TexPoleTop 1 1
 Animation ForestBack TexForestBack 1 1
 Animation ForestMid TexForestMid 1 1
 Animation ForestFore TexForestFore 1 1
+
+Animation Sign TexSign 1 1
+Animation Fence TexFence 1 1
+Animation Rock TexRock 1 1
+Animation Lamp TexLamp 1 1
+
+Animation Barrel TexBarrel 1 1
+Animation BoxBig TexBoxBig 1 1
+Animation BoxSmall TexBoxSmall 1 1
+Animation Well TexWell 1 1
 
 Font Pixel ../assets/fonts/rainyhearts.ttf
 Font Tech ../assets/fonts/nulshock.otf
