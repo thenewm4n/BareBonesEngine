@@ -522,6 +522,11 @@ void ScenePlatformer::sGUI()
 
     if (ImGui::BeginTabBar("Tabs"))
     {
+        if (ImGui::BeginTabItem("Enity Inspector"))
+        {
+            ImGui::EndTabItem();
+        }
+
         if (ImGui::BeginTabItem("Enity Manager"))
         {
             // 2x collapsing headers
@@ -532,9 +537,28 @@ void ScenePlatformer::sGUI()
 
         if (ImGui::BeginTabItem("Animations"))
         {
-            // for animations in assets.getAnimations()
-                // ImGui::TexturedButton()
+            ImVec2 size = ImVec2(32.0f, 32.0f);                         // Size of the image we want to make visible
+            ImVec4 bgColour = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);             // Black background
+            ImVec4 tintColour = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);           // No tint
 
+            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2.0f, 2.0f));
+
+            for (const auto& texturePair : m_game->getAssets().getTextureMap())
+            {
+                sf::Vector2u texSize = texturePair.second.getSize();
+
+                ImVec2 uv0 = ImVec2(0.0f, 0.0f);                            // UV coordinates for lower-left
+                ImVec2 uv1 = ImVec2(32.0f / texSize.x, 32.0f / texSize.y);    // UV coordinates for (32,32) in our texture
+                
+                if (ImGui::ImageButton("", texturePair.second, size, uv0, uv1, bgColour, tintColour))
+                {
+                    // add entity to entity manager with correct animation at (1,1)
+
+                }
+                // if button pressed, 
+            }
+        
+            ImGui::PopStyleVar();
             ImGui::EndTabItem();
         }
 

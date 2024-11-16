@@ -21,6 +21,10 @@ public:
     const sf::Font& getFont(const std::string& fontName) const;
     const sf::Texture& getTexture(const std::string& textureName) const;
 
+    const AnimationMap& getAnimationMap() const;
+    const FontMap& getFontMap() const;
+    const TextureMap& getTextureMap() const;
+
 private:
     AnimationMap m_animationMap;
     FontMap m_fontMap;

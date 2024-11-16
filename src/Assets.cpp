@@ -114,3 +114,18 @@ const sf::Texture& Assets::getTexture(const std::string& textureName) const
         exit(-6);
     }
 }
+
+const AnimationMap& Assets::getAnimationMap() const
+{
+    return m_animationMap;
+}
+
+const FontMap& Assets::getFontMap() const
+{
+    return m_fontMap;
+}
+
+const TextureMap& Assets::getTextureMap() const
+{
+    return m_textureMap;
+}
