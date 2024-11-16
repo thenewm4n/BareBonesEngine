@@ -7,8 +7,9 @@
 #include "Physics.h"
 #include "SceneStartMenu.h"
 
-#include "imgui.h"
-#include "imgui-SFML.h"
+#include <imgui.h>
+#include <imgui-SFML.h>
+#include <SFML/OpenGL.hpp>
 
 #include <fstream>
 #include <iostream>
@@ -537,20 +538,17 @@ void ScenePlatformer::sGUI()
 
         if (ImGui::BeginTabItem("Animations"))
         {
-            ImVec2 size = ImVec2(32.0f, 32.0f);                         // Size of the image we want to make visible
-            ImVec4 bgColour = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);             // Black background
-            ImVec4 tintColour = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);           // No tint
+            sf::Vector2f buttonSize(32.0f, 32.0f);
+            sf::Color bgColour(0, 0, 0, 1);
+            sf::Color tintColour(1, 1, 1, 1);
 
             ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2.0f, 2.0f));
 
-            for (const auto& texturePair : m_game->getAssets().getTextureMap())
-            {
-                sf::Vector2u texSize = texturePair.second.getSize();
+            const TextureMap& sfmlTextureMap = m_game->getAssets().getTextureMap();
 
-                ImVec2 uv0 = ImVec2(0.0f, 0.0f);                            // UV coordinates for lower-left
-                ImVec2 uv1 = ImVec2(32.0f / texSize.x, 32.0f / texSize.y);    // UV coordinates for (32,32) in our texture
-                
-                if (ImGui::ImageButton("", texturePair.second, size, uv0, uv1, bgColour, tintColour))
+            for (const auto& texturePair : sfmlTextureMap)
+            {
+                if (ImGui::ImageButton(texturePair.first.c_str(), texturePair.second, buttonSize, bgColour, tintColour))
                 {
                     // add entity to entity manager with correct animation at (1,1)
 
