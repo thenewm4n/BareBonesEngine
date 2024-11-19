@@ -1,6 +1,6 @@
-#include "SceneStartMenu.h"
+#include "scenes/SceneStartMenu.h"
 
-#include "ScenePlatformer.h"
+#include "scenes/ScenePlatformer.h"
 
 SceneStartMenu::SceneStartMenu(GameEngine* gameEngine)
     : Scene(gameEngine), m_title("Game Engine: The Game"), m_menuStrings({ "Level 1", "Level 2", "Level 3" }), m_levelPaths({"../assets/levels/level_mario.txt", "../assets/levels/level_platformer.txt"})

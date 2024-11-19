@@ -1,7 +1,5 @@
 #include "Assets.h"
 
-#include "Animation.h"
-
 #include <fstream>
 #include <iostream>
 #include <string>

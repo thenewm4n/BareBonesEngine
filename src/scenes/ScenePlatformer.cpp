@@ -1,14 +1,14 @@
-#include "ScenePlatformer.h"
+#include "scenes/ScenePlatformer.h"
 
-#include "Action.h"
-#include "Assets.h"
-#include "Components.h"
-#include "GameEngine.h"
-#include "Physics.h"
-#include "SceneStartMenu.h"
+#include "systems/Action.h"
+#include "core/Assets.h"
+#include "core/Components.h"
+#include "core/GameEngine.h"
+#include "systems/Physics.h"
+#include "scenes/SceneStartMenu.h"
 
-#include <imgui.h>
-#include <imgui-SFML.h>
+#include <ui/imgui/imgui.h>
+#include <ui/imgui/imgui-SFML.h>
 #include <SFML/OpenGL.hpp>
 
 #include <fstream>
@@ -55,7 +55,6 @@ void ScenePlatformer::loadLevel(const std::string& filename)
     // Overwrites previous EntityManager and parallax layers vector
     m_entityManager = EntityManager();
 
-    // Can be Player, Block, or Prop
     std::ifstream levelFile(filename);
     if (!levelFile.is_open())
     {
@@ -548,6 +547,8 @@ void ScenePlatformer::sGUI()
 
             for (const auto& texturePair : sfmlTextureMap)
             {
+                // To determine how many on row, do GUI window width % width of icon or something
+
                 if (ImGui::ImageButton(texturePair.first.c_str(), texturePair.second, buttonSize, bgColour, tintColour))
                 {
                     // add entity to entity manager with correct animation at (1,1)

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Entity.h"
-#include "Vec2.h"
+#include "entity/Entity.h"
+#include "utils/Vec2.h"
 
 namespace Physics
 {

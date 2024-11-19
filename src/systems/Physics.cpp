@@ -1,6 +1,6 @@
-#include "Physics.h"
+#include "systems/Physics.h"
 
-#include "Components.h"
+#include "core/Components.h"
 
 // Anonymous namespace -> essentially "private" helper function
 namespace

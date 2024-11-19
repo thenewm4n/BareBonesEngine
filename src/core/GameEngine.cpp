@@ -1,10 +1,10 @@
-#include "GameEngine.h"
+#include "core/GameEngine.h"
 
-#include "Action.h"
-#include "SceneStartMenu.h"
+#include "systems/Action.h"
+#include "scenes/SceneStartMenu.h"
 
-#include "imgui.h"
-#include "imgui-SFML.h"
+#include "ui/imgui/imgui.h"
+#include "ui/imgui/imgui-SFML.h"
 
 #include <chrono>
 #include <fstream>
