@@ -548,7 +548,7 @@ void ScenePlatformer::sGUI()
             for (const auto& texturePair : sfmlTextureMap)
             {
                 // To determine how many on row, do GUI window width % width of icon or something
-
+                std::cout << "Texture Name: " << texturePair.first << std::endl;
                 if (ImGui::ImageButton(texturePair.first.c_str(), texturePair.second, buttonSize, bgColour, tintColour))
                 {
                     // add entity to entity manager with correct animation at (1,1)
