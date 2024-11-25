@@ -728,17 +728,11 @@ void Image(const sf::Sprite& sprite, const sf::Vector2f& size, const sf::Color& 
 /////////////// Image Button Overloads for sf::Texture
 
 bool ImageButton(const char* id, const sf::Texture& texture, const sf::Vector2f& size,
-                 const sf::Color& bgColor, const sf::Color& tintColor) {
+    const sf::Color& bgColor, const sf::Color& tintColor) {
     ImTextureID textureID = convertGLTextureHandleToImTextureID(texture.getNativeHandle());
 
-    // DEBUG
-    std::cout << "Texture ID: " << textureID << std::endl;
-    std::cout << "Button Size: " << size.x << ", " << size.y << std::endl;
-    std::cout << "Background Color: " << bgColor.toInteger() << std::endl;
-    std::cout << "Tint Color: " << tintColor.toInteger() << std::endl;
-
     return ImGui::ImageButton(id, textureID, ImVec2(size.x, size.y), ImVec2(0, 0), ImVec2(1, 1),
-                              toImColor(bgColor), toImColor(tintColor));
+        toImColor(bgColor), toImColor(tintColor));
 }
 
 /////////////// Image Button Overloads for sf::RenderTexture

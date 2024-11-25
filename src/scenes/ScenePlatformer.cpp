@@ -538,23 +538,34 @@ void ScenePlatformer::sGUI()
         if (ImGui::BeginTabItem("Animations"))
         {
             sf::Vector2f buttonSize(32.0f, 32.0f);
-            sf::Color bgColour(0, 0, 0, 1);
-            sf::Color tintColour(1, 1, 1, 1);
+            sf::Color bgColour(0, 0, 0, 0);
+            sf::Color tintColour(255, 255, 255, 255);
 
-            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2.0f, 2.0f));
+            ImVec2 padding = ImVec2(2.0f, 2.0f);
+            ImVec2 itemSpacing = ImGui::GetStyle().ItemSpacing;
+            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, padding);
 
             const TextureMap& sfmlTextureMap = m_game->getAssets().getTextureMap();
+            float buttonWidth = buttonSize.x + (padding.x * 2) + itemSpacing.x;
+            int buttonsPerRow = static_cast<int>(ImGui::GetWindowWidth() / buttonWidth);
+            int buttonCount = 0;
 
             for (const auto& texturePair : sfmlTextureMap)
             {
-                // To determine how many on row, do GUI window width % width of icon or something
-                std::cout << "Texture Name: " << texturePair.first << std::endl;
-                if (ImGui::ImageButton(texturePair.first.c_str(), texturePair.second, buttonSize, bgColour, tintColour))
+                const sf::Texture& texture = texturePair.second;
+                std::string buttonID = "button_" + texturePair.first;
+
+                if (buttonCount > 0 && buttonCount % buttonsPerRow != 0)
+                {
+                    ImGui::SameLine();
+                }
+                
+                if (ImGui::ImageButton(buttonID.c_str(), texture, buttonSize, bgColour, tintColour))
                 {
                     // add entity to entity manager with correct animation at (1,1)
-
                 }
-                // if button pressed, 
+
+                buttonCount++;
             }
         
             ImGui::PopStyleVar();
