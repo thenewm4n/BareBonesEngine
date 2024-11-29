@@ -78,7 +78,7 @@ Font N P
 > Note: A texture used in an animation must be defined before the animation.
 
 ### Level File
-Specify game levels and player properties:
+Specify initial conditions of level including environment and player entity properties:
 ```
 Player GX GY BW BH SX SY SM G W
     GX,GY   GridPositionX,Y         float,float
