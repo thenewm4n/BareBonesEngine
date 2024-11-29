@@ -17,7 +17,7 @@ public:
     Scene(GameEngine* gameEngine);
 
     virtual void update() = 0;
-    virtual void sDoAction(const Action& action) = 0;
+    virtual void sPerformAction(const Action& action) = 0;
 
     void registerAction(int inputKey, const std::string& actionName);
     void simulate(const size_t frames);

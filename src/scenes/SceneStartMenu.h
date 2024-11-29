@@ -19,7 +19,7 @@ private:
 
     void init();
     void update() override;
-    void sDoAction(const Action& action) override;
+    void sPerformAction(const Action& action) override;
     void sRender() override;
     void endScene() override;
 };

@@ -1,12 +1,13 @@
 #pragma once
 
+
 #include "core/EntityManager.h"
 #include "scenes/Scene.h"
 
 #include <memory>
 
 
-class ScenePlatformer : public Scene
+class SceneLevelEditor : public Scene
 {
     struct PlayerConfig
     {
@@ -15,7 +16,7 @@ class ScenePlatformer : public Scene
     };
 
 public:
-    ScenePlatformer(GameEngine* game, const std::string& levelPath);
+    SceneLevelEditor(GameEngine* game, const std::string& levelPath);
 
 private:
     std::unordered_map<PlayerState, std::string> m_stateToAnimationMap =
@@ -27,10 +28,12 @@ private:
         {PlayerState::Shooting, "ArcherShoot"}
     };
 
+    std::shared_ptr<Entity> m_selectedEntity;
+    std::shared_ptr<Entity> m_draggedEntity;
     std::string m_levelPath;
+    EntityManager m_entityManager;
     std::shared_ptr<Entity> m_player;
     PlayerConfig m_playerConfig;
-    EntityManager m_entityManager;
     sf::Clock m_clock;
 
     sf::Vector2f m_viewSize{ 1152.0f, 648.0f };             // Was 1536.0f, 864.0f
@@ -48,31 +51,15 @@ private:
 
     // System methods
     void sPerformAction(const Action& action) override;
-    void sMovement();
-    void sLifespan();
-    void sCollision();
-    void sAnimation();
     void sRender() override;
     void sGUI();
     void sParallax(float viewDeltaX);
 
-    // Spawning methods
     void spawnPlayer();
-    void spawnArrow(std::shared_ptr<Entity> entity);
-    
+
     // Render helper methods
     Vec2f gridToMidPixel(const Vec2f& gridPosition, std::shared_ptr<Entity> entity);
     void renderEntity(std::shared_ptr<Entity> e);
     void renderGrid();
     void renderBBox(std::shared_ptr<Entity> entity);
-
-    // Animation helper methods
-    void endAnimation(std::shared_ptr<Entity> entity);
-    void changePlayerAnimation();
-    void spawnTempAnimation(Vec2f position, std::string animationName);
-
-    // Collision helper methods
-    void handlePlayerCollision(std::shared_ptr<Entity> object);
-    void handleArrowCollision(std::shared_ptr<Entity> arrow, std::shared_ptr<Entity> object);
-    void destroySolid(std::shared_ptr<Entity> solid);
 };

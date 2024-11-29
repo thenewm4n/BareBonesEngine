@@ -1,5 +1,6 @@
 #include "scenes/SceneStartMenu.h"
 
+#include "scenes/SceneLevelEditor.h"
 #include "scenes/ScenePlatformer.h"
 
 SceneStartMenu::SceneStartMenu(GameEngine* gameEngine)
@@ -13,6 +14,7 @@ void SceneStartMenu::init()
     registerAction(sf::Keyboard::W, "UP");
     registerAction(sf::Keyboard::S, "DOWN");
     registerAction(sf::Keyboard::Enter, "SELECT");
+    registerAction(sf::Keyboard::Tilde, "EDIT_LEVEL");
     registerAction(sf::Keyboard::Escape, "QUIT");
 
     m_menuText.setOutlineColor(sf::Color::Black);
@@ -28,7 +30,7 @@ void SceneStartMenu::update()
     sRender();
 }
 
-void SceneStartMenu::sDoAction(const Action& action)
+void SceneStartMenu::sPerformAction(const Action& action)
 {
     const std::string& actionName = action.getName();
 
@@ -53,6 +55,11 @@ void SceneStartMenu::sDoAction(const Action& action)
         {
             const std::string sceneName("LEVEL_%i", m_selectedMenuIndex);
             m_game->changeScene(sceneName, std::make_shared<ScenePlatformer>(m_game, m_levelPaths[m_selectedMenuIndex]));
+        }
+        else if (actionName == "EDIT_LEVEL")
+        {
+            const std::string sceneName("EDITOR_LEVEL_%i", m_selectedMenuIndex);
+            m_game->changeScene(sceneName, std::make_shared<SceneLevelEditor>(m_game, m_levelPaths[m_selectedMenuIndex]));
         }
         else if (actionName == "QUIT")
         {
