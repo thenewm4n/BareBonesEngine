@@ -47,6 +47,7 @@ private:
     void init();
     void loadLevel(const std::string& filename);
     void update() override;
+    void save();
     void endScene() override;
 
     // System methods

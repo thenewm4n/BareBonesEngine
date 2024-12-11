@@ -358,6 +358,11 @@ void SceneLevelEditor::sParallax(float viewDeltaX)
     }
 }
 
+void SceneLevelEditor::save()
+{
+    // Save all entities in entity manager (inverse of loadLevel())
+}
+
 void SceneLevelEditor::spawnPlayer()
 {
     // Add Player entity and add components according to playerConfig struct
