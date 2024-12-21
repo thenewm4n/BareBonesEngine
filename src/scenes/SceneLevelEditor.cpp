@@ -9,6 +9,7 @@
 #include <ui/imgui/imgui-SFML.h>
 #include <SFML/OpenGL.hpp>
 
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -358,9 +359,71 @@ void SceneLevelEditor::sParallax(float viewDeltaX)
     }
 }
 
-void SceneLevelEditor::save()
+// Wipe the current level txt and write to it all entities in entity manager
+void SceneLevelEditor::saveToFile()
 {
-    // Save all entities in entity manager (inverse of loadLevel())
+    // Create a backup of the current save file
+    std::string backupPath = m_levelPath + ".bak";
+    std::error_code ec;
+    std::filesystem::copy_file(m_levelPath, backupPath, std::filesystem::copy_options::overwrite_existing, ec);
+    
+    // If creating a backup failed, return early
+    if (ec)
+    {
+        std::cerr << "SceneLevelEditor::saveToFile() - Error creating backup: " ec.message() << std::endl;
+        return;
+    }
+
+    // Open file at m_levelPath
+    bool saveFailed = false;
+
+    std::ofstream levelFile(m_levelPath, std::ios::trunc);
+    if (!levelFile.is_open())
+    {
+        saveFailed = true;
+    }
+
+    // Write entities to level file
+    for (const auto& entity : m_entityManager.getEntities())
+    {
+        std::string tag = entity->getTag();
+        std::string animationName = entity->get<CAnimation>().animation.getName();
+
+        Vec2f position = entity->get<CTransform>().position;
+        Vec2f flooredGridPosition = (position - (position % m_gridCellSize)) / m_gridCellSize;
+
+        levelFile << tag << " " << animationName << " " << flooredGridPosition.x << " " << flooredGridPosition.y << "\n";       //    wait... should we just make level file positions not grid based? There's less point now?
+    }
+
+    // Checks whether IO operations succeeded
+    if (levelFile.fail())
+    {
+        saveFailed = true;
+    }
+
+    // If opening level file or IO operations failed, revert to backup
+    if (saveFailed)
+    {
+        std::cerr << "SceneLevelEditor::save() - Error saving."
+
+        // Load backup
+        std::filesystem::copy_file(backupPath, m_levelPath, std::filesystem::copy_options::overwrite_existing, ec);
+
+        if (ec)
+        {
+            std::cerr << "Critical error: Unable to restore from backup. Exiting program." << std::endl;
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    levelFile.close();
+
+    // Remove the backup file, regardless of whether saving succeed
+    std::filesystem::remove(backupPath, ec);
+    if (ec)
+    {
+        std::cerr << "SceneLevelEditor::saveToFile() - Error deleting backup: " << ec.message() << std::endl;
+    }
 }
 
 void SceneLevelEditor::spawnPlayer()

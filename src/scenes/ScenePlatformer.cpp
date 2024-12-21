@@ -407,25 +407,27 @@ void ScenePlatformer::sAnimation()
     for (auto& entity : m_entityManager.getEntities())
     {
         // If entity has Animation component, either update it, or remove if has ended
-        if (entity->has<CAnimation>())
+        if (!entity->has<CAnimation>())
         {
-            auto& animationComponent = entity->get<CAnimation>();
-            bool hasEnded = animationComponent.update();
+            continue;
+        }
+        
+        auto& animationComponent = entity->get<CAnimation>();
+        bool hasEnded = animationComponent.update();
 
-            if (hasEnded)
-            {
-                endAnimation(entity);
-            }
+        if (hasEnded)
+        {
+            endAnimation(entity);
+        }
 
-            if (entity == m_player)
+        if (entity == m_player)
+        {
+            // If player state has changed, change animation 
+            const CState& stateComponent = m_player->get<CState>();
+            if (stateComponent.currentState != stateComponent.previousState)
             {
-                // If player state has changed, change animation 
-                const CState& stateComponent = m_player->get<CState>();
-                if (stateComponent.currentState != stateComponent.previousState)
-                {
-                    changePlayerAnimation();
-                }       
-            }
+                changePlayerAnimation();
+            }       
         }
     }
 }
