@@ -459,7 +459,10 @@ void ScenePlatformer::sRender()
 	view.setCenter(newViewCentreX, view.getCenter().y);
     window.setView(view);
 
-    // Move player to end of entity vector, then draw entities
+
+    // Drawing entities
+    // 
+    // Move player to end of entity vector
     EntityVector& entities = m_entityManager.getEntities();
 
     // Check whether player exists
@@ -483,15 +486,17 @@ void ScenePlatformer::sRender()
     }
 
 	// Render bounding boxes if enabled; in a separate loop to ensure they are drawn on top of textures
-    for (auto entity : entities)
+    if (m_drawBoundingBoxes)
     {
-        if (m_drawBoundingBoxes && entity->has<CBody>())
+        for (auto entity : entities)
         {
-            renderBBox(entity);
+            if (entity->has<CBody>())
+            {
+                renderBBox(entity);
+            }
         }
     }
-
-    // Draw grid for debugging
+    
     if (m_drawGrid)
     {
 		renderGrid();
@@ -685,41 +690,43 @@ Vec2f ScenePlatformer::gridToMidPixel(const Vec2f& gridPosition, std::shared_ptr
 void ScenePlatformer::renderEntity(std::shared_ptr<Entity> e)
 {
     // Draw Entity textures/animations
-    if (m_drawTextures && e->has<CAnimation>())
+    if (!m_drawTextures || !e->has<CAnimation>())
     {
-        auto& transform = e->get<CTransform>();
-        auto& sprite = e->get<CAnimation>().animation.getSprite();
-
-        // If entity has CBody, align bottom of sprite to bottom of bounding box
-        float spriteCentreY = -transform.position.y;
-        if (e->has<CBody>())
-        {
-            spriteCentreY += (e->get<CBody>().bBox.size.y - sprite.getGlobalBounds().height) / 2.0f;
-        }
-
-        // If entity is background, render copies either side to ensure screen covered
-        if (e->getTag() == "Background")
-        {
-            float layerWidth = sprite.getGlobalBounds().width;
-
-            // Calculate the number of times the layer needs to be drawn to cover the screen width
-            int numRepeats = static_cast<int>(std::ceil(m_viewSize.x / layerWidth)) + 1;
-
-            // Draw the layer multiple times
-            for (int i = -1; i < numRepeats; ++i)
-            {
-                sprite.setPosition(transform.position.x + i * layerWidth, -transform.position.y);
-                m_game->getWindow().draw(sprite);
-            }
-        }
-        else
-        {
-            sprite.setPosition(transform.position.x, spriteCentreY);
-            sprite.setScale(transform.scale.x, transform.scale.y);
-            sprite.setRotation(transform.angle);
-            m_game->getWindow().draw(sprite);
-        }   
+        return;
     }
+
+    auto& transform = e->get<CTransform>();
+    auto& sprite = e->get<CAnimation>().animation.getSprite();
+
+    // If entity has CBody, align bottom of sprite to bottom of bounding box
+    float spriteCentreY = -transform.position.y;
+    if (e->has<CBody>())
+    {
+        spriteCentreY += (e->get<CBody>().bBox.size.y - sprite.getGlobalBounds().height) / 2.0f;
+    }
+
+    // If entity is background, render copies either side to ensure screen covered
+    if (e->getTag() == "Background")
+    {
+        float layerWidth = sprite.getGlobalBounds().width;
+
+        // Calculate the number of times the layer needs to be drawn to cover the screen width
+        int numRepeats = static_cast<int>(std::ceil(m_viewSize.x / layerWidth)) + 1;
+
+        // Draw the layer multiple times
+        for (int i = -1; i < numRepeats; ++i)
+        {
+            sprite.setPosition(transform.position.x + i * layerWidth, -transform.position.y);
+            m_game->getWindow().draw(sprite);
+        }
+    }
+    else
+    {
+        sprite.setPosition(transform.position.x, spriteCentreY);
+        sprite.setScale(transform.scale.x, transform.scale.y);
+        sprite.setRotation(transform.angle);
+        m_game->getWindow().draw(sprite);
+    }   
 }
 
 void ScenePlatformer::renderGrid()
