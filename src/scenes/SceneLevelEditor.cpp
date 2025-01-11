@@ -370,7 +370,7 @@ void SceneLevelEditor::saveToFile()
     // If creating a backup failed, return early
     if (ec)
     {
-        std::cerr << "SceneLevelEditor::saveToFile() - Error creating backup: " ec.message() << std::endl;
+        std::cerr << "SceneLevelEditor::saveToFile() - Error creating backup: " << ec.message() << std::endl;
         return;
     }
 
@@ -390,9 +390,10 @@ void SceneLevelEditor::saveToFile()
         std::string animationName = entity->get<CAnimation>().animation.getName();
 
         Vec2f position = entity->get<CTransform>().position;
-        Vec2f flooredGridPosition = (position - (position % m_gridCellSize)) / m_gridCellSize;
+        float flooredGridPositionX = (position.x - std::fmod(position.x, m_gridCellSize)) / m_gridCellSize;
+        float flooredGridPositionY = (position.y - std::fmod(position.y, m_gridCellSize)) / m_gridCellSize;
 
-        levelFile << tag << " " << animationName << " " << flooredGridPosition.x << " " << flooredGridPosition.y << "\n";       //    wait... should we just make level file positions not grid based? There's less point now?
+        levelFile << tag << " " << animationName << " " << flooredGridPositionX << " " << flooredGridPositionY << "\n";       //    wait... should we just make level file positions not grid based? There's less point now?
     }
 
     // Checks whether IO operations succeeded
@@ -404,7 +405,7 @@ void SceneLevelEditor::saveToFile()
     // If opening level file or IO operations failed, revert to backup
     if (saveFailed)
     {
-        std::cerr << "SceneLevelEditor::save() - Error saving."
+        std::cerr << "SceneLevelEditor::save() - Error saving." << std::endl;
 
         // Load backup
         std::filesystem::copy_file(backupPath, m_levelPath, std::filesystem::copy_options::overwrite_existing, ec);
@@ -453,7 +454,7 @@ Vec2f SceneLevelEditor::gridToMidPixel(const Vec2f& gridPosition, std::shared_pt
     }
 
     const Vec2f& spriteSize = entity->get<CAnimation>().animation.getSize();
-    Vec2f offset = (gridPosition * Vec2f(m_gridCellSize)) + (spriteSize / 2.0f);
+    Vec2f offset = (gridPosition * (float)m_gridCellSize) + (spriteSize / 2.0f);
 
     return offset;
 }
@@ -504,38 +505,38 @@ void SceneLevelEditor::renderGrid()
     sf::View view = window.getView();
 
     float leftEdgeX = view.getCenter().x - (m_viewSize.x / 2);                                      // Left edge of viewable area
-    float rightEdgeX = leftEdgeX + m_viewSize.x + m_gridCellSize.x;                                 // Right edge of viewable area - width of a cell is added to ensure full coverage
-    float firstVertLineX = leftEdgeX - (static_cast<int>(leftEdgeX) % m_gridCellSize.x);            // X position of leftmost viewable cell starting just outside of window
+    float rightEdgeX = leftEdgeX + m_viewSize.x + m_gridCellSize;                                 // Right edge of viewable area - width of a cell is added to ensure full coverage
+    float firstVertLineX = leftEdgeX - (static_cast<int>(leftEdgeX) % m_gridCellSize);            // X position of leftmost viewable cell starting just outside of window
 
     sf::Vector2f viewSize = view.getSize();
 
     float topEdgeY = view.getCenter().y - (m_viewSize.y / 2.0f);                                     // Top of viewable area
-    float bottomEdgeY = view.getCenter().y + (m_viewSize.y / 2.0f) + m_gridCellSize.y;               // Bottom of viewable area; height of a cell added to ensure full coverage
-    float firstHorizontalLineY = topEdgeY + (-static_cast<int>(topEdgeY) % m_gridCellSize.y);        // Y position of topmost cell starting just outside of window
+    float bottomEdgeY = view.getCenter().y + (m_viewSize.y / 2.0f) + m_gridCellSize;               // Bottom of viewable area; height of a cell added to ensure full coverage
+    float firstHorizontalLineY = topEdgeY + (-static_cast<int>(topEdgeY) % m_gridCellSize);        // Y position of topmost cell starting just outside of window
 
     sf::VertexArray lines(sf::Lines);
 
     // Add verticle lines to vertex array
-    for (float x = firstVertLineX; x < rightEdgeX; x += m_gridCellSize.x)
+    for (float x = firstVertLineX; x < rightEdgeX; x += m_gridCellSize)
     {
         lines.append(sf::Vertex(sf::Vector2f(x, bottomEdgeY)));
         lines.append(sf::Vertex(sf::Vector2f(x, topEdgeY)));
     }
 
     // Draw horizontal lines
-    for (float y = firstHorizontalLineY; y < bottomEdgeY; y += m_gridCellSize.y)
+    for (float y = firstHorizontalLineY; y < bottomEdgeY; y += m_gridCellSize)
     {
         lines.append(sf::Vertex(sf::Vector2f(leftEdgeX, y)));
         lines.append(sf::Vertex(sf::Vector2f(rightEdgeX, y)));
 
         // Draw coordinate text for each cell in row
-        for (float x = firstVertLineX; x < rightEdgeX; x += m_gridCellSize.x)
+        for (float x = firstVertLineX; x < rightEdgeX; x += m_gridCellSize)
         {
-            int gridX = static_cast<int>(x) / m_gridCellSize.x;
-            int gridY = -static_cast<int>(y) / m_gridCellSize.y;
+            int gridX = static_cast<int>(x) / m_gridCellSize;
+            int gridY = -static_cast<int>(y) / m_gridCellSize;
 
             m_gridText.setString("(" + std::to_string(gridX) + ", " + std::to_string(gridY) + ")");
-            m_gridText.setPosition(x, y - m_gridCellSize.y);
+            m_gridText.setPosition(x, y - m_gridCellSize);
             window.draw(m_gridText);
         }
     }

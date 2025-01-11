@@ -24,7 +24,7 @@ public:
     Vec2<T> operator - (const Vec2<T>& other) const;
     Vec2<T> operator * (float scalar) const;                    // Allows multiplication with scalar on right; see non-member function for scalar on left version
     Vec2<T> operator * (const Vec2<T>& other) const;            // Allows multiplication with scalar on right; see non-member function for scalar on left version
-    Vec2<T> operator / (const float scalar) const;
+    Vec2<T> operator / (float scalar) const;
 
     void operator += (const Vec2<T>& other);
     void operator -= (const Vec2<T>& other);

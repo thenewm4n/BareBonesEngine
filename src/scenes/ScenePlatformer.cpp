@@ -684,7 +684,7 @@ Vec2f ScenePlatformer::gridToMidPixel(const Vec2f& gridPosition, std::shared_ptr
     }
 
     const Vec2f& spriteSize = entity->get<CAnimation>().animation.getSize();
-    Vec2f offset = (gridPosition * Vec2f(m_gridCellSize)) + (spriteSize / 2.0f);
+    Vec2f offset = (gridPosition * (float)m_gridCellSize) + (spriteSize / 2.0f);
 
     return offset;
 }
@@ -737,38 +737,38 @@ void ScenePlatformer::renderGrid()
     sf::View view = window.getView();
 
     float leftEdgeX = view.getCenter().x - (m_viewSize.x / 2);                                      // Left edge of viewable area
-    float rightEdgeX = leftEdgeX + m_viewSize.x + m_gridCellSize.x;                                 // Right edge of viewable area - width of a cell is added to ensure full coverage
-    float firstVertLineX = leftEdgeX - (static_cast<int>(leftEdgeX) % m_gridCellSize.x);            // X position of leftmost viewable cell starting just outside of window
+    float rightEdgeX = leftEdgeX + m_viewSize.x + m_gridCellSize;                                 // Right edge of viewable area - width of a cell is added to ensure full coverage
+    float firstVertLineX = leftEdgeX - (static_cast<int>(leftEdgeX) % m_gridCellSize);            // X position of leftmost viewable cell starting just outside of window
     
     sf::Vector2f viewSize = view.getSize();
 
     float topEdgeY = view.getCenter().y - (m_viewSize.y / 2.0f);                                     // Top of viewable area
-    float bottomEdgeY = view.getCenter().y + (m_viewSize.y / 2.0f) + m_gridCellSize.y;               // Bottom of viewable area; height of a cell added to ensure full coverage
-	float firstHorizontalLineY = topEdgeY + (-static_cast<int>(topEdgeY) % m_gridCellSize.y);        // Y position of topmost cell starting just outside of window
+    float bottomEdgeY = view.getCenter().y + (m_viewSize.y / 2.0f) + m_gridCellSize;               // Bottom of viewable area; height of a cell added to ensure full coverage
+	float firstHorizontalLineY = topEdgeY + (-static_cast<int>(topEdgeY) % m_gridCellSize);        // Y position of topmost cell starting just outside of window
 
     sf::VertexArray lines(sf::Lines);
 
     // Add verticle lines to vertex array
-    for (float x = firstVertLineX; x < rightEdgeX; x += m_gridCellSize.x)
+    for (float x = firstVertLineX; x < rightEdgeX; x += m_gridCellSize)
     {
         lines.append(sf::Vertex(sf::Vector2f(x, bottomEdgeY)));
         lines.append(sf::Vertex(sf::Vector2f(x, topEdgeY)));
     }
 
     // Draw horizontal lines
-    for (float y = firstHorizontalLineY; y < bottomEdgeY; y += m_gridCellSize.y)
+    for (float y = firstHorizontalLineY; y < bottomEdgeY; y += m_gridCellSize)
     {
         lines.append(sf::Vertex(sf::Vector2f(leftEdgeX, y)));
         lines.append(sf::Vertex(sf::Vector2f(rightEdgeX, y)));
 
         // Draw coordinate text for each cell in row
-        for (float x = firstVertLineX; x < rightEdgeX; x += m_gridCellSize.x)
+        for (float x = firstVertLineX; x < rightEdgeX; x += m_gridCellSize)
         {
-            int gridX = static_cast<int>(x) / m_gridCellSize.x;
-            int gridY = -static_cast<int>(y) / m_gridCellSize.y;
+            int gridX = static_cast<int>(x) / m_gridCellSize;
+            int gridY = -static_cast<int>(y) / m_gridCellSize;
 
             m_gridText.setString("(" + std::to_string(gridX) + ", " + std::to_string(gridY) + ")");
-            m_gridText.setPosition(x, y - m_gridCellSize.y);
+            m_gridText.setPosition(x, y - m_gridCellSize);
             window.draw(m_gridText);
         }
     }
@@ -872,6 +872,6 @@ void ScenePlatformer::destroySolid(std::shared_ptr<Entity> solid)
     else if (animationName == "QMark")
     {
         solid->add<CAnimation>(m_game->getAssets().getAnimation("QMarkDead"), true);
-        spawnTempAnimation(solid->get<CTransform>().position + Vec2f(0.0f, m_gridCellSize.y), "Coin");
+        spawnTempAnimation(solid->get<CTransform>().position + Vec2f(0.0f, m_gridCellSize), "Coin");
     }
 }
