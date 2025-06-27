@@ -1,27 +1,30 @@
-#include "scenes/SceneStartMenu.h"
+#include "SceneStartMenu.h"
 
-#include "scenes/SceneLevelEditor.h"
-#include "scenes/ScenePlatformer.h"
+#include "SceneLevelEditor.h"
+#include "ScenePlatformer.h"
 
-SceneStartMenu::SceneStartMenu(GameEngine* gameEngine)
-    : Scene(gameEngine), m_title("Game Engine: The Game"), m_menuStrings({ "Level 1", "Level 2", "Level 3" }), m_levelPaths({"../assets/levels/level_mario.txt", "../assets/levels/level_platformer.txt"})
+SceneStartMenu::SceneStartMenu(GameEngine* gameEngine) :
+    Scene(gameEngine),
+    m_title("Game Engine: The Game"),
+    m_menuStrings({ "Level 1", "Level 2", "Level 3" }),
+    m_levelPaths({"../assets/levels/level_mario.txt", "../assets/levels/level_platformer.txt"}),
+    m_menuText(sf::Text(m_game->getAssets().getFont("Pixel"), "", 150))
 {
     init();
 }
 
 void SceneStartMenu::init()
 {
-    registerAction(sf::Keyboard::W, "UP");
-    registerAction(sf::Keyboard::S, "DOWN");
-    registerAction(sf::Keyboard::Enter, "SELECT");
-    registerAction(sf::Keyboard::Tilde, "EDIT_LEVEL");
-    registerAction(sf::Keyboard::Escape, "QUIT");
+    registerAction(sf::Keyboard::Key::W, "UP");
+    registerAction(sf::Keyboard::Key::S, "DOWN");
+    registerAction(sf::Keyboard::Key::Enter, "SELECT");
+    registerAction(sf::Keyboard::Key::Grave, "EDIT_LEVEL");
+    registerAction(sf::Keyboard::Key::Escape, "QUIT");
 
     m_menuText.setOutlineColor(sf::Color::Black);
     m_menuText.setOutlineThickness(1.5f);
-    m_menuText.setFont(m_game->getAssets().getFont("Pixel"));
 
-    sf::View view(sf::FloatRect(0.0f, 0.0f, 1920.0f, 1080.0f));  // View size is hardcoded, as to be consistent after window resizing
+    sf::View view(sf::FloatRect({0.f, 0.f}, {1920.f, 1080.f}));  // View size is hardcoded, as to be consistent after window resizing
     m_game->getWindow().setView(view);
 }
 
@@ -39,6 +42,7 @@ void SceneStartMenu::sPerformAction(const Action& action)
     {
         if (actionName == "UP")
         {
+            std::cout << "W Pressed!." << std::endl;
             if (m_selectedMenuIndex > 0)
             {
                 m_selectedMenuIndex--;
@@ -84,8 +88,8 @@ void SceneStartMenu::sRender()
 
     // Set origin to center of text after changing string and character size, then set position with new origin
     sf::FloatRect textRect = m_menuText.getLocalBounds();
-    m_menuText.setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);
-    m_menuText.setPosition(midScreenX, distanceBetweenStrings);
+    m_menuText.setOrigin({textRect.position.x + textRect.size.x / 2.0f, textRect.position.y + textRect.size.y / 2.0f});
+    m_menuText.setPosition({midScreenX, distanceBetweenStrings});
 
     // Draw title text
     window.draw(m_menuText);
@@ -100,8 +104,8 @@ void SceneStartMenu::sRender()
 
         // Set origin according to new string, then set position with new origin
         textRect = m_menuText.getLocalBounds();
-        m_menuText.setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);
-        m_menuText.setPosition(midScreenX, (i + 2) * distanceBetweenStrings);
+        m_menuText.setOrigin({textRect.position.x + textRect.size.x / 2.0f, textRect.position.y + textRect.size.y / 2.0f});
+        m_menuText.setPosition({midScreenX, (i + 2) * distanceBetweenStrings});
 
         if (i == m_selectedMenuIndex)
         {

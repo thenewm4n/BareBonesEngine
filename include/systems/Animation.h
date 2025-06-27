@@ -1,6 +1,6 @@
 #pragma once
 
-#include "utils/Vec2.h"
+#include "Vec2.h"
 
 #include <SFML/Graphics.hpp>
 
@@ -20,6 +20,7 @@ public:
     const int getCurrentFrame() const;
     const int getFrameCount() const;
     const int getFrameDuration() const;
+    static sf::Texture& getDefaultTexture();
 
 private:
     std::string m_name;

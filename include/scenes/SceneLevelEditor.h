@@ -1,8 +1,8 @@
 #pragma once
 
 
-#include "core/EntityManager.h"
-#include "scenes/Scene.h"
+#include "EntityManager.h"
+#include "Scene.h"
 
 #include <memory>
 
@@ -47,8 +47,8 @@ private:
     void init();
     void loadLevel(const std::string& filename);
     void update() override;
-    void saveToFile();
     void endScene() override;
+    void saveToFile();
 
     // System methods
     void sPerformAction(const Action& action) override;

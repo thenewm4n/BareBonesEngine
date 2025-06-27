@@ -1,12 +1,12 @@
-#include "scenes/SceneLevelEditor.h"
+#include "SceneLevelEditor.h"
 
-#include "core/Assets.h"
-#include "core/Components.h"
-#include "core/GameEngine.h"
-#include "scenes/SceneStartMenu.h"
+#include "Assets.h"
+#include "Components.h"
+#include "GameEngine.h"
+#include "SceneStartMenu.h"
 
-#include <ui/imgui/imgui.h>
-#include <ui/imgui/imgui-SFML.h>
+#include "imgui.h"
+#include "imgui-SFML.h"
 #include <SFML/OpenGL.hpp>
 
 #include <filesystem>
@@ -16,27 +16,25 @@
 
 
 SceneLevelEditor::SceneLevelEditor(GameEngine* game, const std::string& levelPath)
-    : Scene(game), m_levelPath(levelPath)
+    : Scene(game), m_levelPath(levelPath), m_gridText(sf::Text(m_game->getAssets().getFont("Tech"), "", 50))
 {
     init();
 }
 
 void SceneLevelEditor::init()
 {
-    registerAction(sf::Keyboard::Escape, "QUIT");
-    registerAction(sf::Keyboard::T, "TOGGLE_TEXTURES");
-    registerAction(sf::Keyboard::B, "TOGGLE_BBOXES");
-    registerAction(sf::Keyboard::G, "TOGGLE_GRID");
-    registerAction(sf::Keyboard::Tilde, "TOGGLE_MENU");
-    registerAction(sf::Keyboard::Equal, "ZOOM_IN");
-    registerAction(sf::Keyboard::Hyphen, "ZOOM_OUT");
+    registerAction(sf::Keyboard::Key::Escape,   "QUIT");
+    registerAction(sf::Keyboard::Key::T,        "TOGGLE_TEXTURES");
+    registerAction(sf::Keyboard::Key::B,        "TOGGLE_BBOXES");
+    registerAction(sf::Keyboard::Key::G,        "TOGGLE_GRID");
+    registerAction(sf::Keyboard::Key::Grave,    "TOGGLE_MENU");
+    registerAction(sf::Keyboard::Key::Equal,    "ZOOM_IN");
+    registerAction(sf::Keyboard::Key::Hyphen,   "ZOOM_OUT");
 
     float textScale = m_viewSize.x * 0.0001;
-    m_gridText.setFont(m_game->getAssets().getFont("Tech"));
-    m_gridText.setCharacterSize(50);
-    m_gridText.setScale(textScale, textScale);
+    m_gridText.setScale({textScale, textScale});
 
-    sf::View view(sf::FloatRect(0, -m_viewSize.y, m_viewSize.x, m_viewSize.y));     // Top left corner of view is at (0, 0); view extends in negative y direction (upwards)
+    sf::View view(sf::FloatRect({0, -m_viewSize.y}, m_viewSize));     // Top left corner of view is at (0, 0); view extends in negative y direction (upwards)
     m_game->getWindow().setView(view);
 
     loadLevel(m_levelPath);
@@ -192,7 +190,7 @@ void SceneLevelEditor::sRender()
     sParallax(viewDeltaX);
 
     // Recentre view
-    view.setCenter(newViewCentreX, view.getCenter().y);
+    view.setCenter({newViewCentreX, view.getCenter().y});
     window.setView(view);
 
     // Move player to end of entity vector, then draw entities
@@ -471,29 +469,29 @@ void SceneLevelEditor::renderEntity(std::shared_ptr<Entity> e)
         float spriteCentreY = -transform.position.y;
         if (e->has<CBody>())
         {
-            spriteCentreY += (e->get<CBody>().bBox.size.y - sprite.getGlobalBounds().height) / 2.0f;
+            spriteCentreY += (e->get<CBody>().bBox.size.y - sprite.getGlobalBounds().size.y) / 2.0f;
         }
 
         // If entity is background, render copies either side to ensure screen covered
         if (e->getTag() == "Background")
         {
-            float layerWidth = sprite.getGlobalBounds().width;
+            float layerWidth = sprite.getGlobalBounds().size.x;
 
             // Calculate the number of times the layer needs to be drawn to cover the screen width
             int numRepeats = static_cast<int>(std::ceil(m_viewSize.x / layerWidth)) + 1;
 
-            // Draw the layer multiple times
+            // Draws layer to cover screen width
             for (int i = -1; i < numRepeats; ++i)
             {
-                sprite.setPosition(transform.position.x + i * layerWidth, -transform.position.y);
+                sprite.setPosition({transform.position.x + i * layerWidth, -transform.position.y});
                 m_game->getWindow().draw(sprite);
             }
         }
         else
         {
-            sprite.setPosition(transform.position.x, spriteCentreY);
-            sprite.setScale(transform.scale.x, transform.scale.y);
-            sprite.setRotation(transform.angle);
+            sprite.setPosition({transform.position.x, spriteCentreY});
+            sprite.setScale({transform.scale.x, transform.scale.y});
+            sprite.setRotation(sf::degrees(transform.angle));
             m_game->getWindow().draw(sprite);
         }
     }
@@ -514,20 +512,26 @@ void SceneLevelEditor::renderGrid()
     float bottomEdgeY = view.getCenter().y + (m_viewSize.y / 2.0f) + m_gridCellSize;               // Bottom of viewable area; height of a cell added to ensure full coverage
     float firstHorizontalLineY = topEdgeY + (-static_cast<int>(topEdgeY) % m_gridCellSize);        // Y position of topmost cell starting just outside of window
 
-    sf::VertexArray lines(sf::Lines);
+    sf::VertexArray lines(sf::PrimitiveType::Lines);
 
     // Add verticle lines to vertex array
     for (float x = firstVertLineX; x < rightEdgeX; x += m_gridCellSize)
     {
-        lines.append(sf::Vertex(sf::Vector2f(x, bottomEdgeY)));
-        lines.append(sf::Vertex(sf::Vector2f(x, topEdgeY)));
+        sf::Vertex v0{{x, bottomEdgeY}};    // According to GPT-4.1, performance gain from constructing before for loops in negligible...
+        sf::Vertex v1{{x, topEdgeY}};
+
+        lines.append(v0);
+        lines.append(v1);
     }
 
     // Draw horizontal lines
     for (float y = firstHorizontalLineY; y < bottomEdgeY; y += m_gridCellSize)
     {
-        lines.append(sf::Vertex(sf::Vector2f(leftEdgeX, y)));
-        lines.append(sf::Vertex(sf::Vector2f(rightEdgeX, y)));
+        sf::Vertex v0{{leftEdgeX, y}};
+        sf::Vertex v1{{rightEdgeX, y}};
+
+        lines.append(v0);
+        lines.append(v1);
 
         // Draw coordinate text for each cell in row
         for (float x = firstVertLineX; x < rightEdgeX; x += m_gridCellSize)
@@ -536,7 +540,7 @@ void SceneLevelEditor::renderGrid()
             int gridY = -static_cast<int>(y) / m_gridCellSize;
 
             m_gridText.setString("(" + std::to_string(gridX) + ", " + std::to_string(gridY) + ")");
-            m_gridText.setPosition(x, y - m_gridCellSize);
+            m_gridText.setPosition({x, y - m_gridCellSize});
             window.draw(m_gridText);
         }
     }
@@ -551,8 +555,8 @@ void SceneLevelEditor::renderBBox(std::shared_ptr<Entity> entity)
 
     sf::RectangleShape rectangle;
     rectangle.setSize(sf::Vector2f(bBox.size.x - 1, bBox.size.y - 1));  // Only takes sf::Vector2f
-    rectangle.setOrigin(bBox.size.x / 2.0f, bBox.size.y / 2.0f);
-    rectangle.setPosition(transform.position.x, -transform.position.y);
+    rectangle.setOrigin({bBox.size.x / 2.0f, bBox.size.y / 2.0f});
+    rectangle.setPosition({transform.position.x, -transform.position.y});
     rectangle.setFillColor(sf::Color(0, 0, 0, 0));                  // Sets alpha of fill colour to 0 i.e. transparent
     rectangle.setOutlineColor(sf::Color(255, 255, 255, 255));       // Sets alpha of outline to 255 i.e. opaque
     rectangle.setOutlineThickness(1);

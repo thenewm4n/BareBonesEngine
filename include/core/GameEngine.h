@@ -2,8 +2,8 @@
 
 #include <memory>
 
-#include "core/Assets.h"
-#include "scenes/Scene.h"
+#include "Assets.h"
+#include "Scene.h"
 
 using SceneMap = std::map<std::string, std::shared_ptr<Scene>>;
 
@@ -124,7 +124,9 @@ private:
     void init(const std::string& assetsFilePath);
     void update();
     void sUserInput();
+    void handleSceneAction(const sf::Keyboard::Key& keyCode, bool isKeyPressed);
     void takeScreenshot();
+    void resize(const sf::Vector2u& newSize);
     std::shared_ptr<Scene> getCurrentScene();
 
     sf::RenderWindow m_window;

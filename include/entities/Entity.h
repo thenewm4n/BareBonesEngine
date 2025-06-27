@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/Components.h"
+#include "Components.h"
 
 #include <string>
 #include <tuple>

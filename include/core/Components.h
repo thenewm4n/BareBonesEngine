@@ -1,6 +1,6 @@
 #pragma once
 
-#include "systems/Animation.h"
+#include "Animation.h"
 
 #include <iostream>
 
@@ -26,7 +26,7 @@ public:
     Vec2f previousPosition = { 0.0f, 0.0f };
     Vec2f scale = { 1.0f, 1.0f };
     Vec2f velocity = { 0.0f, 0.0f };
-    float angle = 0.0f;
+    float angle = 0.0f;                         // in degrees
 
     CTransform() {}
     CTransform(const Vec2f& pos)

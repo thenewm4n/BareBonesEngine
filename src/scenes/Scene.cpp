@@ -1,4 +1,4 @@
-#include "scenes/Scene.h"
+#include "Scene.h"
 
 #include <iostream>
 
@@ -14,7 +14,7 @@ Scene::Scene(GameEngine* gameEngine)
     }
 }
 
-void Scene::registerAction(int inputKey, const std::string& actionName) { m_actionMap[inputKey] = actionName; }
+void Scene::registerAction(sf::Keyboard::Key inputKey, const std::string& actionName) { m_actionMap[inputKey] = actionName; }
 
 void Scene::simulate(const size_t frames)
 {

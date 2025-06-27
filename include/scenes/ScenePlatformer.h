@@ -1,7 +1,7 @@
 #pragma once
 
-#include "core/EntityManager.h"
-#include "scenes/Scene.h"
+#include "EntityManager.h"
+#include "Scene.h"
 
 #include <memory>
 
@@ -17,7 +17,7 @@ class ScenePlatformer : public Scene
 public:
     ScenePlatformer(GameEngine* game, const std::string& levelPath);
 
-private:
+protected:
     std::unordered_map<PlayerState, std::string> m_stateToAnimationMap =
     {
         {PlayerState::Idle, "ArcherIdle"},

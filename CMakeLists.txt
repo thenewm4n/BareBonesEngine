@@ -1,33 +1,22 @@
-cmake_minimum_required(VERSION 3.14)
-project(BareBones VERSION 1.0)
+cmake_minimum_required(VERSION 4.0)
+project(BareBones LANGUAGES CXX VERSION 1.0)
+
+# Configures global (i.e. for all targets) output directories for binary and object files for single-configuration generators
+# (I'm using Makefile on Mac and Ninja on Windows)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Set output directories
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
-set(CMAKE_OBJECTS_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/obj)
-
-# Per-configuration paths for object and binary files
-foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
-    string(TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG)
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/bin)
-    set(CMAKE_OBJECTS_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/obj)
-endforeach()
-
-find_package(SFML 2.5 COMPONENTS graphics audio REQUIRED)
+find_package(SFML 3 REQUIRED COMPONENTS Graphics Audio Window)
 find_package(OpenGL REQUIRED)
 
-# Source files
-file(GLOB_RECURSE SOURCES "src/*/*.cpp")
-add_executable(${PROJECT_NAME} ${SOURCES})
+add_executable(${PROJECT_NAME})
 
-# Makes src the root for includes
-target_include_directories(${PROJECT_NAME} PRIVATE src)
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    DEBUG_POSTFIX "_d"
+    RELWITHDEBINFO_POSTFIX "_rd"
+    RELEASE_POSTFIX ""
+)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE sfml-graphics sfml-audio OpenGL::GL)
-
-# ImGui files
-file(GLOB IMGUI_SOURCES "src/*/imgui/*.cpp")
-target_sources(${PROJECT_NAME} PRIVATE ${IMGUI_SOURCES})
-target_include_directories(${PROJECT_NAME} PRIVATE src/ui/imgui)
+add_subdirectory(src)

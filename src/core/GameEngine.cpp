@@ -1,10 +1,10 @@
-#include "core/GameEngine.h"
+#include "GameEngine.h"
 
-#include "systems/Action.h"
-#include "scenes/SceneStartMenu.h"
+#include "Action.h"
+#include "SceneStartMenu.h"
 
-#include "ui/imgui/imgui.h"
-#include "ui/imgui/imgui-SFML.h"
+#include "imgui.h"
+#include "imgui-SFML.h"
 
 #include <chrono>
 #include <fstream>
@@ -83,7 +83,7 @@ void GameEngine::init(const std::string& configFilePath)
 
     // Create window using values from config.txt or current desktop configuration
     // sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
-    m_window.create(sf::VideoMode(m_resolution.x, m_resolution.y), "BareBones", sf::Style::Default);    // TODO: change title and fullscreen according to config
+    m_window.create(sf::VideoMode({m_resolution.x, m_resolution.y}), "BareBones", sf::Style::Default);    // TODO: change title and fullscreen according to config
     m_window.setFramerateLimit(framerateCap);
     m_aspectRatio = static_cast<float>(m_resolution.x) / static_cast<float>(m_resolution.y);
 
@@ -112,50 +112,71 @@ void GameEngine::update()
 
 void GameEngine::sUserInput()
 {
-    sf::Event event;
-    while (m_window.pollEvent(event))
+    while (const std::optional event = m_window.pollEvent())
     {
-        ImGui::SFML::ProcessEvent(m_window, event);
-        
-        switch (event.type)
+        ImGui::SFML::ProcessEvent(m_window, *event);
+
+        if (const auto* keyEvent = event->getIf<sf::Event::KeyPressed>())
+            handleSceneAction(keyEvent->code, true);
+
+        else if (const auto* keyEvent = event->getIf<sf::Event::KeyReleased>())
+            handleSceneAction(keyEvent->code, false);
+
+        else if (event->is<sf::Event::Closed>())
+            quit();
+
+        else if (const auto* resizeEvent = event->getIf<sf::Event::Resized>())
+            resize(resizeEvent->size);
+    }
+
+    /*
+    m_window.handleEvents(
+        [&](const sf::Event::KeyPressed& event)
         {
-            case sf::Event::KeyPressed:
-            case sf::Event::KeyReleased:
-                // Instantiates an Action object and makes Scene perform Action if registered in the current scene
-                if (getCurrentScene()->getActionMap().find(event.key.code) != getCurrentScene()->getActionMap().end())
-                {
-                    const std::string actionType = (event.type == sf::Event::KeyPressed) ? "START" : "END";
-                    getCurrentScene()->sPerformAction(Action(getCurrentScene()->getActionMap().at(event.key.code), actionType));
-                }
+            std::cout << "Key pressed" << std::endl;
+        },
+        // THIS IS THE PROBLEM
+        [&](const sf::Event* event)
+        {
+            std::cout << "Event being handled" << std::endl;
+            //ImGui::SFML::ProcessEvent(m_window, event);
 
-                if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::L)
-                {
-                    takeScreenshot();
-                }
-                break;
-            
-            case sf::Event::Closed:
+            // Couldn't think of a more concise method than repeating code
+            if (const auto* keyEvent = event->getIf<sf::Event::KeyPressed>())
+            {
+                std::cout << "Key pressed" << std::endl;
+                handleSceneAction(keyEvent->code, true);
+            }
+            else if (const auto* keyEvent = event->getIf<sf::Event::KeyReleased>())
+            {
+                handleSceneAction(keyEvent->code, false);
+            }
+            else if (event->is<sf::Event::Closed>())
                 quit();
-                break;
+            else if (const auto* resizeEvent = event->getIf<sf::Event::Resized>())
+                resize(resizeEvent->size);
+        },
+        [](const auto&) {}  // Fallback; silently ignores other event types
+    );
+    */
+}
 
-            case sf::Event::Resized:
-                if ((event.size.width != m_resolution.x) || (event.size.height != m_resolution.y))
-                {
-                    // Changes window size according to whether width or height has changed
-                    sf::Vector2u newWindowSize = (event.size.width != m_resolution.x) ?
-                        sf::Vector2u(event.size.width, static_cast<unsigned int>(event.size.width / m_aspectRatio)) :
-                        sf::Vector2u(static_cast<unsigned int>(event.size.height * m_aspectRatio), event.size.height);
+void GameEngine::handleSceneAction(const sf::Keyboard::Key& keyCode, bool isKeyPressed)
+{
+    if (isKeyPressed && keyCode == sf::Keyboard::Key::L)
+    {
+        takeScreenshot();
+        return;
+    }
 
-                    m_window.setSize(newWindowSize);
+    auto actionMap = getCurrentScene()->getActionMap();
+    auto it = actionMap.find(keyCode);
 
-                    // Update local resolution variable
-                    m_resolution = m_window.getSize();
-                }
-                break;
-
-            default:
-                break;
-        }
+    if (it != actionMap.end())
+    {
+        // Instantiates an Action object and makes Scene perform Action if registered in the current scene
+        const std::string actionType = isKeyPressed ? "START" : "END";
+        getCurrentScene()->sPerformAction(Action(it->second, actionType));
     }
 }
 
@@ -163,7 +184,11 @@ void GameEngine::takeScreenshot()
 {
     // Create a texture to hold the current window contents
     sf::Texture texture;
-    texture.create(m_window.getSize().x, m_window.getSize().y);
+    if (!texture.resize(m_window.getSize()))
+    {
+        std::cerr << "GameEngine.cpp::takeScreenshot() - Failed to resize texture for screenshot." << std::endl;
+        return;
+    }
     texture.update(m_window);
 
     // Create an image from the texture
@@ -197,6 +222,22 @@ void GameEngine::takeScreenshot()
     else
     {
         std::cerr << "Error saving screenshot!" << std::endl;
+    }
+}
+
+void GameEngine::resize(const sf::Vector2u& newSize)
+{
+    if ((newSize.x != m_resolution.x) || (newSize.y != m_resolution.y))
+    {
+        // Changes window size according to whether width or height has changed
+        sf::Vector2u adjustedSize = (newSize.x != m_resolution.x)
+            ? sf::Vector2u(newSize.x, static_cast<unsigned int>(newSize.x / m_aspectRatio))
+            : sf::Vector2u(static_cast<unsigned int>(newSize.y * m_aspectRatio), newSize.y);
+
+        m_window.setSize(adjustedSize);
+
+        // Update local resolution variable
+        m_resolution = m_window.getSize();
     }
 }
 

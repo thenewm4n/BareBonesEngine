@@ -1,10 +1,11 @@
 #pragma once
 
-#include "systems/Action.h"
+#include "Action.h"
+#include "SFML/Window/Keyboard.hpp"
 
-#include <map>
+#include <unordered_map>
 
-using ActionMap = std::map<int, std::string>;
+using ActionMap = std::unordered_map<sf::Keyboard::Key, std::string>;
 
 // Declaration to avoid including GameEngine.h -> reduces dependencies and compilation time
 // Possible because GameEngine* used
@@ -19,7 +20,7 @@ public:
     virtual void update() = 0;
     virtual void sPerformAction(const Action& action) = 0;
 
-    void registerAction(int inputKey, const std::string& actionName);
+    void registerAction(sf::Keyboard::Key inputKey, const std::string& actionName);
     void simulate(const size_t frames);
 
     size_t getCurrentFrame() const;
