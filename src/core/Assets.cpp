@@ -5,11 +5,11 @@
 #include <string>
 #include <sstream>
 
-Assets::Assets() {}
+Assets::Assets(const std::filesystem::path& assetsDir) : m_assetsDir(assetsDir) {}
 
-void Assets::loadFromFile(const std::string& assetsFilePath)
+void Assets::loadFromFile(const std::string& assetsTxtPath)
 {
-    std::ifstream file(assetsFilePath);
+    std::ifstream file(assetsTxtPath);
     if (!file.is_open())
     {
         std::cerr << "Assets.cpp, Line 19: Error opening assets file." << std::endl;
@@ -38,13 +38,13 @@ void Assets::loadFromFile(const std::string& assetsFilePath)
             }
             else if (firstElement == "Font")
             {
-                std::string name, path;
+                std::string name, filename;
 
-                lineStream >> name >> path;
+                lineStream >> name >> filename;
 
                 // Load font from file
                 sf::Font font;
-                if (!font.openFromFile(path))
+                if (!font.openFromFile(m_assetsDir / "fonts" / filename))
                 {
                     std::cerr << "Assets.cpp, Line 53 - Could not load font: " << name << std::endl;
                     exit(-2);
@@ -60,7 +60,7 @@ void Assets::loadFromFile(const std::string& assetsFilePath)
                 lineStream >> name >> path;
 
                 sf::Texture texture;
-                if (!texture.loadFromFile(path))
+                if (!texture.loadFromFile(m_assetsDir / "images" / path))
                 {
                     std::cerr << "Could not load texture:" << name << std::endl;
                     exit(-3);

@@ -13,9 +13,9 @@ using TextureMap = std::map<std::string, sf::Texture>;
 class Assets
 {
 public:
-    Assets();
+    Assets(const std::filesystem::path& assetsDir);
 
-    void loadFromFile(const std::string& assetsFilePath);
+    void loadFromFile(const std::string& assetsTxtPath);
 
     const Animation& getAnimation(const std::string& animationName) const;
     const sf::Font& getFont(const std::string& fontName) const;
@@ -26,6 +26,7 @@ public:
     const TextureMap& getTextureMap() const;
 
 private:
+    std::filesystem::path m_assetsDir;
     AnimationMap m_animationMap;
     FontMap m_fontMap;
     TextureMap m_textureMap;

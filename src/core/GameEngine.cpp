@@ -15,7 +15,11 @@
 
 // Public methods
 
-GameEngine::GameEngine(const std::string& configFilePath) { init(configFilePath); }
+GameEngine::GameEngine(const std::filesystem::path& executableDir)
+    : m_executableDir(executableDir), m_assets(executableDir.parent_path() / "assets")
+{
+    init();
+}
 
 void GameEngine::run()
 {
@@ -38,6 +42,8 @@ void GameEngine::changeScene(const std::string& sceneName, std::shared_ptr<Scene
 
 bool GameEngine::isRunning() { return m_running && m_window.isOpen(); }
 
+const std::filesystem::path& GameEngine::getExecutableDir() { return m_executableDir; }
+
 sf::RenderWindow& GameEngine::getWindow() { return m_window; }
 
 sf::Vector2u GameEngine::getResolution() { return m_resolution; }
@@ -49,12 +55,12 @@ const Assets& GameEngine::getAssets() const { return m_assets; }
 
 // Private methods
 
-void GameEngine::init(const std::string& configFilePath)
+void GameEngine::init()
 {
-    std::ifstream file(configFilePath);
+    std::ifstream file(m_executableDir / "config.txt");
     if (!file.is_open())
     {
-        std::cerr << "GameEngine.cpp, Line 20: Error opening config file." << std::endl;
+        std::cerr << "GameEngine.cpp, Line 57: Error opening config file." << std::endl;
         exit(-1);
     }
 
@@ -83,7 +89,7 @@ void GameEngine::init(const std::string& configFilePath)
 
     // Create window using values from config.txt or current desktop configuration
     // sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
-    m_window.create(sf::VideoMode({m_resolution.x, m_resolution.y}), "BareBones", sf::Style::Default);    // TODO: change title and fullscreen according to config
+    m_window.create(sf::VideoMode({m_resolution.x, m_resolution.y}), GAME_TITLE, sf::Style::Default);    // TODO: change title and fullscreen according to config
     m_window.setFramerateLimit(framerateCap);
     m_aspectRatio = static_cast<float>(m_resolution.x) / static_cast<float>(m_resolution.y);
 
@@ -98,7 +104,7 @@ void GameEngine::init(const std::string& configFilePath)
     ImGui::GetIO().FontGlobalScale = 1.0f;		// Scales imgui text size
 
     // Load assets into Assets object
-    m_assets.loadFromFile("assets.txt");
+    m_assets.loadFromFile(m_executableDir / "assets.txt");
 
     // Create new menu scene, add it to scene map, and make it the current scene
     changeScene("MENU", std::make_shared<SceneStartMenu>(this));
@@ -128,37 +134,6 @@ void GameEngine::sUserInput()
         else if (const auto* resizeEvent = event->getIf<sf::Event::Resized>())
             resize(resizeEvent->size);
     }
-
-    /*
-    m_window.handleEvents(
-        [&](const sf::Event::KeyPressed& event)
-        {
-            std::cout << "Key pressed" << std::endl;
-        },
-        // THIS IS THE PROBLEM
-        [&](const sf::Event* event)
-        {
-            std::cout << "Event being handled" << std::endl;
-            //ImGui::SFML::ProcessEvent(m_window, event);
-
-            // Couldn't think of a more concise method than repeating code
-            if (const auto* keyEvent = event->getIf<sf::Event::KeyPressed>())
-            {
-                std::cout << "Key pressed" << std::endl;
-                handleSceneAction(keyEvent->code, true);
-            }
-            else if (const auto* keyEvent = event->getIf<sf::Event::KeyReleased>())
-            {
-                handleSceneAction(keyEvent->code, false);
-            }
-            else if (event->is<sf::Event::Closed>())
-                quit();
-            else if (const auto* resizeEvent = event->getIf<sf::Event::Resized>())
-                resize(resizeEvent->size);
-        },
-        [](const auto&) {}  // Fallback; silently ignores other event types
-    );
-    */
 }
 
 void GameEngine::handleSceneAction(const sf::Keyboard::Key& keyCode, bool isKeyPressed)

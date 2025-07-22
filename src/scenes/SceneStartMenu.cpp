@@ -7,7 +7,7 @@ SceneStartMenu::SceneStartMenu(GameEngine* gameEngine) :
     Scene(gameEngine),
     m_title("Game Engine: The Game"),
     m_menuStrings({ "Level 1", "Level 2", "Level 3" }),
-    m_levelPaths({"../assets/levels/level_mario.txt", "../assets/levels/level_platformer.txt"}),
+    m_levelFiles({"level_mario.txt", "level_platformer.txt"}),
     m_menuText(sf::Text(m_game->getAssets().getFont("Pixel"), "", 150))
 {
     init();
@@ -42,7 +42,6 @@ void SceneStartMenu::sPerformAction(const Action& action)
     {
         if (actionName == "UP")
         {
-            std::cout << "W Pressed!." << std::endl;
             if (m_selectedMenuIndex > 0)
             {
                 m_selectedMenuIndex--;
@@ -55,15 +54,23 @@ void SceneStartMenu::sPerformAction(const Action& action)
                 m_selectedMenuIndex++;
             }
         }
-        else if (actionName == "SELECT")
+        else if (actionName == "SELECT" || actionName == "EDIT_LEVEL")
         {
             const std::string sceneName("LEVEL_%i", m_selectedMenuIndex);
-            m_game->changeScene(sceneName, std::make_shared<ScenePlatformer>(m_game, m_levelPaths[m_selectedMenuIndex]));
-        }
-        else if (actionName == "EDIT_LEVEL")
-        {
-            const std::string sceneName("EDITOR_LEVEL_%i", m_selectedMenuIndex);
-            m_game->changeScene(sceneName, std::make_shared<SceneLevelEditor>(m_game, m_levelPaths[m_selectedMenuIndex]));
+            const std::filesystem::path levelPath =
+                m_game->getExecutableDir().parent_path() /
+                "assets" /
+                "levels" /
+                m_levelFiles[m_selectedMenuIndex];
+
+            std::shared_ptr<Scene> levelScene;
+            
+            if (actionName == "SELECT")
+                levelScene = std::make_shared<ScenePlatformer>(m_game, levelPath);
+            else                // If editing level
+                levelScene = std::make_shared<SceneLevelEditor>(m_game, levelPath);
+            
+            m_game->changeScene(sceneName, levelScene);
         }
         else if (actionName == "QUIT")
         {

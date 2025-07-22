@@ -1,8 +1,5 @@
-game_title = Game Engine: The Game
 resolution_width = 1920
 resolution_height = 1080
 fullscreen = false
 vsync = false
 max_fps = 60
-
-levels = Platformer

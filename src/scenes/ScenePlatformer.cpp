@@ -20,6 +20,7 @@ ScenePlatformer::ScenePlatformer(GameEngine* game, const std::string& levelPath)
     : Scene(game), m_levelPath(levelPath), m_gridText(sf::Text(m_game->getAssets().getFont("Tech"), "", 50))
 {
     init();
+    loadEntities(m_levelPath);
 }
 
 void ScenePlatformer::init()
@@ -43,19 +44,17 @@ void ScenePlatformer::init()
 
 	sf::View view(sf::FloatRect({0, -m_viewSize.y}, m_viewSize));     // Top left corner of view is at (0, 0); view extends in negative y direction (upwards)
     m_game->getWindow().setView(view);
-
-    loadLevel(m_levelPath);
 }
 
-void ScenePlatformer::loadLevel(const std::string& filename)
+void ScenePlatformer::loadEntities(const std::filesystem::path& levelPath)
 {
     // Overwrites previous EntityManager and parallax layers vector
     m_entityManager = EntityManager();
 
-    std::ifstream levelFile(filename);
+    std::ifstream levelFile(levelPath);
     if (!levelFile.is_open())
     {
-        std::cerr << "ScenePlatformer.cpp, Line 60: Error opening level file." << std::endl;
+        std::cerr << "ScenePlatformer::loadLevel(): Error opening level file." << std::endl;
         exit(-1);
     }
 
@@ -396,7 +395,7 @@ void ScenePlatformer::sCollision()
     // Restart level if player has fallen down hole
     if (posPlayer.y < 0)
     {
-        loadLevel(m_levelPath);
+        loadEntities(m_levelPath);
     }
 }
 

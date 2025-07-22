@@ -27,7 +27,7 @@ protected:
         {PlayerState::Shooting, "ArcherShoot"}
     };
 
-    std::string m_levelPath;
+    std::filesystem::path m_levelPath;
     std::shared_ptr<Entity> m_player;
     PlayerConfig m_playerConfig;
     EntityManager m_entityManager;
@@ -42,7 +42,7 @@ protected:
     bool m_drawGui = true;
 
     void init();
-    void loadLevel(const std::string& filename);
+    void loadEntities(const std::filesystem::path& levelPath);
     void update() override;
     void endScene() override;
 

@@ -1,36 +1,36 @@
-Texture TexArcherIdle ../assets/images/archer/archer_idle.png
-Texture TexArcherRun ../assets/images/archer/archer_run.png
-Texture TexArcherJump ../assets/images/archer/archer_jump.png
-Texture TexArcherFall ../assets/images/archer/archer_fall.png
-Texture TexArcherShoot ../assets/images/archer/archer_shoot.png
+Texture TexArcherIdle archer/archer_idle.png
+Texture TexArcherRun archer/archer_run.png
+Texture TexArcherJump archer/archer_jump.png
+Texture TexArcherFall archer/archer_fall.png
+Texture TexArcherShoot archer/archer_shoot.png
 
-Texture TexExplosion ../assets/images/misc/explosion.png
-Texture TexArrow ../assets/images/misc/arrow.png
-Texture TexCoin ../assets/images/mario/coinspin.png
-Texture TexBrick ../assets/images/mario/brick.png
-Texture TexQMark ../assets/images/mario/qmarkfade.png
-Texture TexQMarkDead ../assets/images/mario/qmarkdead.png
-Texture TexPipe ../assets/images/mario/pipe.png
-Texture TexCloud ../assets/images/mario/cloud.png
-Texture TexBush ../assets/images/mario/bush.png
-Texture TexGround ../assets/images/environment/ground.png
-Texture TexBlock ../assets/images/mario/block.png
-Texture TexPole ../assets/images/mario/flagpole.png
-Texture TexPoleTop ../assets/images/mario/flagpoletop.png
+Texture TexExplosion misc/explosion.png
+Texture TexArrow misc/arrow.png
+Texture TexCoin mario/coinspin.png
+Texture TexBrick mario/brick.png
+Texture TexQMark mario/qmarkfade.png
+Texture TexQMarkDead mario/qmarkdead.png
+Texture TexPipe mario/pipe.png
+Texture TexCloud mario/cloud.png
+Texture TexBush mario/bush.png
+Texture TexGround environment/ground.png
+Texture TexBlock mario/block.png
+Texture TexPole mario/flagpole.png
+Texture TexPoleTop mario/flagpoletop.png
 
-Texture TexForestBack ../assets/images/environment/forest_background.png
-Texture TexForestMid ../assets/images/environment/forest_midground.png
-Texture TexForestFore ../assets/images/environment/forest_foreground.png
+Texture TexForestBack environment/forest_background.png
+Texture TexForestMid environment/forest_midground.png
+Texture TexForestFore environment/forest_foreground.png
 
-Texture TexSign ../assets/images/environment/sign.png
-Texture TexFence ../assets/images/environment/fence.png
-Texture TexRock ../assets/images/environment/rock.png
-Texture TexLamp ../assets/images/environment/lamp.png
+Texture TexSign environment/sign.png
+Texture TexFence environment/fence.png
+Texture TexRock environment/rock.png
+Texture TexLamp environment/lamp.png
 
-Texture TexBarrel ../assets/images/environment/barrel.png
-Texture TexBoxBig ../assets/images/environment/box_big.png
-Texture TexBoxSmall ../assets/images/environment/box_small.png
-Texture TexWell ../assets/images/environment/well.png
+Texture TexBarrel environment/barrel.png
+Texture TexBoxBig environment/box_big.png
+Texture TexBoxSmall environment/box_small.png
+Texture TexWell environment/well.png
 
 Animation ArcherIdle TexArcherIdle 12 5
 Animation ArcherRun TexArcherRun 10 5
@@ -67,6 +67,6 @@ Animation BoxBig TexBoxBig 1 1
 Animation BoxSmall TexBoxSmall 1 1
 Animation Well TexWell 1 1
 
-Font Pixel ../assets/fonts/rainyhearts.ttf
-Font Tech ../assets/fonts/nulshock.otf
+Font Pixel rainyhearts.ttf
+Font Tech nulshock.otf
 
