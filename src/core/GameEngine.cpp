@@ -42,7 +42,7 @@ void GameEngine::changeScene(const std::string& sceneName, std::shared_ptr<Scene
 
 bool GameEngine::isRunning() { return m_running && m_window.isOpen(); }
 
-const std::filesystem::path& GameEngine::getExecutableDir() { return m_executableDir; }
+const std::filesystem::path& GameEngine::getExecutableDir() const { return m_executableDir; }
 
 sf::RenderWindow& GameEngine::getWindow() { return m_window; }
 
@@ -60,15 +60,14 @@ void GameEngine::init()
     std::ifstream file(m_executableDir / "config.txt");
     if (!file.is_open())
     {
-        std::cerr << "GameEngine.cpp, Line 57: Error opening config file." << std::endl;
+        std::cerr << "GameEngine.cpp: Error opening config file." << std::endl;
         exit(-1);
     }
 
     // Read config.txt
+    
     std::string line;
     std::string firstElement;
-
-    int framerateCap = 60;
 
     while (std::getline(file, line))
     {
@@ -80,7 +79,7 @@ void GameEngine::init()
         {
             if (firstElement == "Window")
             {
-                lineStream >> m_resolution.x >> m_resolution.y >> framerateCap;
+                lineStream >> m_resolution.x >> m_resolution.y >> m_framerateCap;
             }
         }
     }
@@ -90,7 +89,7 @@ void GameEngine::init()
     // Create window using values from config.txt or current desktop configuration
     // sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
     m_window.create(sf::VideoMode({m_resolution.x, m_resolution.y}), GAME_TITLE, sf::Style::Default);    // TODO: change title and fullscreen according to config
-    m_window.setFramerateLimit(framerateCap);
+    m_window.setFramerateLimit(m_framerateCap);
     m_aspectRatio = static_cast<float>(m_resolution.x) / static_cast<float>(m_resolution.y);
 
     // Create and resize ImGui

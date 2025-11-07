@@ -13,7 +13,8 @@ public:
 private:
     std::string m_title;
     sf::Text m_menuText;
-    std::vector<std::string> m_menuStrings;
+    // std::vector<std::string> m_menuStrings;
+    char* m_menuStrings[];
     std::vector<std::string> m_levelFiles;
     uint8_t m_selectedMenuIndex = 0;
 

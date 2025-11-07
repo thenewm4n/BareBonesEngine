@@ -8,7 +8,7 @@
 using ActionMap = std::unordered_map<sf::Keyboard::Key, std::string>;
 
 // Declaration to avoid including GameEngine.h -> reduces dependencies and compilation time
-// Possible because GameEngine* used
+// Possible because only GameEngine pointer used
 class GameEngine;
 
 class Scene

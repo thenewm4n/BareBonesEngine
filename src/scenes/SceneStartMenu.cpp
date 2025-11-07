@@ -5,9 +5,9 @@
 
 SceneStartMenu::SceneStartMenu(GameEngine* gameEngine) :
     Scene(gameEngine),
-    m_title("Game Engine: The Game"),
-    m_menuStrings({ "Level 1", "Level 2", "Level 3" }),
-    m_levelFiles({"level_mario.txt", "level_platformer.txt"}),
+    m_title(gameEngine->GAME_TITLE),
+    m_menuStrings(gameEngine->LEVELS),//{ "Level 1", "Level 2", "Level 3" }),
+    m_levelFiles({"level_Mario.txt", "level_Platformer.txt"}),
     m_menuText(sf::Text(m_game->getAssets().getFont("Pixel"), "", 150))
 {
     init();
