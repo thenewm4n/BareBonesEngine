@@ -15,7 +15,7 @@
 #include <sstream>
 
 
-SceneLevelEditor::SceneLevelEditor(GameEngine* game, const std::string& levelPath)
+SceneLevelEditor::SceneLevelEditor(GameEngine* game, const std::filesystem::path& levelPath)
     : Scene(game), m_levelPath(levelPath), m_gridText(sf::Text(m_game->getAssets().getFont("Tech"), "", 50))
 {
     init();
@@ -40,7 +40,7 @@ void SceneLevelEditor::init()
     loadLevel(m_levelPath);
 }
 
-void SceneLevelEditor::loadLevel(const std::string& filename)
+void SceneLevelEditor::loadLevel(const std::filesystem::path& filename)
 {
     // Overwrites previous EntityManager and parallax layers vector
     m_entityManager = EntityManager();
@@ -361,7 +361,7 @@ void SceneLevelEditor::sParallax(float viewDeltaX)
 void SceneLevelEditor::saveToFile()
 {
     // Create a backup of the current save file
-    std::string backupPath = m_levelPath + ".bak";
+    std::filesystem::path backupPath = m_levelPath / ".bak";
     std::error_code ec;
     std::filesystem::copy_file(m_levelPath, backupPath, std::filesystem::copy_options::overwrite_existing, ec);
     

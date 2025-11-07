@@ -16,7 +16,7 @@ class SceneLevelEditor : public Scene
     };
 
 public:
-    SceneLevelEditor(GameEngine* game, const std::string& levelPath);
+    SceneLevelEditor(GameEngine* game, const std::filesystem::path& levelPath);
 
 private:
     std::unordered_map<PlayerState, std::string> m_stateToAnimationMap =
@@ -30,7 +30,7 @@ private:
 
     std::shared_ptr<Entity> m_selectedEntity;
     std::shared_ptr<Entity> m_draggedEntity;
-    std::string m_levelPath;
+    const std::filesystem::path& m_levelPath;
     EntityManager m_entityManager;
     std::shared_ptr<Entity> m_player;
     PlayerConfig m_playerConfig;
@@ -45,7 +45,7 @@ private:
     bool m_drawGui = true;
 
     void init();
-    void loadLevel(const std::string& filename);
+    void loadLevel(const std::filesystem::path& filename);
     void update() override;
     void endScene() override;
     void saveToFile();

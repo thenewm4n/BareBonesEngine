@@ -15,7 +15,7 @@ class Assets
 public:
     Assets(const std::filesystem::path& assetsDir);
 
-    void loadFromFile(const std::string& assetsTxtPath);
+    void loadFromFile(const std::filesystem::path& assetsTxtPath);
 
     const Animation& getAnimation(const std::string& animationName) const;
     const sf::Font& getFont(const std::string& fontName) const;

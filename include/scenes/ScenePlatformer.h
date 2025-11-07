@@ -15,7 +15,7 @@ class ScenePlatformer : public Scene
     };
 
 public:
-    ScenePlatformer(GameEngine* game, const std::string& levelPath);
+    ScenePlatformer(GameEngine* game, const std::filesystem::path& levelPath); //const std::string& levelPath);
 
 protected:
     std::unordered_map<PlayerState, std::string> m_stateToAnimationMap =

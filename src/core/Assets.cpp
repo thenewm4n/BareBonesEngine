@@ -7,7 +7,7 @@
 
 Assets::Assets(const std::filesystem::path& assetsDir) : m_assetsDir(assetsDir) {}
 
-void Assets::loadFromFile(const std::string& assetsTxtPath)
+void Assets::loadFromFile(const std::filesystem::path& assetsTxtPath)
 {
     std::ifstream file(assetsTxtPath);
     if (!file.is_open())
