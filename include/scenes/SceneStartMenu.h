@@ -11,10 +11,9 @@ public:
     SceneStartMenu(GameEngine* gameEngine);
 
 private:
-    std::string m_title;
+    std::string m_title = GameEngine::GAME_TITLE;
     sf::Text m_menuText;
-    // std::vector<std::string> m_menuStrings;
-    char* m_menuStrings[];
+    std::vector<std::string> m_menuStrings;
     std::vector<std::string> m_levelFiles;
     uint8_t m_selectedMenuIndex = 0;
 
