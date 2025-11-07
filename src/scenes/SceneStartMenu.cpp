@@ -8,6 +8,13 @@ SceneStartMenu::SceneStartMenu(GameEngine* gameEngine) :
     m_menuStrings(std::begin(GameEngine::LEVELS), std::end(GameEngine::LEVELS)),
     m_menuText(sf::Text(m_game->getAssets().getFont("Pixel"), "", 150))
 {
+    // Dynamically initialise m_levelFiles according to GameEngine::LEVELS
+    for (std::string levelName : GameEngine::LEVELS)
+    {
+        std::transform(levelName.begin(), levelName.end(), levelName.begin(), ::tolower);
+        m_levelFiles.emplace_back("level_" + levelName + ".txt");
+    }
+
     init();
 }
 
@@ -21,13 +28,6 @@ void SceneStartMenu::init()
 
     m_menuText.setOutlineColor(sf::Color::Black);
     m_menuText.setOutlineThickness(1.5f);
-
-    // Dynamically initialise m_levelFiles according to GameEngine::LEVELS
-    for (std::string levelName : GameEngine::LEVELS)
-    {
-        std::transform(levelName.begin(), levelName.end(), levelName.begin(), ::tolower);
-        m_levelFiles.emplace_back("level_" + levelName + ".txt");
-    }
 
     sf::View view(sf::FloatRect({0.f, 0.f}, {1920.f, 1080.f}));  // View size is hardcoded, as to be consistent after window resizing
     m_game->getWindow().setView(view);
@@ -87,8 +87,8 @@ void SceneStartMenu::sPerformAction(const Action& action)
 void SceneStartMenu::sRender()
 {
     sf::RenderWindow& window = m_game->getWindow();
-    /*static*/ float midScreenX = window.getView().getSize().x / 2.0f;
-    /*static*/ float distanceBetweenStrings = window.getView().getSize().y / static_cast<float>(m_menuStrings.size() + 2);
+    float midScreenX = window.getView().getSize().x / 2.0f;
+    float distanceBetweenStrings = window.getView().getSize().y / static_cast<float>(m_menuStrings.size() + 2);
 
     // Clear screen with the background colour
     window.clear(sf::Color(244, 214, 204));
