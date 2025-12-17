@@ -460,7 +460,7 @@ void ScenePlatformer::sRender()
 
 
     // Drawing entities
-    // 
+ 
     // Move player to end of entity vector
     EntityVector& entities = m_entityManager.getEntities();
 
