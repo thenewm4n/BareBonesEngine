@@ -5,8 +5,6 @@ add_library(scenes STATIC
     SceneStartMenu.cpp
 )
 
-target_include_directories(scenes PUBLIC
-    ${CMAKE_SOURCE_DIR}/include/scenes
-)
+target_include_directories(scenes PUBLIC ${CMAKE_SOURCE_DIR}/include)
 
 target_link_libraries(scenes PUBLIC core systems)
