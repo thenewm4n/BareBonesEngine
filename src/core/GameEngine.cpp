@@ -65,7 +65,7 @@ void GameEngine::init()
     }
 
     // Read config.txt
-    
+
     std::string line;
     std::string firstElement;
 
@@ -86,21 +86,25 @@ void GameEngine::init()
 
     file.close();
 
+
     // Create window using values from config.txt or current desktop configuration
-    // sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
-    m_window.create(sf::VideoMode({m_resolution.x, m_resolution.y}), GAME_TITLE, sf::Style::Default);    // TODO: change title and fullscreen according to config
+    
+    m_window.create(sf::VideoMode({m_resolution.x, m_resolution.y}), GAME_TITLE, sf::Style::Default);       // TODO: change fullscreen according to config
+    // m_window.create(sf::VideoMode::getDesktopMode(), GAME_TITLE, sf::Style::Default);                    // Creates window according to desktop resolution
     m_window.setFramerateLimit(m_framerateCap);
     m_aspectRatio = static_cast<float>(m_resolution.x) / static_cast<float>(m_resolution.y);
 
+
     // Create and resize ImGui
-    auto result = ImGui::SFML::Init(m_window);
-    if (!result)
+
+    if (!ImGui::SFML::Init(m_window))
     {
         std::cerr << "ImGui::SFML::Init failed." << std::endl;
         exit(-8);
     }
-    ImGui::GetStyle().ScaleAllSizes(2.5f);		// Scales imgui elements
-    ImGui::GetIO().FontGlobalScale = 1.0f;		// Scales imgui text size
+
+    ImGui::GetStyle().ScaleAllSizes(2.5f);		// ImGui elements
+    ImGui::GetIO().FontGlobalScale = 1.0f;		// ImGui text size
 
     // Load assets into Assets object
     m_assets.loadFromFile(m_executableDir / "assets.txt");
@@ -199,6 +203,7 @@ void GameEngine::takeScreenshot()
     }
 }
 
+// Called when window resized or maximised
 void GameEngine::resize(const sf::Vector2u& newSize)
 {
     if ((newSize.x != m_resolution.x) || (newSize.y != m_resolution.y))
