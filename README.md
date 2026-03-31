@@ -36,6 +36,7 @@ cmake --build build
 ```
 
 3. Run the Game:
+
 **On Linux / macOS:**
 ```bash
 ./bin/BareBones
