@@ -24,28 +24,28 @@ Note: Exact version requirements may vary. Please refer to the CMakeLists.txt fi
 
 ### Setup Instructions
 1. Clone the Repository:
-   ```
-   git clone https://github.com/thenewm4n/BareBonesEngine.git
-   cd BareBonesEngine
-   ```
+```
+git clone https://github.com/thenewm4n/BareBonesEngine.git
+cd BareBonesEngine
+```
 
 2. Build the Project:
-   ```
-   cmake -B build
-   cmake --build build
-   ```
+```
+cmake -B build
+cmake --build build
+```
 
 3. Run the Game:
-   **On Linux / macOS:**
-   ```bash
-   ./bin/BareBones
-   ```
+**On Linux / macOS:**
+```bash
+./bin/BareBones
+```
 
-   **On Windows:**
-   ```powershell
-   .\bin\BareBones.exe
-   ```
-   *Note: might require .\bin\Debug\BareBones.exe or .\bin\Release\BareBones.exe, depending on your CMake generator.*
+**On Windows:**
+```powershell
+.\bin\BareBones.exe
+```
+*Note: might require .\bin\Debug\BareBones.exe or .\bin\Release\BareBones.exe, depending on your CMake generator.*
 
 ### Usage
 #### Config File
