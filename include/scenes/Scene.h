@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Action.h"
+#include "systems/Action.h"
 #include "SFML/Window/Keyboard.hpp"
 
 #include <unordered_map>

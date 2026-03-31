@@ -1,7 +1,7 @@
 #pragma once
 
-#include "GameEngine.h"
-#include "Scene.h"
+#include "core/GameEngine.h"
+#include "scenes/Scene.h"
 
 #include <vector>
 

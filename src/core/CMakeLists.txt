@@ -5,10 +5,7 @@ add_library(core STATIC
     #ConfigManager.cpp
 )
 
-target_include_directories(core PUBLIC
-    ${CMAKE_SOURCE_DIR}/include/core
-    ${CMAKE_SOURCE_DIR}/include/utils
-)
+target_include_directories(core PUBLIC ${CMAKE_SOURCE_DIR}/include)
 
 target_link_libraries(core PUBLIC
     entities

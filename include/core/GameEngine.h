@@ -2,8 +2,8 @@
 
 #include <memory>
 
-#include "Assets.h"
-#include "Scene.h"
+#include "core/Assets.h"
+#include "scenes/Scene.h"
 
 using SceneMap = std::map<std::string, std::shared_ptr<Scene>>;
 

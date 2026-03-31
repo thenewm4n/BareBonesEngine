@@ -1,7 +1,7 @@
-#include "SceneStartMenu.h"
+#include "scenes/SceneStartMenu.h"
 
-#include "SceneLevelEditor.h"
-#include "ScenePlatformer.h"
+#include "scenes/SceneLevelEditor.h"
+#include "scenes/ScenePlatformer.h"
 
 SceneStartMenu::SceneStartMenu(GameEngine* gameEngine) :
     Scene(gameEngine),

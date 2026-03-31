@@ -1,14 +1,14 @@
-#include "ScenePlatformer.h"
+#include "scenes/ScenePlatformer.h"
 
-#include "Action.h"
-#include "Assets.h"
-#include "Components.h"
-#include "GameEngine.h"
-#include "Physics.h"
-#include "SceneStartMenu.h"
+#include "systems/Action.h"
+#include "core/Assets.h"
+#include "core/Components.h"
+#include "core/GameEngine.h"
+#include "systems/Physics.h"
+#include "scenes/SceneStartMenu.h"
 
-#include "imgui.h"
-#include "imgui-SFML.h"
+#include "ui/imgui/imgui.h"
+#include "ui/imgui/imgui-SFML.h"
 #include <SFML/OpenGL.hpp>
 
 #include <fstream>
