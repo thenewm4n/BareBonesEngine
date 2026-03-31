@@ -46,7 +46,7 @@ Note: Exact version requirements may vary. Please refer to the CMakeLists.txt fi
     ```powershell
     .\bin\BareBones.exe
     ```
-    *Note: might require .\bin\Debug\BareBones.exe or .\bin\Release\BareBones.exe, depending on your CMake generator.*
+    > Note: Might require .\bin\Debug\BareBones.exe or .\bin\Release\BareBones.exe, depending on your CMake generator.
 
 ### Usage
 #### Config File
@@ -101,7 +101,7 @@ Prop N GX GY
     GY  GridPositionY   float
 ```
 > Note: GX and GY positions in the level specification file are in 'grid' coordinates. Each 'grid' cell measures 64 by 64 pixels. Entities are positioned so that the bottom-left corner of their texture aligns with the bottom-left corner of the specified grid coordinate.
-> Note: Solid entities have bodies, i.e., bounding boxes, whereas props don't.
+> Note: Solid entities have bounding boxes, whereas props don't.
 
 ### Controls
 #### Menu scene
