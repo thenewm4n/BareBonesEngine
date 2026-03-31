@@ -3,45 +3,49 @@
 
 *A minimal game engine to help me understand games, from the bottom up, and make my own.*
 
+---
 
 ### Features
 - Entity-Component-System (ECS) architecture for composable functionality
-- Basic physics including gravity, collision detection and resolution
+- Basic physics system including gravity, collision detection and resolution
+- Sprite-based animation system
 - Remappable control scheme
-- Simple level configuration system
+- Simple level configuration
 - Debug rendering options (toggle textures, bounding boxes, grid)
 - Scene management
-- Window management, graphics and sound handled by SFML
 
 ### Prerequisites
 - C++17 (or later) compatible compiler
-- SFML 2.5.1 or later
-- CMake 3.10 or later
+- CMake 4.0 or later
+- OpenGL development headers
 - Operating System: Windows, macOS, or Linux (Ubuntu 18.04+)
+- An active internet connection (to automatically download SFML during CMake configuration).
 Note: Exact version requirements may vary. Please refer to the CMakeLists.txt file for the most up-to-date dependency information.
 
 ### Setup Instructions
-1. Install SFML:
-   - On macOS with Homebrew: `brew install sfml`
-   - On Linux: Use your package manager or see the [SFML download page](https://www.sfml-dev.org/download.php)
-   - On Windows: Download from the [SFML website](https://www.sfml-dev.org/download.php) and extract to a known location
-
-2. Clone the Repository:
+1. Clone the Repository:
    ```
    git clone https://github.com/thenewm4n/BareBonesEngine.git
    cd BareBonesEngine
    ```
 
-3. Build the Project:
+2. Build the Project:
    ```
    cmake -B build
    cmake --build build
    ```
 
-4. Run the Game:
-   ```
+3. Run the Game:
+   **On Linux / macOS:**
+   ```bash
    ./bin/BareBones
    ```
+
+   **On Windows:**
+   ```powershell
+   .\bin\BareBones.exe
+   ```
+   *Note: might require .\bin\Debug\BareBones.exe or .\bin\Release\BareBones.exe, depending on your CMake generator.*
 
 ### Usage
 #### Config File
