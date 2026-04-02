@@ -2,9 +2,17 @@
 
 #include <filesystem>
 
+
 int main(int argc, char* argv[])
 {
-    // Finds executable directory -> finding config and level files is working directory-agnostic
+    const std::string& gameName = "BareBonesShooter";
+    const std::string& assetsFile = "assets.txt";
+    
+    // Determine list of scenes (from text file or hardcoded?)
+    
+
+    // Instantiate game with name, assets and scenes    
+    // Finds executable directory -> finding config file is working directory-agnostic
     std::filesystem::path executableDir = std::filesystem::absolute(argv[0]).parent_path();
     executableDir = std::filesystem::canonical(executableDir); // Resolves . and .. cleanly
     
