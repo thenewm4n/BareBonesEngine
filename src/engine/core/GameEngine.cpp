@@ -57,7 +57,7 @@ const Assets& GameEngine::getAssets() const { return m_assets; }
 
 void GameEngine::init()
 {
-    std::ifstream file(m_executableDir / "config.txt");
+    std::ifstream file(m_executableDir / "config/config.txt");
     if (!file.is_open())
     {
         std::cerr << "GameEngine.cpp: Error opening config file." << std::endl;
@@ -107,7 +107,7 @@ void GameEngine::init()
     ImGui::GetIO().FontGlobalScale = 1.0f;		// ImGui text size
 
     // Load assets into Assets object
-    m_assets.loadFromFile(m_executableDir / "assets.txt");
+    m_assets.loadFromFile(m_executableDir / "assets/assets.txt");
 
     // Create new menu scene, add it to scene map, and make it the current scene
     changeScene("MENU", std::make_shared<SceneStartMenu>(this));
