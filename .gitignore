@@ -11,6 +11,7 @@
 *.DS_Store
 *.ini
 
+/bin/
 /build/
 
 cmake_install.cmake
