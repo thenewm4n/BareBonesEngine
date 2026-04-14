@@ -3,8 +3,9 @@
 #include "ScenePlatformer.h"
 
 
-SceneStartMenu::SceneStartMenu(GameEngine* gameEngine) :
+SceneStartMenu::SceneStartMenu(GameEngine* gameEngine, const std::string& title) :
     Scene(gameEngine),
+    m_title(title)
     m_menuStrings(std::begin(GameEngine::LEVELS), std::end(GameEngine::LEVELS)),
     m_menuText(sf::Text(m_game->getAssets().getFont("Pixel"), "", 150))
 {

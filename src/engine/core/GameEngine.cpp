@@ -15,8 +15,10 @@
 
 // Public methods
 
-GameEngine::GameEngine(const std::filesystem::path& executableDir)
-    : m_executableDir(executableDir), m_assets(executableDir.parent_path() / "assets")
+GameEngine::GameEngine(const std::filesystem::path& executableDir, const std::string& title)
+    : m_executableDir(executableDir),
+    m_title(title),
+    m_assets(executableDir.parent_path() / "assets")
 {
     init();
 }
@@ -89,7 +91,7 @@ void GameEngine::init()
 
     // Create window using values from config.txt or current desktop configuration
     
-    m_window.create(sf::VideoMode({m_resolution.x, m_resolution.y}), GAME_TITLE, sf::Style::Default);       // TODO: change fullscreen according to config
+    m_window.create(sf::VideoMode({m_resolution.x, m_resolution.y}), m_title, sf::Style::Default);
     // m_window.create(sf::VideoMode::getDesktopMode(), GAME_TITLE, sf::Style::Default);                    // Creates window according to desktop resolution
     m_window.setFramerateLimit(m_framerateCap);
     m_aspectRatio = static_cast<float>(m_resolution.x) / static_cast<float>(m_resolution.y);
@@ -110,7 +112,7 @@ void GameEngine::init()
     m_assets.loadFromFile(m_executableDir / "assets/assets.txt");
 
     // Create new menu scene, add it to scene map, and make it the current scene
-    changeScene("MENU", std::make_shared<SceneStartMenu>(this));
+    changeScene("MENU", std::make_shared<SceneStartMenu>(this, m_title));
 }
 
 void GameEngine::update()

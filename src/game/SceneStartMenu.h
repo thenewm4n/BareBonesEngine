@@ -9,10 +9,10 @@
 class SceneStartMenu : public Scene
 {
 public:
-    SceneStartMenu(GameEngine* gameEngine);
+    SceneStartMenu(GameEngine* gameEngine, const std::string& title);
 
 private:
-    std::string m_title = GameEngine::GAME_TITLE;
+    std::string m_title;
     sf::Text m_menuText;
     std::vector<std::string> m_menuStrings;
     std::vector<std::string> m_levelFiles;
