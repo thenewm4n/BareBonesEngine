@@ -79,6 +79,10 @@ void ScenePlatformer::loadEntities(const std::filesystem::path& levelPath)
                 // Spawn player according to PlayerConfig values
                 spawnPlayer();
             }
+            else if (token == "GridSize")
+            {
+                lineStream >> m_gridCellSize;
+            }
             else
             {
                 std::string animationName;

@@ -32,7 +32,7 @@ void SceneStartMenu::init()
         }
     }
 
-    // TODO: add Play, Level Select, Settings and Exit menu strings;
+    // TODO: add Play, Level Select, Settings and Exit menu strings
     for (size_t i = 0; i < m_levels.size(); i++)
     {
         m_menuStrings.push_back(m_levels[i].name);

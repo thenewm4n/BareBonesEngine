@@ -14,6 +14,7 @@ Texture TexPipe mario/pipe.png
 Texture TexCloud mario/cloud.png
 Texture TexBush mario/bush.png
 Texture TexGround environment/ground.png
+Texture TexGroundMario mario/ground.png
 Texture TexBlock mario/block.png
 Texture TexPole mario/flagpole.png
 Texture TexPoleTop mario/flagpoletop.png
@@ -49,6 +50,7 @@ Animation Pipe TexPipe 1 1
 Animation Cloud TexCloud 1 1
 Animation Bush TexBush 1 1
 Animation Ground TexGround 1 1
+Animation GroundMario TexGroundMario 1 1
 Animation Block TexBlock 1 1
 Animation Pole TexPole 1 1
 Animation PoleTop TexPoleTop 1 1
