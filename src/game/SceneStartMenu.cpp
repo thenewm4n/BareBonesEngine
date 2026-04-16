@@ -2,25 +2,42 @@
 #include "SceneLevelEditor.h"
 #include "ScenePlatformer.h"
 
+#include <fstream>
+#include <sstream>
 
-SceneStartMenu::SceneStartMenu(GameEngine* gameEngine, const std::string& title) :
-    Scene(gameEngine),
-    m_title(title)
-    m_menuStrings(std::begin(GameEngine::LEVELS), std::end(GameEngine::LEVELS)),
+
+SceneStartMenu::SceneStartMenu(GameEngine* gameEngine)
+    : Scene(gameEngine),
+    m_title(m_game->getTitle()),
     m_menuText(sf::Text(m_game->getAssets().getFont("Pixel"), "", 150))
 {
-    // Dynamically initialise m_levelFiles according to GameEngine::LEVELS
-    for (std::string levelName : GameEngine::LEVELS)
-    {
-        std::transform(levelName.begin(), levelName.end(), levelName.begin(), ::tolower);
-        m_levelFiles.emplace_back("level_" + levelName + ".txt");
-    }
-
     init();
 }
 
 void SceneStartMenu::init()
 {
+    // Read level names
+    std::ifstream levelsTextFile(m_game->getExecutableDir() / "assets/levels/levels.txt");
+    std::string line;
+    std::string token;
+
+    while (std::getline(levelsTextFile, line))
+    {
+        std::istringstream lineStream(line);
+        
+        LevelData level;
+        if (lineStream >> level.name >> level.path)
+        {
+            m_levels.emplace_back(level);
+        }
+    }
+
+    // TODO: add Play, Level Select, Settings and Exit menu strings;
+    for (size_t i = 0; i < m_levels.size(); i++)
+    {
+        m_menuStrings.push_back(m_levels[i].name);
+    }
+
     registerAction(sf::Keyboard::Key::W, "UP");
     registerAction(sf::Keyboard::Key::S, "DOWN");
     registerAction(sf::Keyboard::Key::Enter, "SELECT");
@@ -30,7 +47,7 @@ void SceneStartMenu::init()
     m_menuText.setOutlineColor(sf::Color::Black);
     m_menuText.setOutlineThickness(1.5f);
 
-    sf::View view(sf::FloatRect({0.f, 0.f}, {1920.f, 1080.f}));     // View size is hardcoded, as to be consistent after window resizing
+    sf::View view(sf::FloatRect({ 0.0f, 0.0f }, {1920.0f, 1080.0f}));     // View size is hardcoded, as to be consistent after window resizing
     m_game->getWindow().setView(view);
 }
 
@@ -62,12 +79,11 @@ void SceneStartMenu::sPerformAction(const Action& action)
         }
         else if (actionName == "SELECT" || actionName == "EDIT_LEVEL")
         {
-            const std::string sceneName = "LEVEL_" + std::to_string(m_selectedMenuIndex);
             const std::filesystem::path levelPath =
-                m_game->getExecutableDir().parent_path() /
+                m_game->getExecutableDir() /
                 "assets" /
                 "levels" /
-                m_levelFiles[m_selectedMenuIndex];
+                m_levels[m_selectedMenuIndex].path;
 
             std::shared_ptr<Scene> levelScene;
             
@@ -76,7 +92,7 @@ void SceneStartMenu::sPerformAction(const Action& action)
             else                // If editing level
                 levelScene = std::make_shared<SceneLevelEditor>(m_game, levelPath);
             
-            m_game->changeScene(sceneName, levelScene);
+            m_game->changeScene(m_levels[m_selectedMenuIndex].name, levelScene);
         }
         else if (actionName == "QUIT")
         {

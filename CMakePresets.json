@@ -63,7 +63,7 @@
       },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-        "CMAKE_CXX_FLAGS_RELWITHDEBINFO": "/O2 /Ob1 /Zi"                // Undefines NDEBUG to keep assertions active
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO": "/O2 /Ob1 /Zi"
       }
     },
     {
@@ -84,7 +84,7 @@
       "inherits": "macos-base",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-        "CMAKE_CXX_FLAGS_RELWITHDEBINFO": "-O2 -g"                        // Undefines NDEBUG to keep assertions active                 
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO": "-O2 -g"
       }
     }
   ],

@@ -46,6 +46,8 @@ bool GameEngine::isRunning() { return m_running && m_window.isOpen(); }
 
 const std::filesystem::path& GameEngine::getExecutableDir() const { return m_executableDir; }
 
+const std::string& GameEngine::getTitle() const { return m_title; }
+
 sf::RenderWindow& GameEngine::getWindow() { return m_window; }
 
 sf::Vector2u GameEngine::getResolution() { return m_resolution; }
@@ -59,8 +61,8 @@ const Assets& GameEngine::getAssets() const { return m_assets; }
 
 void GameEngine::init()
 {
-    std::ifstream file(m_executableDir / "config/config.txt");
-    if (!file.is_open())
+    std::ifstream configFile(m_executableDir / "config/config.txt");
+    if (!configFile.is_open())
     {
         std::cerr << "GameEngine.cpp: Error opening config file." << std::endl;
         exit(-1);
@@ -69,24 +71,28 @@ void GameEngine::init()
     // Read config.txt
 
     std::string line;
-    std::string firstElement;
+    std::string token;
 
-    while (std::getline(file, line))
+    while (std::getline(configFile, line))
     {
         // Enables reading of tokens separated by whitespace
         std::istringstream lineStream(line);
 
         // If there is text on this line, parse line
-        if (lineStream >> firstElement)
+        if (lineStream >> token)
         {
-            if (firstElement == "Window")
+            if (token == "Window")
             {
                 lineStream >> m_resolution.x >> m_resolution.y >> m_framerateCap;
             }
         }
     }
 
-    file.close();
+    configFile.close();
+
+
+    // Load assets into Assets object
+    m_assets.loadFromFile(m_executableDir / "assets/assets.txt");
 
 
     // Create window using values from config.txt or current desktop configuration
@@ -108,11 +114,9 @@ void GameEngine::init()
     ImGui::GetStyle().ScaleAllSizes(2.5f);		// ImGui elements
     ImGui::GetIO().FontGlobalScale = 1.0f;		// ImGui text size
 
-    // Load assets into Assets object
-    m_assets.loadFromFile(m_executableDir / "assets/assets.txt");
 
     // Create new menu scene, add it to scene map, and make it the current scene
-    changeScene("MENU", std::make_shared<SceneStartMenu>(this, m_title));
+    changeScene("MENU", std::make_shared<SceneStartMenu>(this));
 }
 
 void GameEngine::update()

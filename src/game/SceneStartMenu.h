@@ -6,16 +6,24 @@
 
 #include <vector>
 
+
+struct LevelData
+{
+    std::string name;
+    std::string path;
+};
+
+
 class SceneStartMenu : public Scene
 {
 public:
-    SceneStartMenu(GameEngine* gameEngine, const std::string& title);
+    SceneStartMenu(GameEngine* gameEngine);
 
 private:
     std::string m_title;
+    std::vector<LevelData> m_levels;
     sf::Text m_menuText;
     std::vector<std::string> m_menuStrings;
-    std::vector<std::string> m_levelFiles;
     uint8_t m_selectedMenuIndex = 0;
 
     void init();

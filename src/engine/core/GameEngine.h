@@ -22,6 +22,7 @@ public:
 
     bool isRunning();
     const std::filesystem::path& getExecutableDir() const;
+    const std::string& getTitle() const;
     sf::RenderWindow& getWindow();
     sf::Vector2u getResolution();
     float getAspectRatio();
@@ -37,6 +38,7 @@ private:
     std::shared_ptr<Scene> getCurrentScene();
 
     std::string m_title;
+    std::vector<std::string> m_levelNames;
     bool m_running = true;
     std::filesystem::path m_executableDir;
     sf::RenderWindow m_window;
