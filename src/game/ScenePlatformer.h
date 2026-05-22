@@ -39,7 +39,7 @@ protected:
     bool m_drawBoundingBoxes = false;
     bool m_drawGrid = false;
     bool m_drawTextures = true;
-    bool m_drawGui = true;
+    bool m_drawGui = false;
 
     void init();
     void loadEntities(const std::filesystem::path& levelPath);

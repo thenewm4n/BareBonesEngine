@@ -6,8 +6,8 @@
 #include <sstream>
 
 
-SceneStartMenu::SceneStartMenu(GameEngine* gameEngine)
-    : Scene(gameEngine),
+SceneStartMenu::SceneStartMenu(GameEngine* gameEngine) :
+    Scene(gameEngine),
     m_title(m_game->getTitle()),
     m_menuText(sf::Text(m_game->getAssets().getFont("Pixel"), "", 150))
 {
@@ -16,7 +16,6 @@ SceneStartMenu::SceneStartMenu(GameEngine* gameEngine)
 
 void SceneStartMenu::init()
 {
-    // Read level names
     std::ifstream levelsTextFile(m_game->getExecutableDir() / "assets/levels/levels.txt");
     std::string line;
     std::string token;
@@ -32,17 +31,14 @@ void SceneStartMenu::init()
         }
     }
 
-    // TODO: add Play, Level Select, Settings and Exit menu strings
-    for (size_t i = 0; i < m_levels.size(); i++)
-    {
-        m_menuStrings.push_back(m_levels[i].name);
-    }
+    Menu mainMenu{ m_title, {"Level Select", "Exit"} };
+    m_menuStack.push(mainMenu);
 
     registerAction(sf::Keyboard::Key::W, "UP");
     registerAction(sf::Keyboard::Key::S, "DOWN");
     registerAction(sf::Keyboard::Key::Enter, "SELECT");
     registerAction(sf::Keyboard::Key::Grave, "EDIT_LEVEL");
-    registerAction(sf::Keyboard::Key::Escape, "QUIT");
+    registerAction(sf::Keyboard::Key::Escape, "ESCAPE");
 
     m_menuText.setOutlineColor(sf::Color::Black);
     m_menuText.setOutlineThickness(1.5f);
@@ -58,45 +54,87 @@ void SceneStartMenu::update()
 
 void SceneStartMenu::sPerformAction(const Action& action)
 {
+    Menu& currentMenu = m_menuStack.top();
     const std::string& actionName = action.getName();
 
-    // Implement scene-specific consequences for Actions
     if (action.getType() == "START")
     {
         if (actionName == "UP")
         {
-            if (m_selectedMenuIndex > 0)
+            if (currentMenu.selectedIndex > 0)
             {
-                m_selectedMenuIndex--;
+                currentMenu.selectedIndex--;
             }
         }
         else if (actionName == "DOWN")
         {
-            if (m_selectedMenuIndex < m_menuStrings.size() - 1)
+            if (currentMenu.selectedIndex < currentMenu.options.size() - 1)
             {
-                m_selectedMenuIndex++;
+                currentMenu.selectedIndex++;
             }
         }
         else if (actionName == "SELECT" || actionName == "EDIT_LEVEL")
         {
-            const std::filesystem::path levelPath =
-                m_game->getExecutableDir() /
-                "assets" /
-                "levels" /
-                m_levels[m_selectedMenuIndex].path;
+            const std::string& selectedString = currentMenu.options[currentMenu.selectedIndex];
 
-            std::shared_ptr<Scene> levelScene;
-            
-            if (actionName == "SELECT")
-                levelScene = std::make_shared<ScenePlatformer>(m_game, levelPath);
-            else                // If editing level
-                levelScene = std::make_shared<SceneLevelEditor>(m_game, levelPath);
-            
-            m_game->changeScene(m_levels[m_selectedMenuIndex].name, levelScene);
+            // Menu-agnostic options
+            if (selectedString == "Back")
+            {
+                m_menuStack.pop();
+                return;
+            }
+            else if (selectedString == "Exit")
+            {
+                m_game->quit();
+                return;
+            }
+
+            // Menu-specific options
+            if (currentMenu.title == m_title)
+            {
+                if (selectedString == "Level Select")
+                {
+                    std::vector<std::string> levelStrings;
+                    for (size_t i = 0; i < m_levels.size(); i++)
+                    {
+                        levelStrings.push_back(m_levels[i].name);
+                    }
+                    levelStrings.push_back("Back");
+
+                    Menu levelSelectMenu("Level Select", levelStrings);
+                    m_menuStack.push(levelSelectMenu);
+                }
+            }
+            else if (currentMenu.title == "Level Select")
+            {
+                const std::filesystem::path levelPath =
+                    m_game->getExecutableDir() /
+                    "assets" /
+                    "levels" /
+                    m_levels[currentMenu.selectedIndex].path;
+
+                std::shared_ptr<Scene> levelScene;
+
+                if (actionName == "SELECT")
+                    levelScene = std::make_shared<ScenePlatformer>(m_game, levelPath);
+                else                // If editing level
+                    levelScene = std::make_shared<SceneLevelEditor>(m_game, levelPath);
+
+                m_game->changeScene(m_levels[currentMenu.selectedIndex].name, levelScene);
+            }
         }
-        else if (actionName == "QUIT")
+        else if (actionName == "ESCAPE")
         {
-            m_game->quit();
+            if (currentMenu.title == m_title)
+            {
+                m_game->quit();
+                return;
+            }
+            else
+            {
+                m_menuStack.pop();
+                return;
+            }
         }
     }
 }
@@ -105,13 +143,14 @@ void SceneStartMenu::sRender()
 {
     sf::RenderWindow& window = m_game->getWindow();
     float midScreenX = window.getView().getSize().x / 2.0f;
-    float distanceBetweenStrings = window.getView().getSize().y / static_cast<float>(m_menuStrings.size() + 2);
+    const Menu& currentMenu = m_menuStack.top();
+    float distanceBetweenStrings = window.getView().getSize().y / static_cast<float>(currentMenu.options.size() + 2);
 
     // Clear screen with the background colour
     window.clear(sf::Color(244, 214, 204));
 
     // Set title text properties
-    m_menuText.setString(m_title);
+    m_menuText.setString(currentMenu.title);
     m_menuText.setCharacterSize(150);
     m_menuText.setFillColor(sf::Color(244, 180, 96));
 
@@ -127,16 +166,16 @@ void SceneStartMenu::sRender()
     m_menuText.setCharacterSize(100);
 
     // Draw selectable menu text
-    for (size_t i = 0; i < m_menuStrings.size(); i++)
+    for (size_t i = 0; i < currentMenu.options.size(); i++)
     {
-        m_menuText.setString(m_menuStrings[i]);
+        m_menuText.setString(currentMenu.options[i]);
 
         // Set origin according to new string, then set position with new origin
         textRect = m_menuText.getLocalBounds();
         m_menuText.setOrigin({textRect.position.x + textRect.size.x / 2.0f, textRect.position.y + textRect.size.y / 2.0f});
         m_menuText.setPosition({midScreenX, (i + 2) * distanceBetweenStrings});
 
-        if (i == m_selectedMenuIndex)
+        if (i == currentMenu.selectedIndex)
         {
             m_menuText.setFillColor(sf::Color(74, 88, 89));
         }

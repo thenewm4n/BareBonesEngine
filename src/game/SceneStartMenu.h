@@ -4,8 +4,19 @@
 #include "engine/scene/Scene.h"
 #include "engine/systems/Action.h"
 
+#include <stack>
 #include <vector>
 
+
+struct Menu
+{
+    std::string title;
+    std::vector<std::string> options;
+    uint8_t selectedIndex;
+
+    Menu(const std::string& t, const std::vector<std::string>& opts)
+        : title(t), options(opts), selectedIndex(0) {}
+};
 
 struct LevelData
 {
@@ -22,9 +33,8 @@ public:
 private:
     std::string m_title;
     std::vector<LevelData> m_levels;
+    std::stack<Menu> m_menuStack;
     sf::Text m_menuText;
-    std::vector<std::string> m_menuStrings;
-    uint8_t m_selectedMenuIndex = 0;
 
     void init();
     void update() override;

@@ -5,7 +5,7 @@
 
 int main(int argc, char* argv[])
 {
-    const std::string& gameName = "BareBonesShooter";
+    const std::string& gameName = "BareBones Shooter";
 
     std::filesystem::path executableDir = std::filesystem::absolute(argv[0]).parent_path(); // Necessary to make finding assets and config files is working directory-agnostic
     executableDir = std::filesystem::canonical(executableDir);                              // Resolves . and .. cleanly

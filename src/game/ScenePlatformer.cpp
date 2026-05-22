@@ -16,8 +16,10 @@
 #include <sstream>
 
 
-ScenePlatformer::ScenePlatformer(GameEngine* game, const std::filesystem::path& levelPath)
-    : Scene(game), m_levelPath(levelPath), m_gridText(sf::Text(m_game->getAssets().getFont("Tech"), "", 50))
+ScenePlatformer::ScenePlatformer(GameEngine* game, const std::filesystem::path& levelPath) :
+    Scene(game),
+    m_levelPath(levelPath),
+    m_gridText(sf::Text(m_game->getAssets().getFont("Tech"), "", 50))
 {
     init();
     loadEntities(m_levelPath);
