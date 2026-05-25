@@ -23,6 +23,10 @@ SceneLevelEditor::SceneLevelEditor(GameEngine* game, const std::filesystem::path
 
 void SceneLevelEditor::init()
 {
+    registerAction(sf::Keyboard::Key::W,        "UP");
+    registerAction(sf::Keyboard::Key::A,        "LEFT");
+    registerAction(sf::Keyboard::Key::S,        "DOWN");
+    registerAction(sf::Keyboard::Key::D,        "RIGHT");
     registerAction(sf::Keyboard::Key::Escape,   "QUIT");
     registerAction(sf::Keyboard::Key::T,        "TOGGLE_TEXTURES");
     registerAction(sf::Keyboard::Key::B,        "TOGGLE_BBOXES");
@@ -200,7 +204,8 @@ void SceneLevelEditor::sRender()
     auto playerIterator = std::find_if(entities.begin(), entities.end(), [](std::shared_ptr<Entity> e)
         {
             return e->getTag() == "Player";
-        });
+        }
+    );
 
     // If player exists, move to end of entity vector, so only a single pass needed
     if (playerIterator != entities.end())

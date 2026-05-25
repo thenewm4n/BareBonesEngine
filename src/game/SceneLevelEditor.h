@@ -19,15 +19,6 @@ public:
     SceneLevelEditor(GameEngine* game, const std::filesystem::path& levelPath);
 
 private:
-    std::unordered_map<PlayerState, std::string> m_stateToAnimationMap =
-    {
-        {PlayerState::Idle, "ArcherIdle"},
-        {PlayerState::Running, "ArcherRun"},
-        {PlayerState::Jumping, "ArcherJump"},
-        {PlayerState::Falling, "ArcherFall"},
-        {PlayerState::Shooting, "ArcherShoot"}
-    };
-
     std::shared_ptr<Entity> m_selectedEntity;
     std::shared_ptr<Entity> m_draggedEntity;
     const std::filesystem::path& m_levelPath;
@@ -36,7 +27,7 @@ private:
     PlayerConfig m_playerConfig;
     sf::Clock m_clock;
 
-    sf::Vector2f m_viewSize{ 1152.0f, 648.0f };             // Was 1536.0f, 864.0f
+    sf::Vector2f m_viewSize{ 1152.0f, 648.0f };
     const int m_gridCellSize = 45;                          // Was 64x64
     sf::Text m_gridText;
     bool m_drawBoundingBoxes = false;
@@ -50,7 +41,6 @@ private:
     void endScene() override;
     void saveToFile();
 
-    // System methods
     void sPerformAction(const Action& action) override;
     void sRender() override;
     void sGUI();
