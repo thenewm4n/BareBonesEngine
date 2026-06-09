@@ -244,6 +244,36 @@ void SceneLevelEditor::sRender()
     window.display();
 }
 
+void SceneLevelEditor::sAnimation()
+{
+    for (auto& entity : m_entityManager.getEntities())
+    {
+        // If entity has Animation component, either update it, or remove if has ended
+        if (!entity->has<CAnimation>())
+        {
+            continue;
+        }
+        
+        auto& animationComponent = entity->get<CAnimation>();
+        bool hasEnded = animationComponent.update();
+
+        if (hasEnded)
+        {
+            endAnimation(entity);
+        }
+
+        if (entity == m_player)
+        {
+            // If player state has changed, change animation 
+            const CState& stateComponent = m_player->get<CState>();
+            if (stateComponent.currentState != stateComponent.previousState)
+            {
+                changePlayerAnimation();
+            }       
+        }
+    }
+}
+
 void SceneLevelEditor::sGUI()
 {
     if (!m_drawGui)
@@ -445,6 +475,29 @@ void SceneLevelEditor::spawnPlayer()
 
     // Adding CTransform must follow adding CAnimation because gridToMidPixel uses CAnimation
     m_player->add<CTransform>(gridToMidPixel(Vec2f(m_playerConfig.X, m_playerConfig.Y), m_player));
+}
+
+void SceneLevelEditor::endAnimation(std::shared_ptr<Entity> entity)
+{
+    if (entity == m_player)
+    {
+        m_player->get<CState>().currentState = PlayerState::Idle;
+    }
+    else
+    {
+        entity->remove<CAnimation>();
+    }
+}
+
+void SceneLevelEditor::changePlayerAnimation()
+{
+    CState& stateComponent = m_player->get<CState>();
+
+    const std::string& animationName = m_stateToAnimationMap[stateComponent.currentState];
+    bool toRepeat = stateComponent.currentState != PlayerState::Shooting;
+    m_player->add<CAnimation>(m_game->getAssets().getAnimation(animationName), toRepeat);
+
+    stateComponent.previousState = stateComponent.currentState;
 }
 
 // Used to position of entity so bottom left of sprite is at bottom left of the cell

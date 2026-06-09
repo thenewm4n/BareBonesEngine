@@ -836,27 +836,24 @@ void ScenePlatformer::spawnTempAnimation(Vec2f position, std::string animationNa
 
 void ScenePlatformer::handlePlayerCollision(std::shared_ptr<Entity> object)
 {
-    // Resolve collision and determine if X or Y direction
     bool isXDirection = Physics::resolveCollision(m_player, object);
 
-    // If collision in y direction, set velocity to 0 and handle according to direction
     if (!isXDirection)
     {
-        // Whether collision from above or below, set y velocity to 0
         m_player->get<CTransform>().velocity.y = 0.0f;
-
-        // If player's previous position was less (i.e. closer to top of screen), collision from above
         bool isFromAbove = m_player->get<CTransform>().previousPosition.y > object->get<CTransform>().previousPosition.y;
 
-        // If collision from above, player can now jump
         if (isFromAbove)
         {
             m_player->get<CInput>().canJump = true;
         }
-        // If from below, destroy block/change animation accordingly
         else
         {
-            destroySolid(object);
+            std::string animationName = object->get<CAnimation>().animation.getName();
+            if (animationName == "Brick" || animationName == "QMark")
+            {
+                destroySolid(object);
+            }
         }
     }
 }
@@ -871,13 +868,11 @@ void ScenePlatformer::destroySolid(std::shared_ptr<Entity> solid)
 {
     std::string animationName = solid->get<CAnimation>().animation.getName();
 
-    // If brick, destroy and spawn explosion animation
     if (animationName == "Brick")
     {
         solid->destroy();
         spawnTempAnimation(solid->get<CTransform>().position, "Explosion");
     }
-    // If question mark, change animation and spawn coin
     else if (animationName == "QMark")
     {
         solid->add<CAnimation>(m_game->getAssets().getAnimation("QMarkDead"), true);

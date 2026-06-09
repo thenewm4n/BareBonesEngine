@@ -18,6 +18,16 @@ class SceneLevelEditor : public Scene
 public:
     SceneLevelEditor(GameEngine* game, const std::filesystem::path& levelPath);
 
+protected:
+    std::unordered_map<PlayerState, std::string> m_stateToAnimationMap =
+    {
+        {PlayerState::Idle, "ArcherIdle"},
+        {PlayerState::Running, "ArcherRun"},
+        {PlayerState::Jumping, "ArcherJump"},
+        {PlayerState::Falling, "ArcherFall"},
+        {PlayerState::Shooting, "ArcherShoot"}
+    };
+
 private:
     std::shared_ptr<Entity> m_selectedEntity;
     std::shared_ptr<Entity> m_draggedEntity;
@@ -43,10 +53,13 @@ private:
 
     void sPerformAction(const Action& action) override;
     void sRender() override;
+    void sAnimation();
     void sGUI();
     void sParallax(float viewDeltaX);
 
     void spawnPlayer();
+    void endAnimation(std::shared_ptr<Entity> entity);
+    void changePlayerAnimation();
 
     // Render helper methods
     Vec2f gridToMidPixel(const Vec2f& gridPosition, std::shared_ptr<Entity> entity);
